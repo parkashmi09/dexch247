@@ -1,0 +1,284 @@
+.betTableContainer {
+  width: 100%;
+
+  margin: 0 auto;
+  background-color: var(--color-bg-alt);
+  font-family: Arial, sans-serif;
+}
+
+/* Top Section */
+.topSection {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.playerColumn {
+  flex: 1;
+  display: flex;
+
+}
+
+.playerLabel {
+  padding: 12px;
+  background-color: var(--color-bg-alt);
+  font-weight: bold;
+  color: var(--color-text-main);
+  border: 1px solid #e0e0e0;
+  width: 100%;
+}
+
+.oddsContainer {
+  display: flex;
+}
+
+.backOdds,
+.layOdds {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  width: 5.5rem;
+}
+
+.backOdds {
+  background-color: var(--bg-back);
+  /* Light blue */
+}
+
+.layOdds {
+  background-color: var(--bg-lay);
+  /* Light pink */
+}
+
+/* Casino Table Box */
+.casinoTableBox {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-right: 4px;
+  margin-top: 1rem;
+}
+
+/* Casino Table Left/Right Box */
+.casinoTableLeftBox,
+.casinoTableRightBox {
+  width: calc(50% - 2px);
+  border-left: 1px solid var(--table-border, #e0e0e0);
+  border-right: 1px solid var(--table-border, #e0e0e0);
+  border-top: 1px solid var(--table-border, #e0e0e0);
+  background-color: var(--bg-table-row, #ffffff);
+}
+
+.casinoTableBoxDivider {
+  width: 4px;
+}
+
+/* Mobile Title */
+.mobileTitle {
+  display: none;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .mobileTitle {
+    display: block;
+  }
+}
+
+/* Seven Up Down Box */
+.sevenUpDownBox {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  border: 2px solid var(--bg-back);
+}
+
+/* Up Box (for DOWN bet) */
+.upBox {
+  width: 50%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 40px;
+  position: relative;
+  justify-content: flex-end;
+}
+
+/* Down Box (for UP bet) */
+.downBox {
+  width: 50%;
+  text-align: right;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  padding-right: 10px;
+  padding-left: 40px;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.upDownBook {
+  /* Empty div for spacing */
+}
+
+.textEnd {
+  text-align: end;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.textStart {
+  text-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.upDownOdds {
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.upDownOdds:hover {
+  opacity: 0.8;
+}
+
+/* Seven Box */
+.sevenBox {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+}
+
+.sevenBox img {
+  height: 70px;
+}
+
+/* Suspended Box */
+.suspendedBox {
+  position: relative;
+  pointer-events: none;
+}
+
+.suspendedBox::before {
+  content: "";
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  pointer-events: none;
+}
+
+.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.suspendedBox .upDownOdds {
+  position: relative;
+  z-index: 0;
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Exposure */
+.exposure {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  margin-top: -8px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Exposure for DOWN bets (left side) */
+.exposureLeft {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+  align-self: flex-start;
+}
+
+/* Exposure for UP bets (right side) */
+.exposureRight {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+  align-self: flex-end;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .topSection {
+    flex-direction: column;
+  }
+
+  .casinoTableBox {
+    flex-direction: column;
+  }
+
+  .casinoTableLeftBox,
+  .casinoTableRightBox {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .casinoTableBoxDivider {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .playerLabel,
+  .backOdds,
+  .layOdds {
+    padding: 8px;
+    font-size: 16px;
+  }
+
+  .upDownOdds {
+    font-size: 16px;
+  }
+
+  .sevenBox img {
+    height: 50px;
+  }
+}

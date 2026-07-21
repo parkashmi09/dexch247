@@ -1,0 +1,466 @@
+.betTable {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  margin: 0 auto;
+  font-family: "Roboto", sans-serif;
+  background-color: var(--color-bg-row);
+}
+
+.section {
+  margin-bottom: 2px;
+}
+
+.header {
+  background-color: var(--color-secondary);
+  color: var(--color-text-inverse);
+  padding: 4px;
+  font-weight: bold;
+  font-size: 15px;
+  text-transform: uppercase;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.subHeader {
+  background-color: #fff;
+  /* padding: 4px 10px; */
+  font-size: 12px;
+  color: #333;
+  border-bottom: 1px solid #d7d7d7;
+}
+
+.optionWrapper {
+  background-color: #fff;
+  border-bottom: 1px solid #d7d7d7;
+}
+
+.optionRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 0.01em solid var(--table-border, #c7c8ca);
+  position: relative;
+  /* min-height: 40px; */
+}
+
+.label {
+  flex: 1;
+  color: var(--color-text-main);
+  padding-right: 10px;
+}
+
+.betOptions {
+  display: flex;
+  gap: 2px;
+}
+
+.betBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+
+  min-width: 60px;
+  height: 40px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.back {
+  background-color: var(--bg-back) !important;
+  color: black;
+}
+
+.lay {
+  background-color: var(--bg-lay);
+  color: black;
+}
+
+.no {
+  background-color: var(--bg-danger);
+  color: black;
+}
+
+.yes {
+  background-color: var(--bg-back);
+  color: black;
+}
+
+.suspended {
+  /* background-color: #333 !important;
+  color: white; */
+  position: relative;
+  cursor: not-allowed !important;
+}
+
+.suspendedRow {
+  position: relative;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.suspendedRow>* {
+  pointer-events: none;
+}
+
+.suspendedRow::after {
+  content: attr(data-title);
+  background-color: var(--color-overlay-lock);
+  color: #ff0000;
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: uppercase;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 100;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .suspendedRow::after {
+    font-size: 14px;
+  }
+}
+
+
+/* Bookmaker suspended row - covers only back and lay boxes area (not the label) */
+.bookmakerSuspendedRow::after {
+  left: auto;
+  right: 0;
+  width: 120px;
+  /* Match betOptionsWrapper width to cover Back and Lay boxes */
+}
+
+@media (max-width: 768px) {
+  .bookmakerSuspendedRow::after {
+    width: 159px;
+    /* Match betOptionsWrapper width to cover Back and Lay boxes */
+  }
+}
+
+/* For Fancy and Tie - ensure overlay covers full width including min/max limits */
+.suspendedRow:not(.bookmakerSuspendedRow):not(.fancy1SuspendedRow)::after {
+  width: 221px;
+  left: auto;
+  right: 0;
+}
+
+@media (max-width: 768px) {
+  .suspendedRow:not(.bookmakerSuspendedRow):not(.fancy1SuspendedRow)::after {
+    width: 221px;
+  }
+}
+
+@media (max-width: 768px) {
+  .suspendedRow:not(.bookmakerSuspendedRow):not(.fancy1SuspendedRow)::after {
+    width: 160px;
+  }
+}
+
+/* @media (max-width: 768px) {
+  .fancy1SuspendedRow::after {
+    width: 37.5%;
+  }
+} */
+/* Fancy1 suspended row - covers full width of each grid item including min/max limits */
+.fancy1SuspendedRow::after {
+  width: 54.5%;
+  left: auto;
+  right: 0;
+}
+
+@media (max-width: 768px) {
+  .fancy1SuspendedRow::after {
+    width: 160px;
+  }
+}
+
+
+
+.odds {
+  font-size: 14px;
+}
+
+.volume {
+  font-size: 10px;
+  color: black;
+  opacity: 0.8;
+}
+
+.betLimits {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 10px;
+  color: var(--color-text-info);
+  line-height: 1.2;
+  font-weight: bold;
+  width: 100px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.fancy1Wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  background-color: #fff;
+}
+
+.fancy1Wrapper .optionRow {
+  background-color: #f7f7f7;
+  /* padding: 0 5px; */
+}
+
+@media (max-width: 768px) {
+  .header {
+    font-size: 12px;
+    padding: 5px 8px;
+  }
+
+  .subHeader {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  .optionRow {
+    font-size: 12px;
+    /* padding: 5px 8px; */
+  }
+
+  .betBox {
+    padding: 5px 10px;
+    min-width: 50px;
+    height: 35px;
+  }
+
+  .odds {
+    font-size: 12px;
+  }
+
+  .volume {
+    font-size: 9px;
+  }
+
+  .betLimits {
+    font-size: 9px;
+  }
+
+  .fancy1Wrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+
+  .subHeader {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+
+  .optionRow {
+    font-size: 10px;
+    /* padding: 4px 6px; */
+  }
+
+  .betBox {
+    padding: 4px 8px;
+    min-width: 79px;
+    height: 30px;
+  }
+
+  .odds {
+    font-size: 10px;
+  }
+
+  .volume {
+    font-size: 8px;
+  }
+
+  .betLimits {
+    font-size: 8px;
+  }
+}
+
+.tableHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  /* padding: 0 10px; */
+  border-bottom: 0.01em solid var(--table-border, #c7c8ca);
+  font-size: 12px;
+  font-weight: bold;
+  justify-content: space-between;
+}
+
+.headerLabel {
+  flex: 1;
+  min-width: 0;
+  /* padding-right: 10px; */
+}
+
+.headerMinMax {
+  font-size: 12px;
+  color: var(--color-text-info);
+  font-weight: bold;
+}
+
+.headerOptions {
+  display: flex;
+  gap: 2px;
+  width: 122px;
+  /* Match betOptions width */
+  justify-content: center;
+}
+
+.bookmakerHeader .headerOptions {
+  margin-left: auto;
+}
+
+.headerCell {
+  width: 60px;
+  text-align: center;
+  padding: 4px 0;
+  color: black;
+}
+
+.backHeader {
+  background-color: var(--bg-back);
+}
+
+.layHeader {
+  background-color: var(--bg-lay);
+}
+
+.noHeader {
+  background-color: var(--bg-lay);
+  /* Pink for No */
+}
+
+.yesHeader {
+  background-color: var(--bg-back);
+  /* Blue for Yes */
+}
+
+.headerLimits {
+  width: 100px;
+  /* Match betLimits width for alignment */
+  flex-shrink: 0;
+}
+
+.betOptionsWrapper {
+  width: 122px;
+  display: flex;
+  justify-content: center;
+}
+
+.betOptions {
+  display: flex;
+  gap: 2px;
+}
+
+.suspendedBox {
+  width: 100%;
+  /* background-color: #333; */
+  color: #ff4040;
+  font-weight: bold;
+  text-align: center;
+  /* padding: 10px 0; */
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.fancy1HeaderRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  background-color: #fff;
+  border-bottom: 0.01em solid var(--table-border, #c7c8ca);
+}
+
+.fancy1HeaderRow .tableHeader {
+  border-bottom: none;
+  /* padding: 0 5px; */
+}
+
+.fancy1Wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  background-color: #fff;
+}
+
+@media (max-width: 768px) {
+
+  .headerOptions,
+  .betOptionsWrapper {
+    width: 102px;
+  }
+
+  .headerCell {
+    width: 50px;
+  }
+
+  .fancy1HeaderRow,
+  .fancy1Wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .fancy1HeaderRow>div:nth-child(2) {
+    display: none;
+  }
+
+  .headerLimits {
+    display: none;
+    /* Hide limits header space on mobile if needed */
+  }
+
+  .betLimits {
+    display: none;
+    /* Hide per-row limits on mobile */
+  }
+}
+
+@media (max-width: 480px) {
+
+  .headerOptions,
+  .betOptionsWrapper {
+    width: 160px;
+  }
+
+  .headerCell {
+    width: 80px;
+  }
+}
+
+/* Bookmaker specific styles */
+@media only screen and (min-width: 1400px) and (max-width: 1599px) {
+  .section:first-child .headerLabel {
+    width: calc(100% - 120px);
+  }
+}

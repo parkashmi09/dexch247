@@ -1,0 +1,275 @@
+/* Deposit Modal Styles */
+
+.modal-dialog.modal-md {
+  max-width: 550px;
+  margin: 5vh auto 0;
+}
+
+@media (min-width: 576px) {
+  .modal-dialog.modal-md {
+    max-width: 550px;
+    margin: 5vh auto 0;
+  }
+  
+  .modal-dialog-scrollable {
+    max-height: calc(100% - 3.5rem);
+  }
+}
+
+.modal-dialog-scrollable .modal-content {
+  max-height: calc(100vh - 3.5rem);
+  overflow: hidden;
+}
+
+@media (min-width: 576px) {
+  .modal-dialog-scrollable .modal-content {
+    max-height: calc(100vh - 1rem);
+  }
+}
+
+.modal-content {
+  padding: 0 1rem;
+  border: none;
+  font-family: var(--font-primary);
+}
+
+.modal-header {
+  border-bottom: none;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: calc(0.3rem - 1px);
+  border-top-right-radius: calc(0.3rem - 1px);
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #1e1e1e;
+  font-family: var(--font-primary);
+  margin: 0;
+}
+
+.modal-header .close {
+  background: var(--bg-primary);
+  opacity: 1;
+  color: #fff;
+  border-radius: 50%;
+  padding: 0;
+  margin: -2px -1rem -1rem auto;
+  width: 35px;
+  height: 35px;
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-header .close:hover {
+  opacity: 0.9;
+  background: var(--bg-primary);
+}
+
+.modal-header .close.text-white {
+  color: #fff !important;
+}
+
+.modal-header .close:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-body .form-group label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-primary);
+  font-size: 14px;
+}
+
+.modal-body .form-control {
+  display: block;
+  width: 100%;
+  height: calc(1.5em + 0.94rem + 2px);
+  padding: 0.47rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  font-family: var(--font-primary);
+}
+
+/* Remove number input spinner arrows */
+.modal-body input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+  margin: 0;
+  pointer-events: auto;
+  user-select: text;
+}
+
+.modal-body input[type="number"]::-webkit-outer-spin-button,
+.modal-body input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.modal-body .form-control.txt-right {
+  text-align: right;
+}
+
+.modal-body .form-control[readonly],
+.modal-body .form-control[readonly="readonly"] {
+  background-color: #ddd;;
+  cursor: not-allowed;
+  border-radius: 0rem;
+  opacity: 0.8;
+  border-color: #000000;
+}
+
+.modal-body .form-control[readonly]:focus,
+.modal-body .form-control[readonly="readonly"]:focus {
+  background-color: #ddd;;
+  border-color: #000000;
+  border-radius: 0rem;
+  outline: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.modal-body .form-control:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.modal-body textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Form validation styles */
+.modal-body .form-control.is-invalid,
+.modal-body .was-validated .form-control:invalid {
+  border-color: #f46a6a;
+  padding-right: calc(1.5em + 0.94rem);
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23f46a6a' viewBox='-2 -2 7 7'%3E%3Cpath stroke='%23f46a6a' d='M0 0l3 3m0-3L0 3'/%3E%3Ccircle r='.5'/%3E%3Ccircle cx='3' r='.5'/%3E%3Ccircle cy='3' r='.5'/%3E%3Ccircle cx='3' cy='3' r='.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.235rem) center;
+  background-size: calc(0.75em + 0.47rem) calc(0.75em + 0.47rem);
+}
+
+.modal-body .form-control.is-invalid:focus,
+.modal-body .was-validated .form-control:invalid:focus {
+  border-color: #f46a6a;
+  outline: none;
+  box-shadow: none;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+}
+
+/* Button styles in modal */
+.modal-body .btn {
+  font-family: var(--font-primary);
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.25rem;
+}
+
+.modal-body .btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.modal-body .btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: #fff;
+}
+
+.modal-body .btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+  color: #fff;
+}
+
+.modal-body .btn-primary {
+  background-color: var(--bg-primary);
+  border-color: var(--bg-primary);
+  color: #fff;
+}
+
+.modal-body .btn-primary:hover {
+  background-color: var(--bg-primary);
+  border-color: var(--bg-primary);
+  opacity: 0.9;
+  color: #fff;
+}
+
+.modal-body .btn-back {
+  background-color: var(--bg-secondary);
+  border-color: var(--bg-secondary);
+  color: #fff;
+  margin-right: 0.5rem;
+}
+
+.modal-body .btn-back:hover {
+  background-color: var(--bg-secondary70);
+  border-color: var(--bg-secondary70);
+  color: #fff;
+}
+
+/* Form group feedback */
+.form-group-feedback {
+  position: relative;
+}
+
+.form-group-feedback-right {
+  position: relative;
+}
+
+/* Col form label */
+.col-form-label {
+  font-weight: 500;
+  color: #495057;
+  font-family: var(--font-primary);
+  font-size: 14px;
+}
+
+/* Close button */
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  opacity: 0.5;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+.btn-close:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Gap utility for flex containers */
+.gap-2 {
+  gap: 0.5rem;
+}

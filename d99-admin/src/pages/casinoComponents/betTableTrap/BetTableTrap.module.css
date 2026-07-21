@@ -1,0 +1,433 @@
+/* Main Container */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Roboto Condensed', sans-serif;
+  /* Condensed often looks closer to gambling UIs */
+  background-color: var(--color-bg-primary);
+  border: 1px solid #dcdcdc;
+}
+
+/* Top Row: Player A / Player B */
+.topRow {
+  display: flex;
+  width: 100%;
+  border-bottom: 2px solid #ccc;
+}
+
+.playerBlock {
+  flex: 1;
+  /* 50% width on desktop */
+  display: flex;
+  border-right: 1px solid #ccc;
+}
+
+.playerBlockRight {
+  border-right: none;
+}
+
+.playerLabel {
+  flex: 1;
+  background-color: var(--color-bg-alt);
+  padding: 8px 12px;
+  font-weight: 700;
+  color: var(--color-text-main);
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  /* Slightly smaller font */
+}
+
+.oddsContainer {
+  display: flex;
+  width: 140px;
+  /* Fixed width for odds part, or percentage if preferred */
+  min-width: 120px;
+}
+
+/* Bottom Row: 7/High/Low & Cards/Odds */
+.bottomRow {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Seven Section (Left Bottom) */
+.sevenSection {
+  flex: 1;
+  /* 50% width */
+  border-right: 1px solid #ccc;
+  padding: 5px;
+  background-color: var(--color-bg-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sevenContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 450px;
+  position: relative;
+  border: 1px solid var(--bg-back);
+  margin: 5px;
+  /* Reduced margin */
+  height: 48px;
+  /* Reduced height from 60px */
+  background: var(--color-bg-alt);
+}
+
+.sevenUpDownBox {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  border: 2px solid var(--bg-back);
+  height: 50px;
+}
+
+.upBox {
+  width: 50%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 40px;
+  position: relative;
+  justify-content: flex-end;
+}
+
+.downBox {
+  width: 50%;
+  text-align: right;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  padding-right: 10px;
+  padding-left: 40px;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.upDownBook {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.textEnd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+}
+
+.textStart {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+}
+
+.upDownOdds {
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.upDownOdds:hover {
+  opacity: 0.8;
+}
+
+.sevenBox {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+}
+
+.sevenBox img {
+  height: 70px;
+}
+
+.suspendedBox {
+  position: relative;
+  pointer-events: none;
+}
+
+.suspendedBox::before {
+  content: "";
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  pointer-events: none;
+}
+
+.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.suspendedBox .upDownOdds {
+  position: relative;
+  z-index: 0;
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.exposure {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.exposureLeft {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.exposureRight {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.lowHighBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  height: 100%;
+}
+
+.lowHighBox:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.lhValue {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-text-main);
+}
+
+.lhLabel {
+  font-size: 0.75rem;
+  color: #555;
+  text-transform: uppercase;
+}
+
+.sevenIconContainer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+}
+
+.sevenCircle {
+  width: 46px;
+  /* Reduced from 58px */
+  height: 46px;
+  background-color: #ffc107;
+  border-radius: 50%;
+  border: 2px solid white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sevenText {
+  color: #8b0000;
+  font-size: 1.8rem;
+  /* Reduced from 2.2rem */
+  font-weight: 900;
+  margin-top: -2px;
+}
+
+/* Cards Section (Right Bottom) */
+.cardsSection {
+  flex: 1;
+  /* 50% width */
+  display: flex;
+  background-color: var(--color-bg-alt);
+}
+
+.cardsDisplay {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 10px;
+  background-color: var(--color-bg-alt);
+}
+
+.cardImg {
+  width: auto;
+  height: 40px;
+  /* Reduced from 48px */
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  object-fit: contain;
+  background: white;
+}
+
+/* Reuse odds container styles for cards section right side */
+.cardsSection .oddsContainer {
+  /* Inherits width from above */
+  background: var(--color-bg-primary);
+  /* Ensure odds stand out */
+}
+
+/* Bet Boxes & Lock */
+.betBox {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.blueValue {
+  background-color: var(--bg-back);
+  color: #1a1a1a;
+  border-left: 1px solid #ccc;
+}
+
+.pinkValue {
+  background-color: var(--bg-lay);
+  color: #1a1a1a;
+  border-left: 1px solid #ccc;
+}
+
+.lockBox {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-overlay-lock);
+  /* Dark grey */
+  color: #a0aec0;
+  /* Lighter lock icon? Or white */
+  border-left: 1px solid #555;
+}
+
+/* Info Bar */
+.infoBar {
+  background-color: var(--color-bg-primary);
+  color: #0d9488;
+  /* Match the teal color in screenshot "IT'S EITHER..." likely teal/green */
+  padding: 8px;
+  text-align: right;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .topRow {
+    flex-direction: column;
+  }
+
+  .playerBlock {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .bottomRow {
+    flex-direction: column;
+  }
+
+  .sevenSection {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .playerLabel {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .sevenContent {
+    margin: 5px 0;
+    max-width: 100%;
+  }
+
+  .sevenUpDownBox {
+    height: 45px;
+    border-width: 1px;
+  }
+
+  .upBox {
+    height: 45px;
+    padding-left: 5px;
+    padding-right: 30px;
+  }
+
+  .downBox {
+    height: 45px;
+    padding-right: 5px;
+    padding-left: 30px;
+  }
+
+  .upDownOdds {
+    font-size: 16px;
+  }
+
+  .sevenBox img {
+    height: 50px;
+  }
+
+  .exposureLeft,
+  .exposureRight {
+    font-size: 9px;
+  }
+
+  .cardsSection {
+    background: white;
+  }
+
+  .cardsDisplay {
+    background: #f3f4f6;
+    justify-content: flex-start;
+    /* Align left on mobile? Or keep center */
+  }
+}

@@ -1,0 +1,133 @@
+/* Toggle Container */
+.toggleContainer {
+  display: flex;
+  width: 200px;
+  margin-bottom: 1px;
+}
+
+/* Toggle Button */
+.toggleButton {
+  flex: 1;
+  padding: 5px;
+  background: var(--color-bg-alt);
+  text-align: center;
+  cursor: pointer;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  transition: background-color 0.3s ease;
+}
+
+.toggleButton.active {
+  background: var(--bg-secondary);
+  color: white;
+}
+
+/* Grid Styles */
+.handsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+}
+
+.patternGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+/* Player Cell */
+.playerCell {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  /* border: 2px solid #d1d5db; */
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.playerCell.locked {
+  cursor: not-allowed;
+  position: relative;
+}
+
+.playerCell.locked::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-overlay-lock);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.activeCard {
+  background-color: var(--bg-back);
+  color: black;
+}
+
+/* Lock Icon */
+.lockIcon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 17px;
+  height: 17px;
+  background-size: 17px 17px;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Player Name */
+.playerName {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.playerCell.locked .playerName,
+.playerCell.locked .playerValue {
+  position: relative;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+/* Player Value */
+.playerValue {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+@media (max-width: 480px) {
+
+  /* Mobile layout for Hands section */
+  .handsGrid {
+    grid-template-columns: 1fr;
+    /* 1 cell per row */
+  }
+
+  /* Mobile layout for Pattern section */
+  .patternGrid {
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 cells per row */
+  }
+
+  .playerCell {
+    padding: 8px 12px;
+  }
+
+  .playerName {
+    font-size: 0.813rem;
+  }
+
+  .playerValue {
+    font-size: 0.875rem;
+  }
+}

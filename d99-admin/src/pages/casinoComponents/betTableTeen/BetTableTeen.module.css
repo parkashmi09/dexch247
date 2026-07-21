@@ -1,0 +1,154 @@
+.betTable {
+  font-family: Arial, sans-serif;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #fff;
+
+}
+
+/* Player Section Styles */
+.playerSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+
+}
+
+.playerTable {
+  background-color: #fff;
+  border-top: 1px solid #e0e0e0;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  background-color: var(--color-bg-alt);
+}
+
+.playerName {
+  padding: 12px;
+  font-weight: bold;
+  color: var(--color-text-main);
+  border: 1px solid #e0e0e0;
+}
+
+.columnHeader {
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid #e0e0e0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  border-top: 1px solid #e0e0e0;
+}
+
+.rowLabel {
+  padding: 12px;
+  background-color: var(--color-bg-alt);
+  color: var(--color-text-main);
+}
+
+.cell {
+  padding: 12px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+}
+
+/* Cards Section Styles */
+.cardsSection {
+  background-color: var(--color-border);
+  padding: 1px;
+}
+
+.cardsTable {
+  background-color: #fff;
+}
+
+.cardsTable .header {
+  display: grid;
+  grid-template-columns: 1fr repeat(6, 1fr);
+  /* 7 columns */
+  background-color: var(--color-bg-alt);
+}
+
+.cardHeader {
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  color: var(--color-text-main);
+}
+
+.cardsTable .row {
+  display: grid;
+  grid-template-columns: 1fr repeat(6, 1fr);
+  /* 7 columns */
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Cell States */
+.back {
+  background-color: var(--bg-back);
+}
+
+.lay {
+  background-color: var(--bg-lay);
+}
+
+.locked {
+  background-color: var(--color-overlay-lock);
+  /* Dark background for locked cells */
+  color: #fff;
+}
+
+.lockedCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lockIcon {
+  font-size: 16px;
+}
+
+.value {
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .playerSection {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+
+
+  .cardsTable .row:nth-child(2) {
+    border-top: none;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .header,
+  .row {
+    font-size: 14px;
+  }
+
+  .cell {
+    padding: 8px;
+    min-height: 40px;
+  }
+
+  .lockIcon {
+    font-size: 14px;
+  }
+}

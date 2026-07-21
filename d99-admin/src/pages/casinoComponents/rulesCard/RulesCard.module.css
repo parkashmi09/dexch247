@@ -1,0 +1,90 @@
+.sidebarBox {
+  margin-bottom: 5px;
+}
+
+.sidebarTitle {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  height: 30px;
+  padding: 0 5px 0 0;
+}
+
+.sidebarTitle h4 {
+  padding: 4px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.myBets {
+  width: 100%;
+}
+
+.tableResponsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  background-color: var(--bg-table);
+  color: var(--text-table);
+  margin-bottom: 0;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+
+
+@media (max-width: 768px) {
+  .sidebarTitle {
+    background-color: var(--bg-primary);
+
+  }
+
+
+}
+
+.table th,
+.table td {
+  padding: 2px 4px;
+  vertical-align: middle;
+}
+
+.table th {
+  font-size: 14px;
+  text-align: left;
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+}
+
+.table td {
+  font-size: 14px;
+  text-align: left;
+  font-weight: 400 !important;
+  border: 1px solid var(--color-border);
+  /* background-color: var(--bg-back); */
+}
+
+.table td:first-child,
+.table th:first-child {
+  padding-left: 10px;
+}
+
+.textEnd {
+  text-align: left !important;
+}
+
+.textCenter {
+  text-align: center !important;
+}
+
+.table tbody tr {
+  background-color: var(--bg-table);
+}
+
+.table tbody tr:hover {
+  background-color: var(--bg-table-row);
+}

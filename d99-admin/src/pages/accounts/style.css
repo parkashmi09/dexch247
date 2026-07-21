@@ -1,0 +1,738 @@
+/* Account Statement Page Styles */
+
+.listing-grid {
+  background-color: #f9f9f9;
+  padding: 10px;
+  margin: 0;
+  position: relative;
+  font-family: var(--font-primary);
+}
+
+.account-list-statement {
+  width: 100%;
+  font-family: var(--font-primary);
+}
+
+.row {
+  padding: 0 !important;
+}
+
+.page-title-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+
+.page-title-box h4 {
+  text-transform: unset;
+  color: #1e1e1e;
+  font-size: 1.6rem !important;
+  font-weight: 500;
+  font-family: var(--font-primary) !important;
+  margin: 0;
+}
+
+.page-title-right {
+  display: flex;
+  align-items: center;
+}
+
+.page-title-right .d-inline-block {
+  display: inline-block;
+}
+
+/* Button Primary Styles */
+.btn-primary {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--bg-primary) !important;
+  color: var(--text-white) !important;
+  padding: 6px 12px;
+  font-size: 1rem;
+  font-family: var(--font-primary);
+  border-radius: 0.25rem;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--bg-primary) !important;
+  color: var(--text-white) !important;
+  opacity: 0.9;
+}
+
+.col-12 {
+  flex: 0 0 100% !important;
+  max-width: 100% !important;
+}
+
+/* Card Styles */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 0 solid #f6f6f6;
+  border-radius: 0.25rem;
+  margin-bottom: 24px;
+  box-shadow: 0 0.75rem 1.5rem rgba(18, 38, 63, 0.03);
+}
+
+.account-list-statement .card {
+  background-color: transparent;
+}
+
+.card-body {
+  flex: 1 1 auto;
+  min-height: 1px;
+}
+
+.account-list-statement .card .card-body {
+  padding: 0;
+}
+
+/* Row5 Styles */
+.row.row5 {
+  margin-left: -5px;
+  margin-right: -5px;
+}
+
+.row.row5>[class*="col-"] {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+/* Export Buttons */
+.buttons-pdf {
+  background-color: #cb0606 !important;
+  border-color: #cb0606 !important;
+  color: #fff !important;
+  box-shadow: 0px 5px 6px -6px #000;
+  cursor: pointer;
+  font-size: 1rem;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttons-pdf:hover {
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
+}
+
+.buttons-pdf i,
+.buttons-pdf .fa-file-pdf {
+  margin-right: 0.25rem !important;
+  font-size: 1rem;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.buttons-excel {
+  background-color: #217346 !important;
+  border-color: #217346 !important;
+  color: #fff !important;
+  box-shadow: 0px 5px 6px -6px #000;
+  cursor: pointer;
+  font-size: 1rem;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttons-excel:hover {
+  background-color: #218838 !important;
+  border-color: #1e7e34 !important;
+}
+
+.buttons-excel i,
+.buttons-excel .fa-file-excel {
+  margin-right: 0.25rem !important;
+  font-size: 1rem;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+/* DataTables Styles */
+.dataTables_length,
+.dataTables_filter {
+  font-family: var(--font-primary);
+}
+
+.dataTables_length label,
+.dataTables_filter label {
+  margin-bottom: 0;
+  font-weight: 500;
+  font-family: var(--font-primary);
+  display: inline-flex;
+  align-items: center;
+}
+
+.dataTables_filter {
+  text-align: right;
+}
+
+@media (max-width: 767.98px) {
+  .dataTables_filter {
+    text-align: left;
+  }
+}
+
+.custom-select {
+  display: inline-block;
+  width: auto;
+  padding: 0.25rem 1.75rem 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #495057;
+  vertical-align: middle;
+  background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  appearance: none;
+  font-family: var(--font-primary);
+}
+
+.custom-select-sm {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.form-control-sm {
+  height: calc(1.5em + 0.5rem + 4px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+  font-family: var(--font-primary);
+}
+
+/* Table Styles */
+.table-responsive {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+  font-family: var(--font-primary);
+}
+
+.table th,
+.table td {
+  font-size: 14px;
+  color: #1e1e1e;
+}
+
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 500;
+  color: #495057;
+  background-color: transparent !important;
+}
+
+.table tbody td {
+  vertical-align: middle;
+  border-top: 1px solid #dee2e6;
+  font-size: 14px;
+  color: #1e1e1e;
+}
+
+.table-striped tbody tr:nth-of-type(2n + 1),
+.b-table.table-striped tbody tr:nth-of-type(2n + 1),
+.account-list-statement .table-striped tbody tr:nth-of-type(2n + 1),
+.account-list-statement .b-table.table-striped tbody tr:nth-of-type(2n + 1) {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.table-bordered {
+  border: 1px solid #dee2e6;
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #dee2e6;
+}
+
+/* Table header border override - no side borders, only bottom border */
+.table-bordered.table thead th,
+.table-bordered.table thead td,
+.table-striped.table-bordered thead th,
+.table-striped.table-bordered thead td,
+.b-table.table-bordered thead th,
+.b-table.table-bordered thead td,
+.b-table.table-striped.table-bordered thead th,
+.b-table.table-striped.table-bordered thead td {
+  border: 0 !important;
+  border-bottom: 1px solid #111 !important;
+}
+
+/* Account List Table Specific Styles */
+.account-list-statement .table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 0;
+}
+
+.account-list-statement .table thead tr {
+  background-color: transparent;
+}
+
+.account-list-statement .table thead th {
+  background-color: #fff;
+  border: 0;
+  padding: 0.5rem 0.5rem;
+  border-bottom: 1px solid #111;
+}
+
+.account-list-statement .table tbody tr:not(.b-table-empty-row) {
+  background-color: #fff;
+}
+
+/* Striped table rows - must come after the general background rule */
+.account-list-statement .table-striped tbody tr:nth-of-type(2n + 1):not(.b-table-empty-row),
+.account-list-statement .b-table.table-striped tbody tr:nth-of-type(2n + 1):not(.b-table-empty-row) {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.account-list-statement .table-bordered.table {
+  border: 0;
+}
+
+.account-list-statement .table-bordered,
+.account-list-statement .table-bordered td {
+  border: 1px solid #dee2e6 !important;
+}
+
+.account-list-statement .table-bordered tbody th,
+.account-list-statement .table-bordered tbody td {
+  border: 1px solid #dee2e6 !important;
+}
+
+/* Override for table header - ensure no side borders, only bottom border */
+.account-list-statement .table-bordered.table thead th,
+.account-list-statement .table-bordered.table thead td,
+.account-list-statement .table-bordered thead th,
+.account-list-statement .table-bordered thead td,
+.account-list-statement .b-table.table-bordered thead th,
+.account-list-statement .b-table.table-bordered thead td,
+.account-list-statement .table-striped.table-bordered thead th,
+.account-list-statement .table-striped.table-bordered thead td,
+.account-list .table-bordered.table thead th,
+.account-list .table-bordered.table thead td,
+.account-list .table-bordered thead th,
+.account-list .table-bordered thead td,
+.account-list .b-table.table-bordered thead th,
+.account-list .b-table.table-bordered thead td {
+  border: 0 !important;
+  border-bottom: 1px solid #111 !important;
+}
+
+.account-list-statement .table th,
+.account-list-statement .table td {
+  font-size: 14px;
+  color: #1e1e1e;
+}
+
+/* Override Bootstrap table padding and styles */
+.account-list-statement .table> :not(caption)>*>* {
+  padding: 0.2rem 0.5rem;
+  color: #1e1e1e;
+}
+
+/* Empty row styles */
+.b-table-empty-row td {
+  text-align: center;
+}
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  padding-left: 0;
+  list-style: none;
+  border-radius: 0.25rem;
+  font-family: var(--font-primary);
+}
+
+.pagination-rounded .page-link {
+  border-radius: 0.25rem;
+  margin: 0 0.125rem;
+}
+
+.page-link {
+  position: relative;
+  display: block;
+  padding: 0.5rem 0.75rem;
+  margin-left: -1px;
+  line-height: 1.25;
+  color: var(--bg-primary);
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  text-decoration: none;
+}
+
+.page-link:hover {
+  z-index: 2;
+  color: #0056b3;
+  text-decoration: none;
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+}
+
+.page-item.active .page-link {
+  z-index: 3;
+  color: #fff;
+  font-weight: 500;
+  background-color: var(--bg-primary);
+  border-color: var(--bg-primary);
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  pointer-events: none;
+  cursor: auto;
+  background-color: #fff;
+  border-color: #dee2e6;
+}
+
+/* Text Utilities */
+.wrape-text {
+  cursor: pointer;
+  background: #444;
+  padding: 2px 10px;
+  text-decoration: none;
+  color: #fff;
+  border-radius: 3px;
+  margin-right: 3px;
+  text-transform: uppercase;
+  display: inline-block;
+  max-width: unset;
+  white-space: unset;
+  font-weight: 500 !important;
+  font-family: var(--font-primary);
+}
+
+.wrape-text:hover {
+  background: #333;
+  color: #fff;
+  text-decoration: none;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-md-right {
+  text-align: right !important;
+}
+
+@media (max-width: 767.98px) {
+  .text-md-right {
+    text-align: left !important;
+  }
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem !important;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem !important;
+}
+
+.mb-3 {
+  margin-bottom: 1rem !important;
+}
+
+.mt-2 {
+  margin-top: 0.5rem !important;
+}
+
+.mt-4 {
+  margin-top: 2rem !important;
+}
+
+.ml-2 {
+  margin-left: 0.5rem !important;
+}
+
+.mr-2 {
+  margin-right: 0.5rem !important;
+}
+
+.mr-1 {
+  margin-right: 0.25rem !important;
+}
+
+.pt-3 {
+  padding-top: 1rem !important;
+}
+
+.float-right {
+  float: right !important;
+}
+
+/* Bootstrap utility classes */
+.d-flex {
+  display: flex !important;
+}
+
+.d-inline-flex {
+  display: inline-flex !important;
+}
+
+.align-items-center {
+  align-items: center !important;
+}
+
+.justify-content-between {
+  justify-content: space-between !important;
+}
+
+.justify-content-end {
+  justify-content: flex-end !important;
+}
+
+.position-relative {
+  position: relative !important;
+}
+
+/* Date Picker Styles */
+.mx-datepicker {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.mx-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.mx-input {
+  width: 100%;
+  display: block !important;
+  height: calc(1.5em + 0.94rem + 2px) !important;
+  padding: 0.47rem 2.5rem 0.47rem 0.75rem !important;
+  font-size: 0.8125rem;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #495057 !important;
+  background-color: #e9ecef !important;
+  background-clip: padding-box;
+  border: 1px solid #ced4da !important;
+  border-radius: 0.25rem;
+  box-shadow: none !important;
+  font-family: var(--font-primary);
+}
+
+/* Hide default date picker icons */
+.mx-input[type="date"]::-webkit-calendar-picker-indicator,
+.mx-input[type="date"]::-webkit-inner-spin-button,
+.mx-input[type="date"]::-webkit-clear-button {
+  display: none;
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* Firefox - Hide default date picker icon and ensure same styling */
+.mx-input[type="date"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.mx-input[type="date"]::-moz-calendar-picker-indicator {
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.mx-input[readonly],
+.mx-input[readonly="readonly"],
+.mx-input[readOnly] {
+  background-color: #e9ecef !important;
+  opacity: 1;
+  cursor: default;
+  pointer-events: none;
+}
+
+.mx-input:focus {
+  outline: 0;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.mx-icon-calendar {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #6c757d;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  width: 1em;
+  height: 1em;
+}
+
+.mx-icon-calendar svg {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+  display: block;
+}
+
+/* Make calendar icon clickable when datepicker is not disabled */
+.mx-datepicker:not(.disabled) .mx-icon-calendar {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.mx-datepicker.disabled .mx-input {
+  background-color: #e9ecef;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.mx-datepicker.disabled .mx-icon-calendar {
+  opacity: 0.5;
+}
+
+/* Form Label Styles */
+form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-family: var(--font-primary);
+  color: #1e1e1e;
+}
+
+/* Form Control */
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  font-family: var(--font-primary);
+}
+
+/* .form-control:focus {
+  color: #212529;
+  background-color: #fff;
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+} */
+
+/* Font Size Utility */
+.font-size-18 {
+  font-size: 1.6rem !important;
+}
+
+/* Print Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .account-list-statement,
+  .account-list-statement * {
+    visibility: visible;
+  }
+
+  .account-list-statement {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  /* Hide filters, buttons, pagination, and other non-table elements */
+  .page-title-box,
+  .ajaxFormSubmit,
+  .buttons-pdf,
+  .buttons-excel,
+  .dataTables_filter,
+  .dataTables_paginate,
+  .pagination,
+  .row.mt-4 {
+    display: none !important;
+  }
+
+  /* Ensure table is visible and styled for print */
+  .table-responsive {
+    overflow: visible !important;
+  }
+
+  .table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  .table th,
+  .table td {
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+    color: #000 !important;
+  }
+
+  /* Add a title for print */
+  .account-list-statement::before {
+    content: "Account Statement";
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+    visibility: visible;
+  }
+}

@@ -1,0 +1,338 @@
+/* Casino Result Modal – 80% viewport, same layout/bg/header/close as BetLockModal (deposit-modal.css) */
+
+/* 80% viewport dialog */
+.casino-result-modal-dialog-80 {
+  max-width: 70vw !important;
+  width: 70vw !important;
+  margin: 2vh auto !important;
+  max-height: 90vh !important;
+}
+
+/* Same header and close as BetLockModal – ensure title is visible */
+.casino-result-modal-dialog-80 .modal-header {
+ 
+  color: #333;
+  padding: 1rem 1.5rem;
+}
+
+.casino-result-modal-dialog-80 .modal-header .modal-title {
+  color: #333 !important;
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0;
+  flex: 1;
+}
+
+.casino-result-modal-dialog-80 .modal-content {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.casino-result-modal-dialog-80 .modal-body {
+  overflow-y: auto;
+  flex: 1 1 auto;
+  max-height: none;
+  /* Same as BetLockModal: light background, no black/dark */
+  background-color: #fff !important;
+  color: #1e1e1e !important;
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+@media only screen and (max-width: 767px) {
+  .casino-result-modal-dialog-80 {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    margin: 0 !important;
+    max-height: 100vh !important;
+  }
+  .casino-result-modal-dialog-80 .modal-content {
+    max-height: 100vh;
+  }
+}
+
+/* Table/layout styles – same values as BetLockModal, scoped for casino result modal */
+.casino-result-modal .casino-result-table-responsive {
+  margin-bottom: 0;
+}
+
+.casino-result-modal .casino-result-table-responsive > .casino-result-table,
+.casino-result-modal .casino-result-table-responsive > .table {
+  margin-bottom: 0;
+}
+
+.casino-result-modal .casino-result-table-responsive > .casino-result-table-bordered,
+.casino-result-modal .casino-result-table-responsive > .table-bordered {
+  border: 0;
+}
+
+.casino-result-modal .casino-result-table-bordered,
+.casino-result-modal .casino-result-table-bordered .casino-result-td,
+.casino-result-modal .casino-result-table-bordered .casino-result-th,
+.casino-result-modal .table-bordered .casino-result-td,
+.casino-result-modal .table-bordered .casino-result-th {
+  border: 1px solid #eff2f7 !important;
+}
+
+.casino-result-modal .casino-result-table thead .casino-result-th,
+.casino-result-modal .casino-result-table thead th {
+  font-weight: bold;
+  font-size: 14px;
+  vertical-align: bottom;
+  border-bottom: 2px solid #eff2f7;
+  padding: 0.75rem;
+  background-color: transparent;
+}
+
+.casino-result-modal .casino-result-table-bordered thead .casino-result-td,
+.casino-result-modal .casino-result-table-bordered thead .casino-result-th,
+.casino-result-modal .casino-result-table-bordered thead td,
+.casino-result-modal .casino-result-table-bordered thead th {
+  border-bottom-width: 2px;
+}
+
+.casino-result-modal .casino-result-table .casino-result-th,
+.casino-result-modal .casino-result-table .casino-result-td,
+.casino-result-modal .casino-result-table th,
+.casino-result-modal .casino-result-table td {
+  font-size: 14px;
+  color: #1e1e1e;
+  padding: 0.75rem;
+  vertical-align: top;
+  border-top: 1px solid #eff2f7 !important;
+  border-bottom: 1px solid #eff2f7 !important;
+}
+
+.casino-result-modal .casino-result-table tbody .casino-result-td,
+.casino-result-modal .casino-result-table tbody td {
+  vertical-align: middle;
+}
+
+.casino-result-modal .casino-result-table .custom-control {
+  position: relative;
+  display: block;
+  min-height: 1.5rem;
+  padding-left: 1.75rem;
+}
+
+.casino-result-modal .casino-result-table .custom-control-input {
+  position: absolute;
+  left: 0;
+  z-index: -1;
+  width: 1.25rem;
+  height: 1.25rem;
+  opacity: 0;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.casino-result-modal .casino-result-table .custom-control-label {
+  position: relative;
+  margin-bottom: 0;
+  vertical-align: top;
+  cursor: pointer;
+}
+
+.casino-result-modal .casino-result-table .custom-control-label::before {
+  position: absolute;
+  top: 0;
+  left: -1.75rem;
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  pointer-events: none;
+  content: "";
+  background-color: #000;
+  border: 1px solid #000;
+  border-radius: 0 !important;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.casino-result-modal .casino-result-table .custom-control-input:checked ~ .custom-control-label::before {
+  color: #fff;
+  border-color: #000;
+  background-color: #000;
+  border-radius: 0 !important;
+}
+
+.casino-result-modal .casino-result-table .custom-control-input:checked ~ .custom-control-label::after {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26l2.974 2.99L8 2.193z'/%3E%3C/svg%3E");
+  background-size: 50% 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.casino-result-modal .casino-result-table .custom-control-label::after {
+  position: absolute;
+  top: 0;
+  left: -1.75rem;
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  content: "";
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Row gutters for result content (row5) */
+.casino-result-modal .row.row5 {
+  margin-left: -5px;
+  margin-right: -5px;
+}
+
+.casino-result-modal .row.row5 > [class*="col-"] {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+/* Casino result content – round, cards, content, desc (mapped from theme CSS) */
+.casino-result-modal .casino-result-round {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px;
+  font-size: 18px;
+}
+
+.casino-result-modal .casino-result-cards {
+  display: block;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.casino-result-modal .casino-result-cards .winner-label {
+  background-color: #28a745;
+  padding: 7px;
+  color: #fff;
+  font-size: 20px;
+}
+
+.casino-result-modal .casino-result-content {
+  padding: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.casino-result-modal .casino-result-cards-item .winner-icon {
+  height: 55px;
+}
+
+.casino-result-modal .casino-result-cards-item img {
+  width: 50px;
+}
+
+.casino-result-modal .casino-result-content-item {
+  display: flex;
+  display: -webkit-flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  width: 49%;
+}
+
+.casino-result-modal .casino-result-content-diveder {
+  width: 2px;
+  height: 130px;
+  background-color: #ddd;
+}
+
+.casino-result-modal .casino-result-cards-item {
+  margin-bottom: 5px;
+  margin-right: 5px;
+  display: inline-block;
+}
+
+.casino-result-modal .casino-result-cards-item:last-child {
+  margin-right: 0;
+}
+
+.casino-result-modal .casino-result-desc {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  padding: 6px;
+  box-shadow: 0 0 5px;
+  margin-top: 10px;
+  width: 80%;
+  margin-left: auto;
+}
+
+.casino-result-modal .casino-result-desc-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: flex-start;
+  width: 100%;
+  margin: 0 10px;
+}
+
+.casino-result-modal .casino-result-desc-item div:first-child {
+  width: 30%;
+  text-align: right;
+  margin-right: 2%;
+  color: var(--text-table, #1e1e1e);
+}
+
+.casino-result-modal .casino-result-desc-item div:last-child {
+  width: 68%;
+  text-align: left;
+  word-break: break-all;
+}
+
+/* Unique Teenpatti result: 6 cards with s1–s6 icons */
+.casino-result-modal .row.row5.teenunique .casino-result-content-item.w-100 {
+  width: 100%;
+}
+
+.casino-result-modal .unique-teen20-box {
+  display: block;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.casino-result-modal .unique-teen20-card.casino-result-cards-item {
+  margin-bottom: 5px;
+  margin-right: 5px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.casino-result-modal .unique-teen20-card.casino-result-cards-item:last-child {
+  margin-right: 0;
+}
+
+.casino-result-modal .unique-teen20-card.casino-result-cards-item img {
+  width: 50px;
+  display: block;
+  margin: 0 auto 2px;
+}
+
+.casino-result-modal .unique-teen20-card.casino-result-cards-item img:first-child {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Video box card sizes (poker1day / poker20) when used in video overlay */
+.poker1day .casino-video-cards span img,
+.poker20 .casino-video-cards span img {
+  width: 27px;
+}
+
+.poker1day .casino-video-cards span:last-child img,
+.poker20 .casino-video-cards span:last-child img {
+  margin-right: 0;
+}
+
+.poker1day .casino-video-cards-container > div,
+.poker20 .casino-video-cards-container > div {
+  flex-wrap: wrap;
+}

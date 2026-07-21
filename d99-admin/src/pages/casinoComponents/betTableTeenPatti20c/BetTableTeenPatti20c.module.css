@@ -1,0 +1,153 @@
+.betTable {
+  font-weight: bold;
+  width: 100%;
+  font-size: 16px;
+  font-family: "Roboto", sans-serif;
+}
+
+.tableHead {
+  background-color: var(--color-bg-row);
+  border: 1px solid #c7c8ca;
+  padding-left: 5px;
+  padding-top: 3px;
+  font-family: "Roboto Condensed", sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.tableSection1 {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionRow1 {
+  display: flex;
+  background-color: var(--color-bg-row);
+  border-left: 1px solid #c7c8ca;
+  border-right: 1px solid #c7c8ca;
+  border-bottom: 1px solid #c7c8ca;
+}
+
+.sectionRow1 .cell {
+  width: 25%;
+  height: 3rem;
+  padding: 13px 0px;
+  border-right: 1px solid #c7c8ca;
+  font-weight: bold;
+  text-align: center;
+  font-size: 15px;
+}
+
+.sectionRow2 {
+  display: flex;
+  background-color: var(--bg-back);
+  border-left: 1px solid #c7c8ca;
+  border-right: 1px solid #c7c8ca;
+  border-bottom: 1px solid #c7c8ca;
+}
+
+.sectionRow2 .cell {
+  width: 25%;
+  height: 3rem;
+  border-right: 1px solid #c7c8ca;
+  font-weight: bold;
+  text-align: center;
+  margin: auto;
+  padding: 0.7rem 0rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.tableSection2 {
+  display: flex;
+  margin-top: 1rem;
+  justify-content: space-between;
+}
+
+.tableSection2 .sectionRow1 {
+  display: flex;
+  width: 48.5%;
+  padding: 1px;
+  justify-content: space-between;
+  background-color: var(--bg-back);
+}
+
+.cardImage {
+  width: 35px;
+  height: 35px;
+}
+
+.cell {
+  padding: 0.4rem;
+  font-weight: bold;
+  text-align: center;
+  margin: auto;
+  font-size: 1.2rem;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Locked Cell */
+.cell.locked {
+  background-color: var(--color-overlay-lock);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Lock overlay for Section 2 */
+.lockOverlay {
+  position: absolute;
+  /* top: 0; */
+  /* left: 0; */
+  width: 12rem;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+
+  .sectionRow1 .cell,
+  .sectionRow2 .cell {
+    font-size: 0.875rem;
+    padding: 8px 0;
+  }
+
+  .cardImage {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .sectionRow1 .cell,
+  .sectionRow2 .cell {
+    font-size: 0.813rem;
+    padding: 6px 0;
+  }
+
+  .cardImage {
+    width: 25px;
+    height: 25px;
+  }
+
+  .lockOverlay {
+    position: absolute;
+    /* top: 0; */
+    /* left: 0; */
+    width: 210px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+}

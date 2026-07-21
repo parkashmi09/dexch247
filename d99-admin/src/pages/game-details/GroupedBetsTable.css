@@ -1,0 +1,10 @@
+/* Shared row colors for GroupedBetsTable – apply wherever .my-bets-table is used (game-details + casino MyBet).
+   Driven by bet.game_type: "back" → .back-border (blue), "lay" → .lay-border (pink). */
+.my-bets-table tr.back-border td,
+.my-bets-table tr.back-border th {
+  background-color: #72bbef57 !important;
+}
+.my-bets-table tr.lay-border td,
+.my-bets-table tr.lay-border th {
+  background-color: #f994ba57 !important;
+}

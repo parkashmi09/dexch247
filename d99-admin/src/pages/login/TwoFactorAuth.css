@@ -1,0 +1,76 @@
+.two-factor-auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #151922;
+    /* Very dark background */
+    font-family: 'Roboto', sans-serif;
+    color: #fff;
+}
+
+.auth-card-container {
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+}
+
+.logo-container {
+    margin-bottom: 40px;
+}
+
+.auth-logo {
+    max-width: 300px;
+    height: auto;
+}
+
+.auth-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: #3f4756;
+}
+
+.auth-subtitle {
+    font-size: 14px;
+    color: #8fa0bc;
+    margin-bottom: 30px;
+}
+
+.resend-text {
+    color: #aebccc;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.otp-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Dark Input Boxes */
+.otp-input-dark {
+    width: 50px;
+    height: 60px;
+    background-color: #2b3241;
+    /* Dark grey/blueish box */
+    border: 1px solid #2b3241;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 24px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.3s, background-color 0.3s;
+}
+
+.otp-input-dark:focus {
+    border-color: #4a5469;
+    background-color: #323a4b;
+}
+
+.otp-input-dark:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

@@ -1,0 +1,130 @@
+import { sidArray } from "../config/sid.js";
+import redisClient from "../../config/redisClient.js";
+import { fetchSportsData } from "../helper/apihelper.js";
+
+const INTERVAL_SECONDS = 3;
+const REDIS_TTL = 3;
+
+let isRunning = false;
+
+const runAllEventsCron = async () => {
+    if (isRunning) return;
+
+    const startTime = Date.now();
+    isRunning = true;
+
+    try {
+        const activeSports = sidArray.filter((sport) => sport.active);
+
+        const getMatchesPromises = activeSports.map(async (sport) => {
+            const sportId = sport.eid;
+
+            try {
+                const cached = await redisClient.get(`allevents:${sportId}`);
+
+                if (!cached) return { sportId, gmids: [] };
+
+                const parsed = JSON.parse(cached);
+
+                // NEW: support { t1, t2 } structure
+                const allMatches = [
+                    ...(Array.isArray(parsed?.t1) ? parsed.t1 : []),
+                    ...(Array.isArray(parsed?.t2) ? parsed.t2 : [])
+                ];
+
+                const gmids = [
+                    ...new Set(
+                        allMatches
+                            .filter(m => m && m.gmid)
+                            .map(m => m.gmid)
+                    )
+                ];
+
+                return { sportId, gmids };
+
+            } catch (err) {
+                console.error(`❌ Redis get failed for sport ${sportId}:`, err.message);
+                return { sportId, gmids: [] };
+            }
+        });
+
+        const sportsWithGmids = await Promise.all(getMatchesPromises);
+
+        const allOddsPromises = [];
+
+        for (const { sportId, gmids } of sportsWithGmids) {
+            if (!gmids || gmids.length === 0) continue;
+
+            for (const gmid of gmids) {
+                const promise = (async () => {
+                    const endpoint = `/sports/getPriveteData?gmid=${gmid}&sid=${sportId}`;
+
+                    try {
+                        const response = await fetchSportsData(endpoint);
+                        const oddsData = response?.data || [];
+
+                        if (Array.isArray(oddsData) && oddsData.length > 0) {
+                            await redisClient.setex(
+                                `odds:${gmid}`,
+                                REDIS_TTL,
+                                JSON.stringify(oddsData)
+                            );
+
+                            return { sportId, gmid, success: true, hasData: true };
+                        }
+
+                        return { sportId, gmid, success: true, hasData: false };
+
+                    } catch (err) {
+                        console.error(
+                            `❌ Odds API failed for ${sportId}:${gmid}:`,
+                            err.message
+                        );
+
+                        return { sportId, gmid, success: false };
+                    }
+                })();
+
+                allOddsPromises.push(promise);
+            }
+        }
+
+        const oddsResults = await Promise.allSettled(allOddsPromises);
+
+        const totalGmids = allOddsPromises.length;
+
+        const successful = oddsResults.filter(
+            r => r.status === "fulfilled" && r.value?.success
+        );
+
+        const withData = oddsResults.filter(
+            r => r.status === "fulfilled" && r.value?.success && r.value?.hasData
+        );
+
+        const failed = oddsResults.filter(
+            r => r.status === "rejected" || !r.value?.success
+        );
+
+        const processingTime = Date.now() - startTime;
+
+        console.log(
+            `⚡ ${totalGmids} matches processed in ${processingTime}ms | ` +
+            `✅ ${successful.length} success (${withData.length} with odds) | ` +
+            `❌ ${failed.length} failed`
+        );
+
+        if (processingTime > 1800) {
+            console.warn(
+                `⚠️ Processing took ${processingTime}ms - slower than 1.8 second interval!`
+            );
+        }
+
+    } catch (err) {
+        console.error("❌ Cron error:", err.message);
+    } finally {
+        isRunning = false;
+    }
+};
+
+runAllEventsCron();
+setInterval(runAllEventsCron, INTERVAL_SECONDS * 1000);

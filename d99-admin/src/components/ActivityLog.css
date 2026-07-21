@@ -1,0 +1,19 @@
+.activity-log-container {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.activity-log-container .card-header {
+  padding: 10px 15px;
+  background-color: #343a40;
+  color: white;
+}
+
+.activity-log-container .card-body {
+  padding: 15px;
+}
+
+.activity-log-container table th {
+  background-color: #f8f9fa;
+}

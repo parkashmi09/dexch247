@@ -1,0 +1,194 @@
+/* Flipper Timer Styles */
+.flipperTimer {
+  --flipper-size: 100px;
+  --card-width: 40px;
+  --card-height: calc(var(--flipper-size) * 1.3);
+  --font-size: calc(var(--flipper-size) * 1);
+  --card-bg: var(--bg-timer);
+  --card-radius: calc(var(--flipper-size) * 0.1);
+  --text-gradient: var(--color-text-on-secondary, var(--text-secondary));
+
+  display: flex;
+  align-items: center;
+  gap: calc(var(--flipper-size) * 0.15);
+  font-family: "Arial Black", "Helvetica Neue", sans-serif;
+}
+
+.digitGroup {
+  display: flex;
+  gap: calc(var(--flipper-size) * 0.2);
+}
+
+.separator {
+  font-size: var(--font-size);
+  font-weight: 900;
+  color: var(--color-text-main, var(--text-secondary));
+  line-height: 1;
+  margin-top: calc(var(--flipper-size) * -0.1);
+}
+
+.flipperDigit {
+  position: relative;
+  width: var(--card-width);
+  height: var(--card-height);
+  perspective: calc(var(--flipper-size) * 4);
+  transform-style: preserve-3d;
+  border-radius: var(--card-radius);
+  box-shadow: 0 calc(var(--flipper-size) * 0.02) calc(var(--flipper-size) * 0.04) rgba(0, 0, 0, 0.3), 0 calc(var(--flipper-size) * 0.06) calc(var(--flipper-size) * 0.12) rgba(0, 0, 0, 0.2), inset 0 calc(var(--flipper-size) * 0.01) 0 rgba(255, 255, 255, 0.05);
+}
+
+.cardFace {
+  position: absolute;
+  width: 100%;
+  height: 200%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size);
+  font-weight: 900;
+  background: var(--text-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.cardTop,
+.cardBottom,
+.flipTop,
+.flipBottom {
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+/* Static top - base layer showing top half of digit */
+.cardTop {
+  top: 0;
+  background: var(--card-bg);
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
+  z-index: 1;
+}
+
+.cardTop .cardFace {
+  top: 0;
+}
+
+/* Static bottom - base layer showing bottom half of NEW digit */
+.cardBottom {
+  bottom: 0;
+  background: var(--card-bg);
+  border-radius: 0 0 var(--card-radius) var(--card-radius);
+  z-index: 1;
+}
+
+.cardBottom .cardFace {
+  bottom: 0;
+}
+
+/* Flip top - highest z-index, starts flat, rotates down to -90deg */
+.flipTop {
+  top: 0;
+  background: var(--card-bg);
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
+  transform-origin: bottom center;
+  z-index: 4;
+}
+
+.flipTop .cardFace {
+  top: 0;
+}
+
+.flipTopAnimate {
+  animation: flipTopDown 0.3s ease-in forwards;
+}
+
+/* Flip bottom - starts at 90deg (hidden), rotates to 0deg (visible) */
+.flipBottom {
+  bottom: 0;
+  background: var(--card-bg);
+  border-radius: 0 0 var(--card-radius) var(--card-radius);
+  transform-origin: top center;
+  transform: rotateX(90deg);
+  z-index: 3;
+}
+
+.flipBottom .cardFace {
+  bottom: 0;
+}
+
+.flipBottomAnimate {
+  animation: flipBottomUp 0.3s ease-out 0.3s forwards;
+}
+
+@keyframes flipTopDown {
+  0% {
+    transform: rotateX(0deg);
+  }
+
+  100% {
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes flipBottomUp {
+  0% {
+    transform: rotateX(90deg);
+  }
+
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+/* Center divider line */
+.centerLine {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: calc(var(--flipper-size) * 0.000);
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.8) 50%, rgba(0, 0, 0, 0.6) 100%);
+  transform: translateY(-50%);
+  z-index: 10;
+  box-shadow: 0 calc(var(--flipper-size) * 0.005) calc(var(--flipper-size) * 0.01) rgba(0, 0, 0, 0.5), 0 calc(var(--flipper-size) * -0.005) calc(var(--flipper-size) * 0.005) rgba(255, 255, 255, 0.03);
+}
+
+/* Add subtle inner shadows for depth */
+.cardTop::after,
+.flipTop::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--flipper-size) * 0.15);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.15), transparent);
+  pointer-events: none;
+}
+
+.cardBottom::before,
+.flipBottom::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--flipper-size) * 0.15);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
+  pointer-events: none;
+}
+
+@media screen and (max-width: 768px) {
+  .flipperTimer {
+    --flipper-size: 50px;
+    --card-width: 20px;
+    --card-height: calc(var(--flipper-size) * 1.3);
+    --font-size: calc(var(--flipper-size) * 0.9);
+
+    --card-radius: calc(var(--flipper-size) * 0.2);
+
+  }
+}

@@ -1,0 +1,351 @@
+.detailPageContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-content: flex-start;
+  position: relative;
+  width: 100%;
+}
+
+.tableWrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  width: 100%;
+}
+
+.gameMarket {
+  flex: 1;
+  min-width: 100%;
+  max-width: 100%;
+  background: var(--color-bg-row);
+  color: var(--color-text-main);
+  margin-top: 4px;
+}
+
+.marketTitle {
+  background-color: var(--color-secondary);
+  color: var(--color-text-inverse);
+  padding: 4px;
+  font-size: 15px;
+  font-weight: bold;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.marketHeader {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  padding: 0;
+  border-bottom: 0.01em solid var(--color-border);
+}
+
+.marketHeader .marketRow {
+  flex: 1;
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  align-items: stretch;
+}
+
+.marketBody {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.marketRow {
+  background-color: var(--color-bg-row);
+  display: flex;
+  flex-wrap: nowrap;
+  border-bottom: 0.01em solid var(--color-border);
+  width: 100%;
+  align-items: stretch;
+}
+
+.marketHeader .marketRow,
+.marketRow {
+  border-bottom: 0.01em solid var(--color-border);
+}
+
+.marketHeader .marketNationDetail {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.marketHeader .marketOddBox {
+  width: 120px;
+  min-width: 120px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-left: 1px solid var(--color-border);
+  height: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.marketHeader .fancyMinMaxBox {
+  width: 120px;
+  min-width: 120px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid var(--color-border);
+}
+
+.marketNationDetail {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.marketNationName {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-text-main);
+  cursor: pointer;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.blbBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.marketOddBox {
+  width: 120px;
+  min-width: 120px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-left: 1px solid var(--color-border);
+  cursor: pointer;
+  height: 46px;
+  position: relative;
+  overflow: hidden;
+}
+
+.marketOddBox.back {
+  background-color: var(--bg-back) !important;
+  transition: background-color 0.3s ease;
+}
+
+.marketOddBox.oddsChanged {
+  background-color: var(--bg-highlight) !important;
+  animation: oddsBlink 1s ease-in-out;
+}
+
+@keyframes oddsBlink {
+  0% {
+    background-color: var(--bg-highlight);
+  }
+
+  50% {
+    background-color: var(--bg-highlight);
+  }
+
+  100% {
+    background-color: var(--bg-back);
+  }
+}
+
+.marketOdd {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 0;
+  line-height: 1;
+  display: block;
+}
+
+.marketVolume {
+  font-size: 12px;
+  color: var(--color-text-main);
+  line-height: 1;
+  display: block;
+}
+
+.fancyMinMaxBox {
+  width: 120px;
+  min-width: 120px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid var(--color-border);
+}
+
+.fancyMinMax {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-text-info);
+  word-break: break-all;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.w100 {
+  width: 100%;
+  display: block;
+}
+
+.fancyMarket {
+  position: relative;
+}
+
+/* Suspended Box Styles */
+.suspendedBox {
+  position: relative;
+}
+
+.suspendedBox::before {
+  content: "";
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  pointer-events: none;
+}
+
+.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+/* Exposure */
+.exposure {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  margin-top: 2px;
+  display: block;
+  text-align: center;
+  z-index: 2;
+  position: relative;
+}
+
+.exposureLocked {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  margin-top: 2px;
+  display: block;
+  text-align: center;
+  z-index: 10;
+  position: relative;
+  pointer-events: none;
+}
+
+.footer {
+  margin-top: 2px;
+  background-color: var(--bg-success);
+  color: white;
+  padding: 6px 10px;
+  font-size: 12px;
+  text-align: center;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .tableWrapper {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .gameMarket {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .marketTitle {
+    font-size: 12px;
+    padding: 5px 8px;
+  }
+
+  .marketOddBox {
+    width: 60px;
+    min-height: 28px;
+  }
+
+  .marketOdd {
+    font-size: 14px;
+  }
+
+  .marketVolume {
+    font-size: 10px;
+  }
+
+  .fancyMinMaxBox {
+    width: 60px;
+  }
+
+  .fancyMinMax {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 480px) {
+  .marketTitle {
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+
+  .marketOddBox {
+    width: 50px;
+    min-height: 24px;
+  }
+
+  .marketOdd {
+    font-size: 12px;
+  }
+
+  .marketVolume {
+    font-size: 9px;
+  }
+
+  .fancyMinMaxBox {
+    width: 50px;
+  }
+
+  .fancyMinMax {
+    font-size: 8px;
+  }
+}

@@ -1,0 +1,289 @@
+.betTableContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: var(--color-bg-alt);
+  font-family: Arial, sans-serif;
+  padding: 10px;
+}
+
+/* KBC Button Image Styles - Global */
+.kbcBtn img,
+.kbcBtn .btnImage {
+  width: 30px;
+  height: auto;
+}
+
+/* Row Layouts */
+.topRow,
+.bottomRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* Section Styling */
+.section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+
+.sectionHeader {
+  background-color: var(--color-secondary);
+  color: white;
+  padding: 10px 15px;
+  font-weight: bold;
+  border-radius: 12px;
+  border: 1px solid #ffd700;
+  /* border-top:none; */
+  /* border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border: 1px solid #ffd700; */
+}
+
+.sectionContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+
+
+}
+
+@media (max-width: 768px) {
+  .sectionHeader {
+    font-size: 12px;
+    flex-direction: column;
+  }
+}
+
+/* Cell Styling */
+.cell {
+  /* background-color: #7fc1e8;
+  padding: 15px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  border: 2px solid #ffd700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+  cursor: pointer;
+  position: relative; */
+
+
+  background-color: var(--bg-back);
+  color: #000;
+  border: 2px solid #ffd700;
+  width: calc(50% - 10px);
+  flex: 0 0 auto;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-left: 1px;
+  border-top: 0;
+  border-radius: 0;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Cell Styling */
+.cell1 {
+  /* background-color: #7fc1e8;
+  padding: 15px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  border: 2px solid #ffd700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+  cursor: pointer;
+  position: relative; */
+
+
+  background-color: var(--bg-back);
+  color: #000;
+  border: 2px solid #ffd700;
+  width: calc(100% - 10px);
+  flex: 0 0 auto;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-left: 1px;
+  border-top: 0;
+  border-radius: 0;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Grid Layout for 2x2 Sections (Q4 and Q5) */
+.gridContainer {
+  width: 85%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Cells inside grid (Q4 and Q5) should use cell1 styling */
+.gridContainer .cell1 {
+  width: 100%;
+  margin-left: 0;
+}
+
+/* Card Suits Styling */
+.redSuits {
+  color: red;
+  font-size: 24px;
+}
+
+.blackSuits {
+  color: black;
+  font-size: 24px;
+}
+
+/* Horizontal Layout for Section Content */
+.sectionContent>div:not(.gridContainer) {
+  display: flex;
+  flex-direction: row;
+}
+
+.sectionContent>div:not(.gridContainer)>.cell {
+  flex: 1;
+}
+
+/* Lock Styles */
+.cardLockWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+}
+
+.lockIcon {
+  color: white;
+  font-size: 16px;
+}
+
+.lockedText {
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Suspended Box Styles - using ::before for lock icon and ::after for overlay */
+.suspendedBox {
+  cursor: not-allowed;
+  position: relative;
+}
+
+.suspendedBox::before {
+  content: "";
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  pointer-events: none;
+}
+
+.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.exposure {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* KBC Button Image Styles */
+.kbc .kbc-btns .btn img,
+.kbcBtn img,
+.kbcBtn .btnImage {
+  width: 30px;
+  height: auto;
+}
+
+.imageContainer {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageContainer img {
+  width: 30px;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+
+  .topRow,
+  .bottomRow {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .section {
+    margin-bottom: 10px;
+  }
+
+  /* ✅ Only update non-grid cell containers to show cells in a row */
+  .sectionContent:not(:has(.gridContainer)) {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* For cells inside gridContainer (like 3-card or suits), we preserve grid layout */
+  .gridContainer {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .cell {
+    flex: 1 1 45%;
+    /* allow 2 per row with wrapping */
+    padding: 10px;
+    font-size: 16px;
+    min-height: 40px;
+  }
+
+  .redSuits,
+  .blackSuits {
+    font-size: 20px;
+  }
+}

@@ -1,0 +1,65 @@
+/* Rules Table */
+.rulesTable {
+    width: 100%;
+    margin-top: 10px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-primary);
+    border-collapse: collapse;
+}
+
+.rulesHeader {
+    background: var(--bg-primary);
+    color: white;
+    padding: 5px 10px;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .rulesHeader {
+        background: var(--bg-primary);
+    }
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-bg-primary);
+}
+
+.tableHeader {
+    padding: 8px;
+    font-weight: bold;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-alt);
+    text-align: center;
+    font-size: 14px;
+    color: var(--color-text-main);
+}
+
+@media (max-width: 768px) {
+    .tableHeader {
+        padding: 0px;
+        font-size: 12px;
+    }
+}
+
+.tableCell {
+    padding: 8px;
+    border: 1px solid var(--color-border);
+    text-align: center;
+    vertical-align: middle;
+}
+
+@media (max-width: 768px) {
+    .tableCell {
+        padding: 0px;
+    }
+}
+
+.ruleItem {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+}

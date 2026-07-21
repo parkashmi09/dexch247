@@ -1,0 +1,142 @@
+import { useMemo, useState, useEffect } from "react";
+import { Modal } from "react-bootstrap";
+import CasinoLoader from "./tableLayout/CasinoLoader.jsx";
+
+const QUICK_STAKES = [25, 50, 100, 200, 500, 1000];
+const XL_BREAKPOINT = 1200;
+
+const SELECTION_BALLS = [
+  "/assets/front/img/sequence/s1.png",
+  "/assets/front/img/sequence/s2.png",
+  "/assets/front/img/sequence/s3.png",
+  "/assets/front/img/sequence/s4.png",
+  "/assets/front/img/sequence/s5.png",
+  "/assets/front/img/sequence/s6.png",
+];
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < XL_BREAKPOINT);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < XL_BREAKPOINT);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  return isMobile;
+}
+
+export default function PlaceBetMobile({
+  show,
+  betValue,
+  betType,
+  selection,
+  min = 1000,
+  max = 25000,
+  stakeAmount,
+  setStakeAmount,
+  placing,
+  onClose,
+  onSubmit,
+  gameType,
+  lotteryBall,
+  jokerCardSrc,
+}) {
+  const isMobile = useIsMobile();
+  const odds = Number(betValue) || 0;
+  const stakeNum = Number(stakeAmount) || 0;
+  const profit = useMemo(() => {
+    if (!odds || !stakeNum) return 0;
+    return Math.round((odds - 1) * stakeNum * 100) / 100;
+  }, [odds, stakeNum]);
+
+  function handleQuickStake(val) {
+    setStakeAmount(String((Number(stakeAmount) || 0) + val));
+  }
+
+  const formatRange = `${min >= 100000 ? `${min / 100000}L` : min >= 1000 ? `${min / 1000}K` : min} to ${max >= 100000 ? `${max / 100000}L` : max >= 1000 ? `${max / 1000}K` : max}`;
+
+  if (!isMobile) return null;
+
+  return (
+    <Modal show={show} onHide={onClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>Place Bet</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <div className={`place-bet-modal casino-bet-modal position-relative ${
+          selection?.startsWith("Andar")
+            ? "andarbg andarbg3"
+            : selection?.startsWith("Bahar")
+            ? "baharbg baharbg3"
+            : (betType || "back")
+        }`}>
+          {placing && <CasinoLoader />}
+          <div className="row row5">
+            <div className="col-6">
+              {gameType === "lottcard" && lotteryBall != null ? (
+                <div className="lottery-place-balls">
+                  <img src={`/assets/img/lottery/ball${lotteryBall}.png`} alt={`ball${lotteryBall}`} />
+                </div>
+              ) : gameType === "teenunique" ? (
+                <div className="unique-teen20-place-balls">
+                  {selection && selection.split("").map((c) => {
+                    const idx = parseInt(c, 10) - 1;
+                    return idx >= 0 && idx <= 5 ? <img key={idx} src={SELECTION_BALLS[idx]} alt={`s${idx + 1}`} /> : null;
+                  })}
+                </div>
+              ) : (
+                <b>{selection}</b>
+              )}
+            </div>
+            <div className="col-6 text-end">
+              <span>Profit: {profit > 0 ? profit : ""}</span>
+            </div>
+          </div>
+          <div className="odd-stake-box">
+            <div className="row row5 mt-1">
+              <div className="col-6 text-center">Odds</div>
+              <div className="col-6 text-center">Amount</div>
+            </div>
+            <div className="row row5 mt-1">
+              <div className="col-6">
+                <input type="text" className="stakeinput w-100" disabled value={odds} />
+              </div>
+              <div className="col-6">
+                <div className="float-end">
+                  <input
+                    type="number"
+                    className="stakeinput w-100"
+                    value={stakeAmount}
+                    onChange={(e) => setStakeAmount(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="place-bet-buttons mt-1">
+            {QUICK_STAKES.map((val) => (
+              <button key={val} className="btn btn-place-bet" onClick={() => handleQuickStake(val)}>
+                +{val}
+              </button>
+            ))}
+          </div>
+          {jokerCardSrc && (
+            <div className="joker-card mt-1">
+              <span><img src={jokerCardSrc} alt="Joker" /></span>
+            </div>
+          )}
+          <div className="mt-1 place-bet-btn-box">
+            <button className="btn btn-link" onClick={() => setStakeAmount("")}>Clear</button>
+            <button className="btn btn-info">Edit</button>
+            <button className="btn btn-danger" onClick={() => setStakeAmount("")}>Reset</button>
+            <button className="btn btn-success" disabled={!stakeNum || placing} onClick={onSubmit}>
+              {placing ? "..." : "Place Bet"}
+            </button>
+          </div>
+          <div className="mt-1 d-flex">
+            <span>Range: {formatRange}</span>
+          </div>
+        </div>
+      </Modal.Body>
+    </Modal>
+  );
+}

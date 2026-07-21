@@ -1,0 +1,136 @@
+import { useState, useMemo } from "react";
+import CasinoLoader from "./tableLayout/CasinoLoader.jsx";
+
+const QUICK_STAKES = [25, 50, 100, 200, 500, 1000];
+
+const SELECTION_BALLS = [
+  "/assets/front/img/sequence/s1.png",
+  "/assets/front/img/sequence/s2.png",
+  "/assets/front/img/sequence/s3.png",
+  "/assets/front/img/sequence/s4.png",
+  "/assets/front/img/sequence/s5.png",
+  "/assets/front/img/sequence/s6.png",
+];
+
+/**
+ * PlaceBet UI — renders inside CasinoRightSidebar.
+ * Actual bet submission logic lives in useCasinoGame hook (handlePlaceBet).
+ */
+export default function PlaceBet({
+  show,
+  betValue,
+  betType,
+  selection,
+  min = 1000,
+  max = 25000,
+  stakeAmount,
+  setStakeAmount,
+  placing,
+  onClose,
+  onSubmit,
+  gameType,
+  lotteryBall,
+  jokerCardSrc,
+}) {
+  const odds = Number(betValue) || 0;
+  const stakeNum = Number(stakeAmount) || 0;
+  const profit = useMemo(() => {
+    if (!odds || !stakeNum) return 0;
+    return Math.round((odds - 1) * stakeNum * 100) / 100;
+  }, [odds, stakeNum]);
+
+  function handleQuickStake(val) {
+    setStakeAmount(String((Number(stakeAmount) || 0) + val));
+  }
+
+  if (!show) return null;
+
+  const formatRange = `${min >= 1000 ? `${min / 1000}K` : min} to ${max >= 1000 ? `${max / 1000}K` : max}`;
+
+  return (
+    <div className="sidebar-box place-bet-container">
+      <div className="sidebar-title">
+        <h4>Place Bet</h4>
+        <span>Range: {formatRange}</span>
+      </div>
+      <div className={`place-bet-box position-relative ${
+        selection?.startsWith("Andar")
+          ? "andarbg andarbg3"
+          : selection?.startsWith("Bahar")
+          ? "baharbg baharbg3"
+          : (betType || "back")
+      }`}>
+        {placing && <CasinoLoader />}
+        <div className="place-bet-box-header">
+          <div className="place-bet-for">(Bet for)</div>
+          <div className="place-bet-odds">Odds</div>
+          <div className="place-bet-stake">Stake</div>
+          <div className="place-bet-profit">Profit</div>
+        </div>
+        <div className="place-bet-box-body">
+          <div className="place-bet-for">
+            {gameType === "lottcard" && lotteryBall != null ? (
+              <div className="lottery-place-balls">
+                <img src={`/assets/img/lottery/ball${lotteryBall}.png`} alt={`ball${lotteryBall}`} />
+              </div>
+            ) : gameType === "teenunique" ? (
+              <div className="unique-teen20-place-balls">
+                {selection && selection.split("").map((c) => {
+                  const idx = parseInt(c, 10) - 1;
+                  return idx >= 0 && idx <= 5 ? <img key={idx} src={SELECTION_BALLS[idx]} alt={`s${idx + 1}`} /> : null;
+                })}
+              </div>
+            ) : (
+              <>
+                <i
+                  className="fas fa-times text-danger me-1"
+                  style={{ cursor: "pointer" }}
+                  onClick={onClose}
+                ></i>
+                <span>{selection}</span>
+              </>
+            )}
+          </div>
+          <div className="place-bet-odds">
+            <input type="text" className="form-control" disabled value={odds} />
+          </div>
+          <div className="place-bet-stake">
+            <input
+              type="number"
+              className="form-control"
+              value={stakeAmount}
+              onChange={(e) => setStakeAmount(e.target.value)}
+            />
+          </div>
+          <div className="place-bet-profit">{profit > 0 ? profit : ""}</div>
+        </div>
+        <div className="place-bet-buttons">
+          {QUICK_STAKES.map((val) => (
+            <button key={val} className="btn btn-place-bet" onClick={() => handleQuickStake(val)}>
+              +{val}
+            </button>
+          ))}
+          <button className="btn btn-sm btn-link text-dark flex-fill text-end" onClick={() => setStakeAmount("")}>
+            clear
+          </button>
+        </div>
+        <div className="place-bet-action-buttons">
+          <div>
+            <button className="btn btn-info">Edit</button>
+          </div>
+          {jokerCardSrc && (
+            <div className="joker-card">
+              <span><img src={jokerCardSrc} alt="Joker" /></span>
+            </div>
+          )}
+          <div>
+            <button className="btn btn-danger me-1" onClick={() => setStakeAmount("")}>Reset</button>
+            <button className="btn btn-success" disabled={!stakeNum || placing} onClick={onSubmit}>
+              {placing ? "..." : "Submit"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

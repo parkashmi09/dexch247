@@ -1,0 +1,41 @@
+.cardContainer {
+  height: auto;
+  overflow: hidden;
+  background-color: #fff;
+  width: 100%;
+  border: 1px solid #ccc;
+  /* Optional: adds a border like the image might have */
+  display: flex;
+  flex-direction: column;
+}
+
+.cardImage {
+  width: 100%;
+  aspect-ratio: 1/1;
+  height: auto;
+  object-fit: cover;
+  display: block;
+  /* Removes bottom space */
+}
+
+.cardFooter {
+  background: linear-gradient(var(--bg-primary), var(--bg-secondary));
+  ;
+  /* Blue color */
+  color: var(--color-text-inverse);
+  text-align: center;
+  padding: 4px 2px;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: sans-serif;
+}
+
+@media (max-width: 480px) {
+  .cardFooter {
+    font-size: 8px;
+  }
+}

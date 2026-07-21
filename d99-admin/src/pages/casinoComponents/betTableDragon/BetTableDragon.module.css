@@ -1,0 +1,522 @@
+/* Main Container */
+.dragonTigerTable {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  width: 100%;
+  margin: 0 auto;
+  padding: 10px;
+  background: var(--color-bg-alt);
+}
+
+/* Top Row */
+.casinoTableFullBox {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.dt20OddBox {
+  margin-right: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dt20dragon,
+.dt20tiger,
+.dt20pair {
+  width: calc(29% - 3px);
+}
+
+.dt20tie {
+  width: calc(13% - 15px);
+}
+
+.dt20pair {
+  margin-right: 0;
+  border-left: 5px solid var(--bg-secondary);
+  padding-left: 8px;
+}
+
+.betBox {
+  background-image: linear-gradient(to right, var(--bg-primary), var(--bg-secondary));
+  color: white;
+  padding: 12px;
+  /* border-radius: 5px; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 60px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.betBoxLarge {
+  background-image: linear-gradient(to right, var(--bg-primary), var(--bg-secondary));
+  color: white;
+  padding: 12px;
+  /* border-radius: 5px; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 60px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.betBoxSmall {
+  background-image: linear-gradient(to right, var(--bg-primary), var(--bg-secondary));
+  color: white;
+  padding: 12px;
+  /* border-radius: 5px; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 40px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.casinoOdds {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.textCenter {
+  text-align: center;
+}
+
+.casinoOddsBox {
+  background-image: linear-gradient(to right, var(--bg-primary), var(--bg-secondary));
+  color: white;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  position: relative;
+  min-height: 42px;
+}
+
+.casinoOddsBoxTheme {
+  border-radius: 0;
+  border: 0;
+}
+
+
+
+.odds {
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.exposure {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.middleSection {
+  display: flex;
+  /* flex-direction: column; */
+  gap: 14px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .middleSection {
+    flex-direction: column;
+  }
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sideMiddle {
+  width: 50%;
+}
+
+@media (max-width: 768px) {
+  .sideMiddle {
+    width: 100%;
+  }
+}
+
+.sideHeader {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--color-text-main);
+  margin: 0;
+  text-align: center;
+}
+
+.oddsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dt20odds {
+  width: calc(25% - 3px);
+  margin-right: 0;
+  margin-bottom: 0;
+}
+
+.suitsRed {
+  font-size: 1.25rem;
+  letter-spacing: 2px;
+  color: var(--color-text-danger);
+}
+
+.suitsBlack {
+  font-size: 1.25rem;
+  letter-spacing: 2px;
+  color: var(--color-text-black);
+}
+
+/* Bottom Section */
+.bottomSection {
+  width: 100%;
+  display: flex;
+  gap: 4px;
+}
+
+.carContainerDt20 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+}
+
+.dt20cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  /* border: 0; */
+  padding: 10px 10px 0 10px;
+  /* background: var(--bg-sidebar, #f5f5f5); */
+  border: 1px solid var(--color-border);
+}
+
+.cardContentDt20 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+}
+
+.cardRow {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.cardRowCentered {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  gap: 4px;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  gap: 8px;
+}
+
+.card {
+  width: 2rem;
+  height: auto;
+  background: var(--color-bg-primary);
+  border: 2px solid #fef08a;
+  /* border-radius: 4px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.cardOddBox {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 4px;
+  margin-right: 4px;
+  cursor: pointer;
+}
+
+.cardOddBox img {
+  height: 65px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Suspended Box Styles */
+.casinoOddsBox.suspendedBox {
+  position: relative;
+  cursor: not-allowed !important;
+}
+
+.casinoOddsBox.suspendedBox::before {
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  pointer-events: none;
+}
+
+.casinoOddsBox.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.suspendedBox {
+  position: relative;
+  cursor: not-allowed !important;
+}
+
+.suspendedBox::before {
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  pointer-events: none;
+}
+
+.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.cardSuits {
+  display: flex;
+  gap: 2px;
+  font-size: 0.75rem;
+}
+
+.black {
+  color: var(--color-text-black);
+}
+
+.red {
+  color: var(--color-text-danger);
+}
+
+/* Responsive Design for Card Images */
+@media only screen and (min-width: 1400px) and (max-width: 1599px) {
+  .cardOddBox img {
+    height: 45px;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .casinoTableFullBox {
+    flex-direction: column;
+  }
+
+  .dt20OddBox {
+    width: 100% !important;
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+
+  .topRow {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .middleSection,
+  .bottomSection {
+    flex-direction: column;
+  }
+
+  .dt20cards {
+    /* flex-wrap: nowrap; */
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+
+  .cardOddBox {
+    flex-shrink: 0;
+    min-width: 40px;
+    margin-right: 4px;
+  }
+
+  .cardsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(35px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .casinoTableFullBox {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding-bottom: 8px;
+  }
+
+  .dt20OddBox {
+    flex-shrink: 1;
+    margin-right: 4px;
+  }
+
+  .dt20dragon,
+  .dt20tiger,
+  .dt20pair {
+    width: calc(24% - 3px);
+    min-width: calc(24% - 3px);
+  }
+
+  .dt20tie {
+    width: calc(12% - 3px);
+    min-width: calc(12% - 3px);
+  }
+
+  .dt20pair {
+    margin-right: 0;
+    padding-left: 4px;
+    border-left: 3px solid var(--bg-secondary);
+  }
+
+  .topRow {
+    grid-template-columns: 1fr;
+  }
+
+  .oddsGrid {
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  .dt20odds {
+    width: calc(25% - 3px);
+    margin-right: 0;
+    margin-bottom: 0;
+  }
+
+  .dt20cards {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+
+  .cardOddBox {
+    flex-shrink: 0;
+    min-width: 35px;
+    margin-right: 4px;
+  }
+
+  .cardOddBox img {
+    height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  /* Top row: 4 boxes in a single row with scroll */
+  .topRow {
+    display: flex !important;
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .topRow>div {
+    min-width: 90px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Even/Odd - single row */
+  .oddsGrid {
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 4px;
+    justify-content: space-between;
+  }
+
+  .dt20odds {
+    width: calc(25% - 3px) !important;
+    margin-right: 0 !important;
+    margin-bottom: 0 !important;
+    flex-shrink: 1;
+  }
+}

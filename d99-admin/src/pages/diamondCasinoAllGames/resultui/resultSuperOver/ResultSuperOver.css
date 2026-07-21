@@ -1,0 +1,132 @@
+/* ResultSuperOver.css */
+
+/* Result row styling */
+.result-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0;
+  justify-content: center;
+}
+
+/* Result circle styling */
+.result-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: white;
+  background-color: #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+/* Win state */
+.result-circle.yes {
+  background-color: #4caf50; /* Green for win */
+}
+
+/* Loss state */
+.result-circle.no {
+  background-color: #f44336; /* Red for loss */
+}
+
+/* Hover effect */
+.result-circle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Table styling */
+.table {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.5rem;
+  vertical-align: top;
+  border-top: 1px solid #dee2e6;
+  text-align: center;
+}
+
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid #dee2e6;
+  background-color: #f8f9fa;
+}
+
+/* Text colors */
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.text-fancy {
+  font-weight: bold;
+  color: #007bff;
+}
+
+/* Score header */
+.score-head {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+/* Responsive table container */
+.table-responsive {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Modal content */
+.five-cricket-result {
+  padding: 1rem;
+}
+
+.five-cricket-result h4 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  color: #343a40;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .result-circle {
+    width: 25px;
+    height: 25px;
+    font-size: 12px;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.3rem;
+    font-size: 0.9rem;
+  }
+  
+  .score-head {
+    font-size: 1rem;
+  }
+}
+
+/* Animation for ball by ball updates */
+@keyframes highlight {
+  from { background-color: #fff3cd; }
+  to { background-color: transparent; }
+}
+
+.highlight-update {
+  animation: highlight 1.5s ease-out;
+}

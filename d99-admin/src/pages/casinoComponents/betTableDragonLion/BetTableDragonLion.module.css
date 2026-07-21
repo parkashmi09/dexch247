@@ -1,0 +1,139 @@
+/* Main Container */
+.dragonLionTable {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--color-bg-primary);
+}
+
+/* Table Grid */
+.tableGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+/* Table Section */
+.tableSection {
+  background: var(--color-bg-primary);
+}
+
+/* Table Styling */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Table Header Row */
+.tableHeaderRow {
+  background-color: var(--color-bg-row);
+}
+
+.emptyHeader {
+  text-align: left;
+  padding: 12px;
+  font-weight: bold;
+}
+
+.columnHeader {
+  padding: 12px;
+  text-align: center;
+  font-weight: 500;
+  color: var(--color-text-main);
+}
+
+/* Table Row */
+.tableRow {
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Bet Type Cell */
+.betType {
+  background-color: var(--color-bg-row);
+  padding: 12px;
+  text-align: left;
+  font-weight: 500;
+  color: var(--color-text-main);
+}
+
+/* Odds Cell */
+.oddsCell {
+  background-color: var(--bg-back);
+  padding: 12px;
+  text-align: center;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Card Cell */
+.cardCell {
+  padding: 0;
+  background-color: var(--color-bg-row);
+}
+
+/* Card Styling */
+.card {
+  border: 2px solid #fef08a;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-primary);
+  padding: 4px 8px;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-weight: 600;
+}
+
+.cardSuits {
+  display: flex;
+  gap: 2px;
+  font-size: 0.75rem;
+}
+
+.black {
+  color: var(--color-text-black);
+}
+
+.red {
+  color: var(--color-text-danger);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tableGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .emptyHeader,
+  .columnHeader,
+  .betType,
+  .oddsCell,
+  .cardCell {
+    padding: 8px;
+    font-size: 0.813rem;
+  }
+
+  .card {
+    padding: 2px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dragonLionTable {
+    font-size: 0.75rem;
+  }
+
+  .cardSuits {
+    font-size: 0.625rem;
+  }
+}
+
+.grayBackground {
+  background-color: var(--color-secondary);
+  /* Or use any dark shade */
+  color: var(--color-text-inverse);
+}

@@ -1,0 +1,310 @@
+.match-odds-table {
+  margin-top: 0;
+  background-color: transparent;
+  color: #333;
+}
+
+.bet-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bg-secondary70);
+  color: var(--text-secondary);
+  height: 40px;
+  padding: 0 0 0 8px;
+}
+
+
+.bet-table-header .nation-name span {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.bet-table-header .float-right .btn {
+  margin-left: 3px;
+  font-size: 12px;
+  padding: 0 8px;
+}
+
+.bet-table-body {
+  box-shadow: 0 0 5px #7c7c7c;
+  border-radius: 0 0 5px 5px;
+}
+
+.bet-table-row {
+  padding: 0 0 0 8px;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  align-items: center;
+  border-bottom: 1px solid #fff;
+  background-color: #ececec;
+}
+
+.bet-table-row-top {
+  background-color: transparent;
+  padding: 0 0 0 8px;
+}
+
+.nation-name {
+  flex: 1 1 auto;
+}
+
+.nation-name p {
+  margin-bottom: 0;
+}
+
+.max-bet {
+  font-size: 12px;
+}
+
+.max-bet-text {
+  font-weight: bold;
+  padding-right: 5px;
+}
+.bl-title {
+  height: 30px;
+  border-radius: 0;
+  width: 85px;
+  text-align: center;
+  line-height: 30px;
+  color: var(--text-black);
+  font-weight: var(--font-medium);
+  margin-right: 0;
+  cursor: default;
+font-weight: bold;
+  font-size: var(--font-caption);
+}
+
+.bl-title.back {
+  background-color: var(--back-hover);
+  /* font-weight: var(--font-bold); */
+  font-weight: bold;
+}
+
+.bl-box {
+  width: 85px;
+  height: 45px;
+  /* min-height: 45px; */
+  padding: 4px 0;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-left: 1px solid #fff;
+  cursor: pointer;
+}
+
+.bl-box-empty {
+  width: 85px;
+  height: auto;
+  /* min-height: 45px; */
+  padding: 4px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-left: 1px solid #fff;
+  cursor: pointer;
+}
+
+.bl-box .odds {
+  font-weight: var(--font-bold);
+}
+
+.back {
+  background-color: var(--back);
+}
+
+.bl-box.back:hover {
+  background-color: var(--back-hover);
+}
+
+.back1 {
+  background-color: var(--back1);
+}
+
+.back2 {
+  background-color: var(--back2);
+}
+
+.lay {
+  background-color: var(--lay);
+}
+
+.bl-box.lay:hover {
+  background-color: var(--lay-hover);
+}
+
+.lay1 {
+  background-color: var(--lay1);
+}
+
+.lay2 {
+  background-color: var(--lay2);
+}
+
+/* Button Back Styles */
+.bet-table-header .btn-back {
+  cursor: pointer;
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+  padding: 0.47rem 0.75rem;
+  text-decoration: none;
+  border-radius: 3px !important;
+  margin-right: 3px;
+  margin-left: 0;
+  text-transform: uppercase;
+  display: inline-block;
+  font-size: 12px;
+}
+
+.bet-table-header .btn-back:hover {
+  background-color: var(--bg-secondary85) !important;
+  border-color: var(--bg-secondary85) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* HT/FT Market Styles (market-1) */
+.market-1 {
+  padding-right: 0 !important;
+  margin-bottom: 10px;
+}
+
+.market-1 .bet-table {
+  margin-top: 0;
+  background-color: transparent;
+  color: #333;
+}
+
+.market-1 .bet-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bg-secondary70);
+  color: var(--text-secondary);
+  height: 40px;
+  padding: 0 0 0 8px;
+}
+
+.market-1 .bet-table-header span {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.market-1 .bet-table-header .float-right .btn {
+  margin-left: 3px;
+  font-size: 12px;
+  padding: 0 8px;
+}
+
+.market-1 .bet-table-body {
+  box-shadow: 0 0 5px #7c7c7c;
+  border-radius: 0 0 5px 5px;
+}
+
+.market-1 .bet-table-row {
+  padding: 0 0 0 8px;
+  background-color: #ececec;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  align-items: center;
+  border-bottom: 1px solid #fff;
+}
+
+.market-1-item {
+  padding: 2px 8px;
+  border-bottom: 1px solid var(--bg-table-header);
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 33.33%;
+  max-width: 50%;
+}
+
+.market-1-item > div:first-child {
+  display: flex;
+  align-items: center;
+}
+
+.market-1-item .ml-2 {
+  margin-left: 0.5rem;
+}
+
+.market-1-item .bl-box {
+  width: auto;
+  min-width: 85px;
+  height: auto;
+  padding: 4px 8px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-left: 1px solid #fff;
+  cursor: pointer;
+  background-color: var(--back);
+}
+
+.market-1-item .bl-box:hover {
+  background-color: var(--back-hover);
+}
+
+.market-1-item .bl-box .odds {
+  font-weight: var(--font-bold);
+  font-size: 14px;
+}
+
+/* Suspended state styling with lock icon */
+.bl-box.suspended {
+  position: relative !important;
+  overflow: visible;
+  background-color: #D7EBFA !important;
+}
+
+.bl-box.suspended::before {
+  content: "" !important;
+  background-image: url(/img/lock.svg) !important;
+  background-size: 15px 15px !important;
+  background-repeat: no-repeat !important;
+  position: absolute !important;
+  z-index: 100 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 45px !important;
+  left: 0 !important;
+  top: 0 !important;
+  background-position: center !important;
+  pointer-events: none !important;
+  display: block !important;
+}
+
+.market-1-item .bl-box.suspended {
+  position: relative !important;
+  min-height: 45px;
+  overflow: visible;
+  background-color: #D7EBFA !important;
+}
+
+.market-1-item .bl-box.suspended::before {
+  content: "" !important;
+  background-image: url(/img/lock.svg) !important;
+  background-size: 15px 15px !important;
+  background-repeat: no-repeat !important;
+  position: absolute !important;
+  z-index: 100 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 45px !important;
+  left: 0 !important;
+  top: 0 !important;
+  background-position: center !important;
+  pointer-events: none !important;
+  display: block !important;
+}
+
+

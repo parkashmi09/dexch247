@@ -1,0 +1,155 @@
+import got from "got";
+import http from "http";
+import https from "https";
+import dns from "dns";
+import ENV from "../config/env.js";
+
+
+// ================= ENV =================
+const SPORTS_BASE_URL = ENV.SPORTS_BASE_URL;
+// const SPORTS_SECOND_URL = process.env.SPORTS_SECOND_URL;
+const SPORTS_API_KEY = ENV.SPORTS_API_KEY;
+
+// ================= KEEP-ALIVE AGENTS =================
+const agent = {
+    http: new http.Agent({
+        keepAlive: true,
+        maxSockets: 500, // 250 concurrent × 2 upstreams
+        maxFreeSockets: 250,
+        keepAliveMsecs: 1000,
+        timeout: 10000,
+    }),
+    https: new https.Agent({
+        keepAlive: true,
+        maxSockets: 500,
+        maxFreeSockets: 250,
+        keepAliveMsecs: 1000,
+        timeout: 10000,
+    }),
+};
+
+// ================= DNS CACHE (WITH TTL) =================
+const dnsCache = new Map();
+const DNS_TTL = 5 * 60 * 1000; // 5 minutes
+
+const dnsLookup = (hostname, options, callback) => {
+    const now = Date.now();
+    const cached = dnsCache.get(hostname);
+
+    if (cached && cached.expires > now) {
+        return callback(null, cached.address, cached.family);
+    }
+
+    dns.lookup(hostname, options, (err, address, family) => {
+        if (!err) {
+            dnsCache.set(hostname, {
+                address,
+                family,
+                expires: now + DNS_TTL,
+            });
+        }
+        callback(err, address, family);
+    });
+};
+
+// ================= PRE-WARM DNS =================
+(() => {
+    const hosts = new Set();
+    //   [SPORTS_BASE_URL, SPORTS_SECOND_URL].forEach((url) => 
+    [SPORTS_BASE_URL].forEach((url) => {
+        try {
+            hosts.add(new URL(url).hostname);
+        } catch { }
+    });
+
+    hosts.forEach((host) => {
+        dns.lookup(host, { all: false }, (err, address) => {
+            if (!err) {
+                dnsCache.set(host, {
+                    address,
+                    family: 4,
+                    expires: Date.now() + DNS_TTL,
+                });
+            }
+        });
+    });
+})();
+
+// ================= COMMON HEADERS =================
+const COMMON_HEADERS = {
+    "x-turnkeyxgaming-key": SPORTS_API_KEY,
+    accept: "application/json",
+    "accept-encoding": "gzip",
+    connection: "keep-alive",
+};
+
+// ================= MAIN FETCH FUNCTION =================
+export const fetchSportsData = (endpoint) => {
+    const controller = new AbortController();
+
+    const url1 = SPORTS_BASE_URL + endpoint;
+    // const url2 = SPORTS_SECOND_URL + endpoint;
+
+    console.log("url1", url1);
+
+    let finished = false;
+    let errorCount = 0;
+
+    return new Promise((resolve, reject) => {
+        const success = (data) => {
+            if (finished) return;
+            finished = true;
+            controller.abort();
+            resolve(data);
+        };
+
+        const failure = (err) => {
+            errorCount++;
+            if (errorCount === 1 && !finished) {
+                finished = true;
+                reject(err);
+            }
+        };
+
+        const requestConfig = {
+            method: "GET",
+            agent,
+            signal: controller.signal,
+            headers: COMMON_HEADERS,
+            responseType: "json",
+            retry: { limit: 0 },
+            throwHttpErrors: true,
+            dnsLookup,
+            decompress: true,
+            followRedirect: false,
+            http2: false,
+            timeout: {
+                lookup: 100, // DNS (cached + fallback)
+                connect: 400, // TCP (cold socket / packet loss)
+                secureConnect: 800, // TLS under load
+                request: 1500, // Send headers/body
+                response: 2000, // ⬅ upstream odds aggregation
+            },
+        };
+
+        // 🔥 FIRE BOTH REQUESTS
+        got(url1, requestConfig)
+            .then((res) => res.body)
+            .then(success)
+            .catch(failure);
+
+        // got(url2, requestConfig)
+        //     .then((res) => res.body)
+        //     .then(success)
+        //     .catch(failure);
+
+        // ⏱ HARD SAFETY TIMEOUT (2s)
+        setTimeout(() => {
+            if (!finished) {
+                finished = true;
+                controller.abort();
+                reject(new Error("Timeout: No response within 2500ms"));
+            }
+        }, 2500);
+    });
+};

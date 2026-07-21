@@ -1,0 +1,102 @@
+/* Main Table Container */
+.pattiTable {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-weight: bold;
+  color: var(--color-text-main);
+  width: 100%;
+  margin: 0 auto;
+  background: white;
+}
+
+/* Table Styling */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+
+/* Table Row */
+.tableRow {
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Label Cell */
+.label {
+  text-align: left;
+  font-weight: bold;
+  font-size: 15px;
+  color: var(--color-text-main);
+  background: var(--color-bg-alt);
+  padding: 12px 5px;
+  width: 100%;
+  border: 1px solid #c7c5c5;
+
+}
+
+/* Value Cells */
+.valueBlue {
+  text-align: center;
+  font-weight: 600;
+  width: 22%;
+  background-color: var(--bg-back);
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.valuePink {
+  text-align: center;
+  font-weight: 600;
+  width: 22%;
+  background-color: var(--bg-lay);
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+/* Locked Cell */
+.lockedCell {
+  text-align: center;
+  width: 22%;
+  background-color: var(--color-overlay-lock);
+  padding: 12px 16px;
+}
+
+/* Stacked Values */
+.stacked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.small {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.large {
+  font-size: 1.125rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+
+  .label,
+  .valueBlue,
+  .valuePink,
+  .lockedCell {
+    padding: 8px 12px;
+  }
+
+  .label {
+    font-size: 0.875rem;
+  }
+
+  .valueBlue,
+  .valuePink {
+    font-size: 0.875rem;
+  }
+
+  .large {
+    font-size: 1rem;
+  }
+}

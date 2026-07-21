@@ -1,0 +1,20 @@
+#loader-full {
+  display: block;
+  position: fixed;
+  z-index: 9999;
+  background-image: url('../assets/loader.gif');
+  background-color: #666;
+  opacity: 0.4;
+  background-repeat: no-repeat;
+  background-position: center;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  top: 0;
+  background-size: 100px 100px;
+}
+
+#loader-full[style*="display: none"] {
+  display: none !important;
+}
+

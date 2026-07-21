@@ -1,0 +1,196 @@
+/* Main Table Container */
+.betTable4 {
+  width: 100%;
+  font-family: "Roboto Condensed", sans-serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--color-text-main);
+  margin: 0 auto;
+}
+
+/* Table Styling */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+/* Table Header Row */
+.tableHeaderRow {
+  background-color: var(--color-bg-row);
+}
+
+/* Player Name Header */
+.playerName {
+  width: 16rem;
+  text-align: start;
+  padding-left: 0.3rem;
+  height: 32px;
+  font-size: 16px;
+  border: 1px solid #d7d7d7;
+}
+
+@media (max-width: 768px) {
+  .playerName {
+    width: 12rem;
+    font-size: 14px;
+  }
+}
+
+/* Back Header */
+.backHeader {
+  width: 5.5rem;
+  background-color: var(--bg-back);
+  font-weight: bold;
+  color: var(--color-text-main);
+  border: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
+  .backHeader {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .layHeader {
+    font-size: 14px;
+  }
+}
+
+/* Lay Header */
+.layHeader {
+  width: 5.5rem;
+  background-color: var(--bg-lay);
+  font-weight: bold;
+  color: var(--color-text-main);
+  border: 1px solid #ddd;
+}
+
+/* Table Row */
+.tableRow {
+  border-bottom: 1px solid #ddd;
+  height: 46px;
+}
+
+.tableRow td {
+  vertical-align: middle;
+}
+
+/* Main Cell */
+.mainCell {
+  width: 16rem;
+  text-align: start;
+  padding-left: 0.5rem;
+  background-color: var(--color-bg-row);
+  height: 46px;
+  font-weight: bold;
+  color: var(--color-text-main);
+  border: 1px solid #ddd;
+}
+
+/* Back Cell */
+.backCell {
+  width: 5.5rem;
+  background-color: var(--bg-back);
+  font-weight: bold;
+  color: var(--color-text-main);
+  border: 1px solid #ddd;
+  padding: 8px 0;
+  cursor: pointer;
+  height: 46px;
+  vertical-align: middle;
+  text-align: center;
+  position: relative;
+}
+
+.backCell>span {
+  display: block;
+}
+
+/* Lay Cell */
+.layCell {
+  width: 5.5rem;
+  background-color: var(--bg-lay);
+  font-weight: bold;
+  color: var(--color-text-main);
+  border: 1px solid #ddd;
+  padding: 8px 0;
+  cursor: pointer;
+  height: 46px;
+  vertical-align: middle;
+  text-align: center;
+  position: relative;
+}
+
+.layCell>span {
+  display: block;
+}
+
+/* Locked Cell */
+.lockedCell {
+  width: 5.5rem;
+  background-color: var(--color-overlay-lock);
+  text-align: center;
+  border: 1px solid #ddd;
+  padding: 0;
+  height: 46px;
+  vertical-align: middle;
+  position: relative;
+}
+
+.lockedCell svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .playerName {
+    width: 12rem;
+    /* Adjust width for smaller screens */
+  }
+
+  .backHeader,
+  .layHeader {
+    width: 4rem;
+    /* Adjust width for smaller screens */
+    padding: 6px 0;
+    /* Adjust padding for smaller screens */
+  }
+
+  .mainCell,
+  .backCell,
+  .layCell,
+  .lockedCell {
+    padding-left: 0.3rem;
+    /* Adjust padding for smaller screens */
+    font-size: 14px;
+    /* Reduce font size for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .playerName {
+    width: 10rem;
+    /* Further adjust width for very small screens */
+  }
+
+  .backHeader,
+  .layHeader {
+    width: 3.5rem;
+    /* Further adjust width for very small screens */
+    padding: 4px 0;
+    /* Further adjust padding for very small screens */
+  }
+
+  .mainCell,
+  .backCell,
+  .layCell,
+  .lockedCell {
+    font-size: 12px;
+    /* Further reduce font size for very small screens */
+  }
+}

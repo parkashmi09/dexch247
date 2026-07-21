@@ -1,0 +1,45 @@
+/* Integrity bell — loaded globally (bell lives in the header). */
+.st-bell { position: relative; background: none; border: none; padding: 8px; cursor: pointer; color: inherit; }
+.st-bell:hover { opacity: .85; }
+.st-bell-badge { position: absolute; top: 1px; right: 1px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: #e11d48; color: #fff; font-size: 10px; line-height: 17px; text-align: center; font-weight: 700; box-shadow: 0 0 0 2px #fff; }
+
+/* dialogClassName puts .st-bell-modal directly ON .modal-dialog, so target it directly */
+.modal-dialog.st-bell-modal { width: 94% !important; max-width: 820px !important; margin-left: auto !important; margin-right: auto !important; }
+.st-bell-modal .modal-content { border: none; border-radius: 14px; overflow: hidden; box-shadow: 0 24px 60px rgba(16,24,40,.28); }
+/* header matches the app top-bar theme (slate #2C3E50 + primary blue accent) */
+.st-bm-head { background: linear-gradient(135deg, #2C3E50 0%, #22303f 100%); color: #fff; border: none; padding: 15px 20px; }
+.st-bm-head .modal-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; letter-spacing: .2px; color: #fff !important; }
+.st-bm-head, .st-bm-head .modal-title, .st-bm-head .modal-title * { color: #fff !important; }
+.st-bm-head .modal-title svg { opacity: .95; }
+.st-bm-head .badge { box-shadow: 0 1px 2px rgba(0,0,0,.18); }
+/* Custom close button — the app ships Bootstrap-4 CSS, so RB5's .btn-close
+   icon never renders; use an explicit icon button instead. */
+.st-bm-close { display: grid; place-items: center; width: 32px; height: 32px; flex: none; padding: 0; border: none; border-radius: 8px; background: rgba(255,255,255,.12); color: #fff; cursor: pointer; transition: background .15s ease; }
+.st-bm-close:hover { background: rgba(255,255,255,.24); }
+.st-bm-head .modal-title { flex: 1; }
+/* body + footer share the header's 20px side padding so everything left/right-aligns */
+.st-bm-body { max-height: 62vh; overflow-y: auto; background: #f4f6f9; padding: 16px 20px; }
+
+.st-au { display: flex; background: #fff; border: 1px solid #e8ebf0; border-radius: 11px; overflow: hidden; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(16,24,40,.05); }
+.st-au:last-child { margin-bottom: 0; }
+.st-au-bar { width: 4px; flex: none; }
+.st-au.high .st-au-bar { background: #fc4242; }
+.st-au.review .st-au-bar { background: #ef910f; }
+.st-au-main { flex: 1; min-width: 0; padding: 12px 14px; }
+.st-au-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.st-au-id { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.st-au-avatar { width: 38px; height: 38px; flex: none; display: grid; place-items: center; border-radius: 50%; background: rgba(0,136,204,.12); color: #0088CC; font-weight: 700; font-size: 16px; }
+.st-au-name { font-weight: 700; color: #1f2937; }
+.st-au-meta { font-size: 12px; color: #94a3b8; }
+.st-au-issues { margin-top: 10px; border-top: 1px dashed #eef0f4; padding-top: 9px; display: flex; flex-direction: column; gap: 6px; }
+.st-au-issue { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; }
+.st-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; margin-top: 4px; }
+.st-dot.high { background: #fc4242; } .st-dot.review { background: #ef910f; }
+.st-au-issue-label { color: #334155; font-weight: 500; }
+.st-au-issue-detail { color: #64748b; }
+
+.st-bm-empty { text-align: center; padding: 38px 20px; color: #64748b; }
+.st-bm-empty svg { width: 46px; height: 46px; color: #03b37f; margin-bottom: 10px; }
+.st-bm-empty-title { font-size: 16px; font-weight: 700; color: #1f2937; }
+.st-bm-empty-sub { font-size: 13px; margin-top: 3px; }
+.st-bm-foot { background: #fff; border-top: 1px solid #e8ebf0; padding: 12px 20px; }

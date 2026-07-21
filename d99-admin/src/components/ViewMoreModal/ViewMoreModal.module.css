@@ -1,0 +1,317 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+
+/* Override refrercestyle.css .modal-dialog { max-width: 530px } so View More is 90% */
+.modalDialogCustom {
+  margin-top: 2% !important;
+  margin-bottom: auto !important;
+  transform: none !important;
+  top: 0 !important;
+  max-width: 90% !important;
+  width: 90% !important;
+}
+
+@media only screen and (max-width: 1024px) {
+  .modalDialogCustom {
+    max-width: 95% !important;
+    width: 95% !important;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .modalDialogCustom {
+    margin: 0 !important;
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+.modalHeader {
+
+  color: #333;
+  padding: 1rem;
+
+  border-top-left-radius: calc(0.3rem - 1px);
+  border-top-right-radius: calc(0.3rem - 1px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modalTitle {
+  color: #333 !important;
+  font-size: 20px;
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+.closeButton {
+  width: 35px;
+  height: 35px;
+  padding: 0;
+  margin: 0;
+  background-color: var(--bg-primary);
+  color: #fff !important;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  line-height: 1;
+  opacity: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  opacity: 0.9;
+}
+
+.modalContentWrapper {
+  background-color: #fff;
+  border-radius: 0.3rem;
+  overflow: hidden;
+}
+
+.modalBody {
+  background-color: #fff;
+  color: #1e1e1e;
+  padding: 1rem;
+  max-height: calc(98vh - 80px);
+  overflow-x: auto;
+  overflow-y: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Table area – use full modal width so columns (e.g. Browser Details) are not compressed */
+.modalTableWrap {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.modalTableWrap .account-list-new,
+.modalTableWrap .card,
+.modalTableWrap .card-body,
+.modalTableWrap .table-responsive {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+.modalTableWrap table {
+  width: 100% !important;
+  min-width: 100%;
+  table-layout: auto;
+}
+
+.modalContent {
+  padding: 10px;
+}
+
+.modalContentTitle {
+  color: #1e1e1e;
+  font-size: 18px;
+  margin-bottom: 1rem;
+}
+
+.filterSection {
+  margin-bottom: 1rem;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.04);
+  border-radius: 4px;
+}
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 120px;
+}
+
+.filterLabel {
+  color: #1e1e1e;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.filterInput,
+.filterSelect {
+  padding: 6px 10px;
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #ddd;
+  font-size: 12px;
+  outline: none;
+}
+
+.amountGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.amountGroup .filterInput {
+  flex: 1;
+}
+
+.amountSeparator {
+  color: #1e1e1e;
+}
+
+.filterActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.searchBtn {
+  background-color: var(--bg-primary, #0088CC);
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.searchBtn:hover {
+  opacity: 0.9;
+}
+
+.resetBtn {
+  background-color: #dc3545;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.resetBtn:hover {
+  background-color: #c82333;
+}
+
+/* Table: same structure and styles as assign-agent (assign-agent.jsx / style.css) */
+.assignAgentTableWrap {
+  width: 100%;
+  font-family: var(--font-primary);
+}
+
+.assignAgentTableWrap .table-responsive {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.assignAgentTableWrap .table {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+  font-family: var(--font-primary);
+}
+
+.assignAgentTableWrap .table th,
+.assignAgentTableWrap .table td {
+  font-size: 14px;
+  color: #1e1e1e;
+}
+
+.assignAgentTableWrap .table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 500;
+  color: #495057;
+  background-color: transparent !important;
+}
+
+.assignAgentTableWrap .table tbody td {
+  vertical-align: middle;
+  border-top: 1px solid #dee2e6;
+  font-size: 14px;
+  color: #1e1e1e;
+}
+
+.assignAgentTableWrap .table-bordered {
+  border: 1px solid #dee2e6;
+}
+
+.assignAgentTableWrap .table-bordered th,
+.assignAgentTableWrap .table-bordered td {
+  border: 1px solid #dee2e6;
+}
+
+.assignAgentTableWrap .table thead tr {
+  background-color: transparent;
+}
+
+.assignAgentTableWrap .table thead th {
+  background-color: #fff;
+}
+
+.assignAgentTableWrap .table tbody tr {
+  background-color: #fff;
+}
+
+.assignAgentTableWrap .table-bordered.table {
+  border: 0;
+}
+
+.assignAgentTableWrap .table-bordered.table thead th,
+.assignAgentTableWrap .table-bordered.table thead td {
+  border: 1px solid #dee2e6 !important;
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+.assignAgentTableWrap .table > :not(caption) > * > * {
+  padding: 0.2rem 0.5rem;
+  color: #1e1e1e;
+}
+
+.assignAgentTableWrap .b-table-empty-row td {
+  text-align: center;
+}
+
+.assignAgentTableWrap .text-center {
+  text-align: center !important;
+}
+
+.assignAgentTableWrap .my-2 {
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.assignAgentTableWrap .mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.backRow {
+  background-color: #fff;
+}
+
+.layRow {
+  background-color: rgba(0, 0, 0, 0.03);
+}

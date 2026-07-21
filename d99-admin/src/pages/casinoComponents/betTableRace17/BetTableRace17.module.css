@@ -1,0 +1,173 @@
+.betTable {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+
+  margin: 0 auto;
+  font-family: "Roboto-Condensed", sans-serif;
+  gap: 0.5rem;
+}
+
+.playerOption {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 18px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.betOptions {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.betBox {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  height: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.cellContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 2px;
+  width: 100%;
+}
+
+.exposure {
+  font-size: 10px;
+  line-height: 1;
+  margin-top: -2px;
+  font-weight: bold;
+}
+
+.back {
+  background-color: var(--bg-back);
+  color: Black;
+}
+
+.lay {
+  background-color: var(--bg-lay);
+  color: Black;
+}
+
+.betBox.locked {
+  background-color: var(--color-overlay-lock) !important;
+}
+
+.odds {
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .betTable {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .playerOption {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background-color: var(--color-bg-row);
+    border: 1px solid #d7d7d7;
+
+  }
+
+  .label {
+    font-size: 12px;
+    font-weight: bold;
+    width: 100%;
+  }
+
+  .betOptions {
+    gap: 2px;
+  }
+
+  .betBox {
+    padding: 5px 10px;
+    height: 35px;
+    min-width: 60px;
+  }
+
+  .odds {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .betTable {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* ✅ 2 columns on mobile */
+    gap: 8px;
+  }
+
+  .playerOption {
+    flex-direction: column;
+    align-items: center;
+    padding: 6px;
+    background-color: var(--color-bg-row);
+    border: 1px solid #d7d7d7;
+  }
+
+  .label {
+    font-size: 10px;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .betOptions {
+    gap: 4px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .betBox {
+    padding: 4px 8px;
+    height: 30px;
+    min-width: 50px;
+  }
+
+  .odds {
+    font-size: 10px;
+  }
+}
+
+.locked {
+  background-color: var(--color-overlay-lock);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: not-allowed;
+}
+
+.locked svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}

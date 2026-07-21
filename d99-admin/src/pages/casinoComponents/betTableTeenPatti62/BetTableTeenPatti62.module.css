@@ -1,0 +1,267 @@
+.betTable {
+    width: 100%;
+    font-family: "Roboto Condensed", sans-serif;
+    background: var(--color-bg-alt);
+    border: 1px solid #ddd;
+}
+
+.topSection {
+    display: flex;
+    margin-bottom: 5px;
+    gap: 5px;
+}
+
+.playerTable {
+    flex: 1;
+    border: 1px solid #ccc;
+    background: var(--color-bg-primary);
+}
+
+/* 
+   Using CSS Grid for strict alignment 
+   Columns: Name (50%), Back (25%), Lay (25%)
+*/
+.tableHeader,
+.tableRow {
+    display: grid;
+    grid-template-columns: 60% 20% 20%;
+    width: 100%;
+}
+
+.tableHeader {
+    /* background: #e0e0e0; */
+    border-bottom: 1px solid #ccc;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Reset flex properties and use consistent padding/borders */
+.headerCell {
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #ddd;
+    /* Separator lines */
+}
+
+@media (max-width: 768px) {
+    .tableHeader {
+        font-size: 12px;
+    }
+
+    .headerCell {
+        padding: 4px;
+    }
+}
+
+.headerCell:last-child {
+    border-right: none;
+}
+
+.headerName {
+    justify-content: flex-start;
+    padding-left: 10px;
+}
+
+.headerBack {
+    background: var(--bg-back);
+    color: #000;
+}
+
+.headerLay {
+    background: var(--bg-lay);
+    color: #000;
+}
+
+
+/* Rows */
+.tableRow {
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.rowName {
+    padding: 8px;
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    border-right: 1px solid #eee;
+}
+@media (max-width: 768px) {
+    .rowName {
+      font-size: 12px;
+    }
+}
+
+.rowCell {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    border-right: 1px solid #eee;
+    position: relative;
+    /* For lock icon overlay if needed */
+}
+
+.rowCell:last-child {
+    border-right: none;
+}
+
+.backCell {
+    background: var(--bg-back);
+}
+
+.layCell {
+    background: var(--bg-lay);
+}
+
+.backCell:hover {
+    background: #5dade2;
+}
+
+.layCell:hover {
+    background: #f194a8;
+}
+
+/* Suspended Box (Locked) */
+.suspendedBox {
+    position: relative;
+    pointer-events: none;
+    cursor: not-allowed;
+    background-color: var(--color-overlay-lock) !important;
+}
+
+.suspendedBox::before {
+    background-image: url(../../../assets/img/lock.svg);
+    background-size: 17px 17px;
+    filter: invert(1);
+    -webkit-filter: invert(1);
+    background-repeat: no-repeat;
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    pointer-events: none;
+}
+
+.suspendedBox::after {
+    content: "";
+    background-color: var(--color-overlay-lock);
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    cursor: not-allowed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+
+/* Bottom Section */
+.bottomSection {
+    width: 100%;
+    border: 1px solid #ccc;
+    background: var(--color-bg-primary);
+    margin-top: 5px;
+}
+
+.cardGrid {
+    display: grid;
+    grid-template-columns: 100px repeat(6, 1fr);
+}
+
+.gridHeader {
+    font-weight: bold;
+    background: var(--color-bg-alt);
+    padding: 8px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+}
+
+.gridHeaderFirst {
+    background: var(--color-bg-alt);
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+}
+
+.gridRowLabel {
+    font-weight: bold;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #eee;
+}
+
+.gridCell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 45px;
+    border-right: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    background: var(--color-secondary);
+    color: white;
+    cursor: pointer;
+}
+
+.gridCellActive {
+    background: var(--bg-back);
+    color: black;
+    font-weight: bold;
+}
+
+
+/* Exposure */
+.exposure {
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 1;
+    margin-top: 2px;
+    display: block;
+    text-align: center;
+    z-index: 4;
+    position: relative;
+}
+
+.rowCell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.gridCell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .topSection {
+        flex-direction: column;
+    }
+
+    .cardGrid {
+        grid-template-columns: 60px repeat(6, 1fr);
+        font-size: 12px;
+    }
+
+    .gridCell {
+        height: 35px;
+    }
+}

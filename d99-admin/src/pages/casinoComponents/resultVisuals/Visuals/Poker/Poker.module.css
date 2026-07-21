@@ -1,0 +1,68 @@
+.pokerContainer {
+    width: 100%;
+    max-width: 400px;
+
+    border-radius: 8px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
+.topSection {
+    display: flex;
+    justify-content: space-between;
+}
+
+.playerSection {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+}
+
+.playerName {
+    color: var(--color-text-inverse);
+    font-weight: bold;
+    font-size: 14px;
+    background: var(--color-black);
+    padding: 2px 8px;
+    border-radius: 4px;
+    width: 100%;
+    text-align: center;
+}
+
+.playerCards {
+    display: flex;
+    gap: 5px;
+}
+
+.boardSection {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.boardTitle {
+    color: var(--color-text-inverse);
+    font-weight: bold;
+    font-size: 14px;
+    background: var(--color-black);
+    padding: 2px 8px;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+.boardCards {
+    display: flex;
+    gap: 5px;
+    justify-content: flex-start;
+}
+
+.cardImage {
+    width: 35px;
+    height: 48px;
+    border-radius: 3px;
+    object-fit: cover;
+}

@@ -1,0 +1,17 @@
+/* Project-local overrides. Add nothing here that belongs in the reference. */
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  font-family: "Roboto Condensed", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-body);
+  color: var(--text-body);
+}
+
+/* Let Bootstrap's default link color (#0d6efd) apply globally so that
+ * Privacy Policy, Terms of Service, Download APK etc. render blue.
+ * Components that need inherited color (nav links, header, sidebar)
+ * already have their own rules from the reference CSS. */
+a {
+  text-decoration: none;
+}

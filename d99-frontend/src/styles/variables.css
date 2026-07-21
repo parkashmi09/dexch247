@@ -1,0 +1,229 @@
+/* =====================================================================
+ * variables.css — single source of truth for every CSS custom property.
+ *
+ * Imported FIRST in main.jsx so every other stylesheet (Bootstrap, the
+ * reference, components) can read these tokens.
+ *
+ * Whitelabel rule: never hardcode a hex in a component. Add it here, then
+ * use `var(--token)`. Per-brand overrides go in `themes/<brand>.css` and
+ * win because they're imported later.
+ * =====================================================================*/
+
+/* --- App / layout ---------------------------------------------------- */
+:root {
+  --app-height: 100%; /* JS sets this to window.innerHeight on resize for mobile */
+}
+
+/* --- Brand palette --------------------------------------------------- */
+:root {
+  --bg-primary: #0088cc;
+  --bg-primary65: #0088cca5;
+  --bg-primary90: #0088cce6;
+  --text-primary: #ffffff;
+
+  --bg-secondary: #2c3e50;
+  --bg-secondary70: #2c3e50b3;
+  --bg-secondary85: #2c3e50d9;
+  --text-secondary: #ffffff;
+
+  --bg-news: transparent;
+}
+
+/* --- Surfaces / chrome ----------------------------------------------- */
+:root {
+  --bg-sidebar: #cccccc;
+  --text-sidebar: #000000;
+  --bg-body: #ffffff;
+  --text-body: #000000;
+  --input-border: #dbdbdb;
+  --input-border-hover: #b5b5b5;
+  --sidebar-menu-link-bg: #bbbbbb;
+  --sidebar-menu-link-color: #000000;
+  --sidebar-menu-link-border: #9e9e9e;
+  --table-border: #c7c8ca;
+  --bg-table: #f7f7f7;
+  --bg-table-row: #f2f2f2;
+  --text-table: #333333;
+
+  --text-info: #097c93;
+  --bg-info: #097c93;
+  --text-danger: #bd1828;
+  --bg-danger: #bd1828;
+  --text-success: #086f3f;
+  --bg-success: #086f3f;
+  --bg-fancy: #fdcf13;
+  --text-fancy: #fdcf13;
+}
+
+/* --- Sport accents --------------------------------------------------- */
+:root {
+  --football: #03b37f;
+  --football_75: #03b37fbf;
+  --football_50: #03b37f80;
+
+  --tennis: #f18521;
+  --tennis_75: #f18521bf;
+  --tennis_50: #f18521a3;
+
+  --boxing: #e44e23;
+  --boxing_75: #e44e23bf;
+  --boxing_50: #e44e2380;
+
+  --cricket: #20327b;
+  --cricket_75: #20327bbf;
+  --cricket_50: #20327b80;
+
+  --golf: #015900;
+  --golf_75: #015900bf;
+  --golf_50: #01590080;
+
+  --beach-volleyball: #ff9c63;
+  --beach-volleyball_75: #ff9c63bf;
+  --beach-volleyball_50: #ff9c6380;
+
+  --table-tennis: #db2752;
+  --table-tennis_75: #db2752bf;
+  --table-tennis_50: #db275280;
+
+  --futsal: #74c94b;
+  --futsal_75: #74c94bbf;
+  --futsal_50: #74c94b80;
+
+  --horse-racing: #9e4025;
+  --horse-racing_75: #9e4025bf;
+  --horse-racing_50: #9e402580;
+
+  --egames: #623cea;
+  --egames_75: #623ceabf;
+  --egames_50: #623cea80;
+}
+
+/* --- W3 cell layout (lobbies / tile grids) --------------------------- */
+:root {
+  --w3-bg: #f5f7fb;
+  --w3-panel: #ffffff;
+  --w3-panel-2: #f2f4f8;
+  --w3-line: #e5e7eb;
+  --w3-text: #111827;
+  --w3-muted: #6b7280;
+  --w3-head: #b45309;
+  --w3-chip: #eef2f7;
+  --w3-date-bg: #111827;
+  --w3-date-ring: #f59e0b;
+  --w3-digit: #475569;
+  --w3-digit-bg: rgba(71, 85, 105, 0.14);
+  --w3-big-color: #333333;
+  --w3-cell-min: 130px;
+}
+@media (max-width: 900px) {
+  :root {
+    --w3-cell-min: 120px;
+  }
+}
+@media (max-width: 720px) {
+  :root {
+    --w3-cell-min: 110px;
+  }
+}
+
+/* --- react-phone-number-input --------------------------------------- */
+:root {
+  --PhoneInput-color--focus: #03b2cb;
+  --PhoneInputInternationalIconPhone-opacity: 0.8;
+  --PhoneInputInternationalIconGlobe-opacity: 0.65;
+  --PhoneInputCountrySelect-marginRight: 0.35em;
+  --PhoneInputCountrySelectArrow-width: 0.3em;
+  --PhoneInputCountrySelectArrow-marginLeft: var(--PhoneInputCountrySelect-marginRight);
+  --PhoneInputCountrySelectArrow-borderWidth: 1px;
+  --PhoneInputCountrySelectArrow-opacity: 0.45;
+  --PhoneInputCountrySelectArrow-color: currentColor;
+  --PhoneInputCountrySelectArrow-color--focus: var(--PhoneInput-color--focus);
+  --PhoneInputCountrySelectArrow-transform: rotate(45deg);
+  --PhoneInputCountryFlag-aspectRatio: 1.5;
+  --PhoneInputCountryFlag-height: 1em;
+  --PhoneInputCountryFlag-borderWidth: 1px;
+  --PhoneInputCountryFlag-borderColor: rgba(0, 0, 0, 0.5);
+  --PhoneInputCountryFlag-borderColor--focus: var(--PhoneInput-color--focus);
+  --PhoneInputCountryFlag-backgroundColor--loading: rgba(0, 0, 0, 0.1);
+}
+
+/* --- SweetAlert2 ---------------------------------------------------- */
+:root {
+  --swal2-outline: 0 0 0 3px rgba(100, 150, 200, 0.5);
+  --swal2-container-padding: 0.625em;
+  --swal2-backdrop: rgba(0, 0, 0, 0.4);
+  --swal2-backdrop-transition: background-color 0.15s;
+  --swal2-width: 32em;
+  --swal2-padding: 0 0 1.25em;
+  --swal2-border: none;
+  --swal2-border-radius: 0.3125rem;
+  --swal2-background: white;
+  --swal2-color: #545454;
+  --swal2-show-animation: swal2-show 0.3s;
+  --swal2-hide-animation: swal2-hide 0.15s forwards;
+  --swal2-icon-zoom: 1;
+  --swal2-icon-animations: true;
+  --swal2-title-padding: 0.8em 1em 0;
+  --swal2-html-container-padding: 1em 1.6em 0.3em;
+  --swal2-input-border: 1px solid #d9d9d9;
+  --swal2-input-border-radius: 0.1875em;
+  --swal2-input-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), 0 0 0 3px transparent;
+  --swal2-input-background: transparent;
+  --swal2-input-transition: border-color 0.2s, box-shadow 0.2s;
+  --swal2-input-hover-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), 0 0 0 3px transparent;
+  --swal2-input-focus-border: 1px solid #b4dbed;
+  --swal2-input-focus-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), 0 0 0 3px rgba(100, 150, 200, 0.5);
+  --swal2-progress-step-background: #add8e6;
+  --swal2-validation-message-background: #f0f0f0;
+  --swal2-validation-message-color: #666666;
+  --swal2-footer-border-color: #eeeeee;
+  --swal2-footer-background: transparent;
+  --swal2-footer-color: inherit;
+  --swal2-timer-progress-bar-background: rgba(0, 0, 0, 0.3);
+  --swal2-close-button-position: initial;
+  --swal2-close-button-inset: auto;
+  --swal2-close-button-font-size: 2.5em;
+  --swal2-close-button-color: #cccccc;
+  --swal2-close-button-transition: color 0.2s, box-shadow 0.2s;
+  --swal2-close-button-outline: initial;
+  --swal2-close-button-box-shadow: inset 0 0 0 3px transparent;
+  --swal2-close-button-focus-box-shadow: inset var(--swal2-outline);
+  --swal2-close-button-hover-transform: none;
+  --swal2-actions-justify-content: center;
+  --swal2-actions-width: auto;
+  --swal2-actions-margin: 1.25em auto 0;
+  --swal2-actions-padding: 0;
+  --swal2-actions-border-radius: 0;
+  --swal2-actions-background: transparent;
+  --swal2-action-button-transition: background-color 0.2s, box-shadow 0.2s;
+  --swal2-action-button-hover: black 10%;
+  --swal2-action-button-active: black 10%;
+  --swal2-confirm-button-box-shadow: none;
+}
+
+/* --- Bootstrap 5 token surface (only what the reference customizes) -- */
+:root {
+  --bs-blue: #0d6efd;
+  --bs-indigo: #6610f2;
+  --bs-purple: #6f42c1;
+  --bs-pink: #d63384;
+  --bs-red: #dc3545;
+  --bs-orange: #fd7e14;
+  --bs-yellow: #ffc107;
+  --bs-green: #198754;
+  --bs-teal: #20c997;
+  --bs-cyan: #0dcaf0;
+  --bs-white: #ffffff;
+  --bs-gray: #6c757d;
+  --bs-gray-dark: #343a40;
+  --bs-primary: #0d6efd;
+  --bs-secondary: #6c757d;
+  --bs-success: #198754;
+  --bs-info: #0dcaf0;
+  --bs-warning: #ffc107;
+  --bs-danger: #dc3545;
+  --bs-light: #f8f9fa;
+  --bs-dark: #212529;
+  --bs-body-color: #212529;
+  --bs-body-bg: #ffffff;
+}

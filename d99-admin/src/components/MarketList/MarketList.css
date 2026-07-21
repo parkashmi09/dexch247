@@ -1,0 +1,48 @@
+/* Market Name List - Soccer Leagues Markets */
+.market-name-list {
+  display: flex;
+  justify-content: flex-start;
+  align-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+
+}
+
+.market-name-list a {
+  margin-bottom: 10px;
+  margin-right: 10px;
+  border-radius: 0;
+  padding: 7px 10px;
+  line-height: normal;
+  text-decoration: none;
+  color: #fff;
+  background-color: #2948df;
+  border-color: #2040db;
+  font-size: 14px;
+  font-weight: 500 !important;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.market-name-list a:hover {
+  background-color: #1a35c7;
+  border-color: #1a35c7;
+  color: #fff;
+  text-decoration: none;
+}
+
+.market-name-list a.active {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+  font-weight: 500 !important;
+}
+
+.market-name-list a.active:hover {
+  background-color: var(--bg-secondary85) !important;
+  border-color: var(--bg-secondary85) !important;
+  color: var(--text-secondary) !important;
+}
+

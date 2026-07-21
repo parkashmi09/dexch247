@@ -1,0 +1,299 @@
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  background-color: var(--color-bg-alt);
+}
+
+/* Top row: 4 card sections in a single row */
+.casinoTableBox {
+  display: flex;
+  /* flex-wrap: wrap; */
+  justify-content: space-between;
+  /* align-items: flex-start; */
+  /* padding-right: 4px; */
+  margin-bottom: 15px;
+}
+
+.casinoOddBoxContainer {
+  width: calc(25% - 7.5px);
+  margin-right: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* For TotalRow containers inside casinoTableLeftBox */
+.casinoTableLeftBox .casinoOddBoxContainer {
+  width: 100%;
+  align-items: center;
+  margin-bottom: 10px;
+  margin-right: 0;
+  /* border-left: 1px solid var(--table-border);
+    border-right: 1px solid var(--table-border);
+    border-top: 1px solid var(--table-border);
+    background-color: var(--bg-table-row); */
+}
+
+.casinoTableLeftBox .casinoOddBoxContainer .casinoNationName,
+.casinoTableLeftBox .casinoOddBoxContainer .casinoOddsBox {
+  width: 33.33%;
+}
+
+.casinoNationName {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.casinoNationName img {
+  height: 40px;
+  margin-bottom: 5px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.casinoOddsBox {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  font-weight: bold;
+  border-left: 1px solid var(--table-border, #ddd);
+  cursor: pointer;
+  min-height: 46px;
+  width: 49%;
+}
+
+.casinoOdds {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.casinoVolume {
+  font-size: 12px;
+  margin-top: 2px;
+  text-align: center;
+}
+
+.exposure {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  margin-top: 2px;
+  text-align: center;
+}
+
+.back {
+  background-color: var(--bg-back) !important;
+  color: #333;
+}
+
+.lay {
+  background-color: var(--bg-lay) !important;
+  color: #333;
+}
+
+.casinoNationBook {
+  width: 100%;
+  text-align: center;
+  min-height: 18px;
+}
+
+.blueBox {
+  background-color: var(--bg-back);
+}
+
+.pinkBox {
+  background-color: var(--bg-lay);
+}
+
+.mainValue {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.subValue {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.bottomSection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.casinoTableLeftBox {
+  width: 33%;
+  padding: 5px 5px 0 5px;
+  display: flex;
+  border-left: 1px solid var(--table-border);
+  border-right: 1px solid var(--table-border);
+  border-top: 1px solid var(--table-border);
+  background-color: var(--bg-table-row);
+  flex-direction: column;
+}
+
+.casinoTableLeftBox .casinoOddBoxContainer:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 5px;
+}
+
+.leftSection {
+  flex: 1;
+  min-width: 300px;
+  margin-right: 10px;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+.rightSection {
+  flex: 2;
+  min-width: 300px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.totalRow {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.totalLabel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+}
+
+.totalOptions {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.optionHeader {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.blueBox,
+.pinkBox {
+  width: 80%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.winOption {
+  text-align: center;
+}
+
+.winHeader {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.locked {
+  background-color: var(--color-overlay-lock) !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.locked svg {
+  position: relative;
+  z-index: 2;
+}
+
+/* Ensure locked boxes in left section match the styling */
+.casinoTableLeftBox .casinoOddsBox.locked {
+  background-color: var(--color-overlay-lock) !important;
+  /* border-left: 1px solid var(--table-border, #ddd);
+  border-right: 1px solid var(--table-border, #ddd); */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .casinoTableBox {
+    flex-direction: column;
+  }
+
+  .casinoOddBoxContainer {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .rightSection {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+
+  /* 1. CardSection: Show 2 per row */
+  .casinoTableBox {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .casinoOddBoxContainer {
+    width: calc(50% - 5px);
+    margin-right: 10px;
+  }
+
+  /* 2. TotalRow: Each full width, but options side-by-side */
+  .totalRowWrapper {
+    width: 100%;
+  }
+
+  .totalRow {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .totalLabel {
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .totalOptions {
+    flex: 1;
+  }
+
+  /* 3. Right Section (Win with X): 3 per row */
+  .rightSection {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .winOption {
+    text-align: center;
+  }
+
+  .blueBox,
+  .pinkBox {
+    width: 100%;
+  }
+}

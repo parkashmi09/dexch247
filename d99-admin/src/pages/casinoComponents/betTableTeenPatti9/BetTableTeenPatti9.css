@@ -1,0 +1,44 @@
+/* BetTableTeenPatti9 - uses global classes from style.css */
+/* Parent wrapper .teenpattitest scopes all rules via style.css */
+
+/* collapse toggle for icon-range (React-based, not Bootstrap) */
+.icon-range.collapse {
+  display: none;
+}
+
+.icon-range.collapse.show {
+  display: block;
+}
+
+/* icon-range positioning from style.css reference */
+.icon-range {
+  position: absolute;
+  top: 100%;
+  background-color: var(--bg-sidebar);
+  padding: 4px;
+  width: fit-content;
+  font-size: var(--font-small);
+  right: 0;
+  transition: 0.1s;
+  text-transform: capitalize;
+  color: var(--text-table);
+  z-index: 150;
+  white-space: nowrap;
+}
+
+/* Header row: labels row layout */
+.teentestother .casino-box-row:first-child .casino-bl-box-item {
+  cursor: default;
+  flex-direction: row;
+  justify-content: center;
+  gap: 2px;
+}
+
+.teentestother .float-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  margin-left: 4px;
+  position: relative;
+}

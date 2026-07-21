@@ -1,0 +1,689 @@
+{
+  "nav_items": [
+    {
+      "href": "/home",
+      "label": "Home"
+    },
+    {
+      "href": "/sports-book/33",
+      "label": "Lottery"
+    },
+    {
+      "href": "/all-sports/4",
+      "label": "Cricket"
+    },
+    {
+      "href": "/all-sports/2",
+      "label": "Tennis"
+    },
+    {
+      "href": "/all-sports/1",
+      "label": "Football"
+    },
+    {
+      "href": "/all-sports/8",
+      "label": "Table Tennis"
+    },
+    {
+      "href": "/casino-list/LC/4/22",
+      "label": "Baccarat"
+    },
+    {
+      "href": "/casino-list/LC/4/24",
+      "label": "32 Cards"
+    },
+    {
+      "href": "/casino-list/LC/4/20",
+      "label": "Teenpatti"
+    },
+    {
+      "href": "/casino-list/LC/4/21",
+      "label": "Poker"
+    },
+    {
+      "href": "/casino-list/LC/4/27",
+      "label": "Lucky 7"
+    }
+  ],
+  "mobile_menu_tabs": [
+    {
+      "href": "/aviator-list",
+      "label": "Crash",
+      "icon": "aviator"
+    },
+    {
+      "href": "/sports-book/33",
+      "label": "Lottery"
+    },
+    {
+      "href": "/home",
+      "label": "Sports"
+    },
+    {
+      "href": "/casino-list",
+      "label": "Our Casino"
+    },
+    {
+      "href": "/live-casino-list",
+      "label": "Live Casino"
+    },
+    {
+      "href": "/slot-list",
+      "label": "Slots"
+    },
+    {
+      "href": "/fantasy-list",
+      "label": "Fantasy"
+    }
+  ],
+  "sports_tabs": [
+    { "name": "Cricket", "iconId": 4 },
+    { "name": "Football", "iconId": 1 },
+    { "name": "Tennis", "iconId": 2 },
+    { "name": "Table Tennis", "iconId": 8 },
+    { "name": "Esoccer", "iconId": 68 },
+    { "name": "Horse Racing", "iconId": 10 },
+    { "name": "Greyhound Racing", "iconId": 65 },
+    { "name": "Basketball", "iconId": 15 },
+    { "name": "Wrestling", "iconId": 69 },
+    { "name": "Volleyball", "iconId": 18 },
+    { "name": "Badminton", "iconId": 22 },
+    { "name": "Snooker", "iconId": 59 },
+    { "name": "Darts", "iconId": 57 },
+    { "name": "Boxing", "iconId": 6 },
+    { "name": "Mixed Martial Arts", "iconId": 3 },
+    { "name": "American Football", "iconId": 58 },
+    { "name": "E Games", "iconId": 11 },
+    { "name": "Ice Hockey", "iconId": 19 },
+    { "name": "Futsal", "iconId": 9 },
+    { "name": "Motor Sports", "iconId": 52 },
+    { "name": "Politics", "iconId": 40 },
+    { "name": "Kabaddi", "iconId": 66 }
+  ],
+  "casino_list": [
+    { "slug": "worli3", "name": "Matka", "file": "/assets/casino-icons/worli3.gif" },
+    { "slug": "teen62", "name": "V VIP Teenpatti 1-day", "file": "/assets/casino-icons/teen62.gif" },
+    { "slug": "dolidana", "name": "Dolidana", "file": "/assets/casino-icons/dolidana.gif" },
+    { "slug": "mogambo", "name": "Mogambo", "file": "/assets/casino-icons/mogambo.gif" },
+
+    { "slug": "lucky5", "name": "Lucky 6", "file": "/assets/casino-icons/lucky5.jpg" },
+    { "slug": "roulette12", "name": "Beach Roulette", "file": "/assets/casino-icons/roulette12.jpg" },
+    { "slug": "roulette13", "name": "Roulette", "file": "/assets/casino-icons/roulette13.jpg" },
+    { "slug": "roulette11", "name": "Golden Roulette", "file": "/assets/casino-icons/roulette11.jpg" },
+    { "slug": "poison", "name": "Teenpatti Poison One Day", "file": "/assets/casino-icons/poison.jpg" },
+    { "slug": "teenunique", "name": "Unique Teenpatti", "file": "/assets/casino-icons/teenunique.jpg" },
+    { "slug": "poison20", "name": "Teenpatti Poison 20-20", "file": "/assets/casino-icons/poison20.jpg" },
+    { "slug": "joker120", "name": "Unlimited Joker 20-20", "file": "/assets/casino-icons/joker120.jpg" },
+    { "slug": "joker20", "name": "Teenpatti Joker 20-20", "file": "/assets/casino-icons/joker20.jpg" },
+    { "slug": "joker1", "name": "Unlimited Joker Oneday", "file": "/assets/casino-icons/joker1.jpg" },
+    { "slug": "teen20c", "name": "20-20 Teenpatti C", "file": "/assets/casino-icons/teen20c.jpg" },
+    { "slug": "btable2", "name": "Bollywood Casino 2", "file": "/assets/casino-icons/btable2.jpg" },
+    { "slug": "ourroullete", "name": "Unique Roulette", "file": "/assets/casino-icons/ourroullete.jpg" },
+    { "slug": "superover3", "name": "Mini Superover", "file": "/assets/casino-icons/superover3.jpg" },
+    { "slug": "goal", "name": "Goal", "file": "/assets/casino-icons/goal.jpg" },
+    { "slug": "ab4", "name": "ANDAR BAHAR 150 cards", "file": "/assets/casino-icons/ab4.jpg" },
+    { "slug": "lucky15", "name": "Lucky 15", "file": "/assets/casino-icons/lucky15.jpg" },
+    { "slug": "superover2", "name": "Super Over2", "file": "/assets/casino-icons/superover2.jpg" },
+    { "slug": "teen41", "name": "Queen Top Open Teenpatti", "file": "/assets/casino-icons/teen41.jpg" },
+    { "slug": "teen42", "name": "Jack Top Open Teenpatti", "file": "/assets/casino-icons/teen42.jpg" },
+    { "slug": "sicbo2", "name": "Sic Bo2", "file": "/assets/casino-icons/sicbo2.jpg" },
+    { "slug": "teen33", "name": "Instant Teenpatti 3.0", "file": "/assets/casino-icons/teen33.jpg" },
+    { "slug": "sicbo", "name": "Sic Bo", "file": "/assets/casino-icons/sicbo.jpg" },
+    { "slug": "ballbyball", "name": "Ball by Ball", "file": "/assets/casino-icons/ballbyball.jpg" },
+    { "slug": "teen32", "name": "Instant Teenpatti 2.0", "file": "/assets/casino-icons/teen32.jpg" },
+    { "slug": "teen", "name": "Teenpatti 1-day", "file": "/assets/casino-icons/teen.jpg" },
+    { "slug": "teen20", "name": "20-20 Teenpatti", "file": "/assets/casino-icons/teen20.jpg" },
+    { "slug": "teen9", "name": "Teenpatti Test", "file": "/assets/casino-icons/teen9.jpg" },
+    { "slug": "teen8", "name": "Teenpatti Open", "file": "/assets/casino-icons/teen8.jpg" },
+    { "slug": "poker", "name": "Poker 1-Day", "file": "/assets/casino-icons/poker.jpg" },
+    { "slug": "poker20", "name": "20-20 Poker", "file": "/assets/casino-icons/poker20.jpg" },
+    { "slug": "poker6", "name": "Poker 6 Players", "file": "/assets/casino-icons/poker6.jpg" },
+    { "slug": "baccarat", "name": "Baccarat", "file": "/assets/casino-icons/baccarat.jpg" },
+    { "slug": "baccarat2", "name": "Baccarat 2", "file": "/assets/casino-icons/baccarat2.jpg" },
+    { "slug": "dt20", "name": "20-20 Dragon Tiger", "file": "/assets/casino-icons/dt20.jpg" },
+    { "slug": "dt6", "name": "1 Day Dragon Tiger", "file": "/assets/casino-icons/dt6.jpg" },
+    { "slug": "dtl20", "name": "20-20 D T L", "file": "/assets/casino-icons/dtl20.jpg" },
+    { "slug": "dt202", "name": "20-20 Dragon Tiger 2", "file": "/assets/casino-icons/dt202.jpg" },
+    { "slug": "card32", "name": "32 Cards A", "file": "/assets/casino-icons/card32.jpg" },
+    { "slug": "card32eu", "name": "32 Cards B", "file": "/assets/casino-icons/card32eu.jpg" },
+    { "slug": "ab20", "name": "Andar Bahar", "file": "/assets/casino-icons/ab20.jpg" },
+    { "slug": "abj", "name": "Andar Bahar 2", "file": "/assets/casino-icons/abj.jpg" },
+    { "slug": "lucky7", "name": "Lucky 7 - A", "file": "/assets/casino-icons/lucky7.jpg" },
+    { "slug": "lucky7eu", "name": "Lucky 7 - B", "file": "/assets/casino-icons/lucky7eu.jpg" },
+    { "slug": "lucky7eu2", "name": "Lucky 7 - C", "file": "/assets/casino-icons/lucky7eu2.jpg" },
+    { "slug": "3cardj", "name": "3 Cards Judgement", "file": "/assets/casino-icons/3cardj.jpg" },
+    { "slug": "war", "name": "Casino War", "file": "/assets/casino-icons/war.jpg" },
+    { "slug": "worli", "name": "Worli Matka", "file": "/assets/casino-icons/worli.jpg" },
+    { "slug": "worli2", "name": "Instant Worli", "file": "/assets/casino-icons/worli2.jpg" },
+    { "slug": "aaa", "name": "Amar Akbar Anthony", "file": "/assets/casino-icons/aaa.jpg" },
+    { "slug": "btable", "name": "Bollywood Casino", "file": "/assets/casino-icons/btable.jpg" },
+    { "slug": "superover", "name": "Super Over", "file": "/assets/casino-icons/superover.jpg" },
+    { "slug": "lottcard", "name": "Lottery", "file": "/assets/casino-icons/lottcard.jpg" },
+    { "slug": "cricketv3", "name": "5Five Cricket", "file": "/assets/casino-icons/cricketv3.jpg" },
+    { "slug": "cmatch20", "name": "Cricket Match 20-20", "file": "/assets/casino-icons/cmatch20.jpg" },
+    { "slug": "cmeter", "name": "Casino Meter", "file": "/assets/casino-icons/cmeter.jpg" },
+    { "slug": "teen6", "name": "Teenpatti - 2.0", "file": "/assets/casino-icons/teen6.jpg" },
+    { "slug": "queen", "name": "Queen", "file": "/assets/casino-icons/queen.jpg" },
+    { "slug": "race20", "name": "Race20", "file": "/assets/casino-icons/race20.jpg" },
+    { "slug": "trap", "name": "The Trap", "file": "/assets/casino-icons/trap.jpg" },
+    { "slug": "patti2", "name": "2 Cards Teenpatti", "file": "/assets/casino-icons/patti2.jpg" },
+    { "slug": "teensin", "name": "29Card Baccarat", "file": "/assets/casino-icons/teensin.jpg" },
+    { "slug": "teenmuf", "name": "Muflis Teenpatti", "file": "/assets/casino-icons/teenmuf.jpg" },
+    { "slug": "race17", "name": "Race To 17", "file": "/assets/casino-icons/race17.jpg" },
+    { "slug": "teen20b", "name": "20-20 Teenpatti B", "file": "/assets/casino-icons/teen20b.jpg" },
+    { "slug": "trio", "name": "Trio", "file": "/assets/casino-icons/trio.jpg" },
+    { "slug": "notenum", "name": "Note Number", "file": "/assets/casino-icons/notenum.jpg" },
+    { "slug": "teen120", "name": "1 CARD 20-20", "file": "/assets/casino-icons/teen120.jpg" },
+    { "slug": "teen1", "name": "1 CARD ONE-DAY", "file": "/assets/casino-icons/teen1.jpg" },
+    { "slug": "ab3", "name": "ANDAR BAHAR 50 cards", "file": "/assets/casino-icons/ab3.jpg" },
+    { "slug": "aaa2", "name": "Amar Akbar Anthony 2", "file": "/assets/casino-icons/aaa2.jpg" },
+    { "slug": "race2", "name": "Race to 2nd", "file": "/assets/casino-icons/race2.jpg" },
+    { "slug": "teen3", "name": "Instant Teenpatti", "file": "/assets/casino-icons/teen3.jpg" },
+    { "slug": "dum10", "name": "Dus ka Dum", "file": "/assets/casino-icons/dum10.jpg" },
+    { "slug": "cmeter1", "name": "1 Card Meter", "file": "/assets/casino-icons/cmeter1.jpg" }
+  ],
+  "bet_rows": [
+    {
+      "href": "/casino/superover2",
+      "title": [
+        "Super Over2"
+      ],
+      "odds": [
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        }
+      ]
+    },
+    {
+      "href": "/game-details/4/582566837",
+      "title": [
+        "Pakistan Super League",
+        "24/03/2026 17:30:00"
+      ],
+      "odds": [
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        }
+      ]
+    },
+    {
+      "href": "/game-details/4/661707314",
+      "title": [
+        "Indian Premier League",
+        "28/03/2026 19:30:00"
+      ],
+      "odds": [
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        }
+      ]
+    },
+    {
+      "href": "/game-details/4/613230088",
+      "title": [
+        "Australia W U19  v Sri Lanka W U19",
+        "08/04/2026 09:00:00"
+      ],
+      "odds": [
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        }
+      ]
+    },
+    {
+      "href": "/game-details/4/491474697",
+      "title": [
+        "Sri Lanka A v New Zealand A",
+        "08/04/2026 09:45:00"
+      ],
+      "odds": [
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "1.01"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "110",
+          "lay": "450"
+        }
+      ]
+    },
+    {
+      "href": "/game-details/4/772654152",
+      "title": [
+        "Scotland v Oman",
+        "08/04/2026 13:00:00"
+      ],
+      "odds": [
+        {
+          "suspended": false,
+          "back": "1.35",
+          "lay": "1.47"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "3.1",
+          "lay": "3.9"
+        }
+      ]
+    },
+    {
+      "href": "/cricketv/4/70569120",
+      "title": [
+        "Perth Scorchers XI  v Sydney Sixers XI",
+        "08/04/2026 15:10:00"
+      ],
+      "odds": [
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        }
+      ]
+    },
+    {
+      "href": "/virtual-cricket/4/845388339",
+      "title": [
+        "West Indies T10 v Sri Lanka T10",
+        "08/04/2026 16:35:00"
+      ],
+      "odds": [
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        }
+      ]
+    },
+    {
+      "href": "/cricketv/4/55391553",
+      "title": [
+        "TKR XI v GAW XI",
+        "08/04/2026 16:50:00"
+      ],
+      "odds": [
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        }
+      ]
+    },
+    {
+      "href": "/virtual-cricket/4/913766691",
+      "title": [
+        "Australia T10 v South Africa T10",
+        "08/04/2026 17:45:00"
+      ],
+      "odds": [
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        }
+      ]
+    },
+    {
+      "href": "/virtual-cricket/4/558488947",
+      "title": [
+        "Joburg Super Kings T10 v Sunrisers EasternCape T10",
+        "08/04/2026 18:45:00"
+      ],
+      "odds": [
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": true,
+          "back": "-",
+          "lay": "-"
+        }
+      ]
+    },
+    {
+      "href": "/game-details/4/723272757",
+      "title": [
+        "Delhi Capitals v Gujarat Titans",
+        "08/04/2026 19:30:00"
+      ],
+      "odds": [
+        {
+          "suspended": false,
+          "back": "1.89",
+          "lay": "1.9"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "2.1",
+          "lay": "2.12"
+        }
+      ]
+    },
+    {
+      "href": "/game-details/4/836252815",
+      "title": [
+        "Hyderabad Kingsmen v Peshawar Zalmi",
+        "08/04/2026 19:30:00"
+      ],
+      "odds": [
+        {
+          "suspended": false,
+          "back": "2.18",
+          "lay": "2.22"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "1.83",
+          "lay": "1.84"
+        }
+      ]
+    },
+    {
+      "href": "/game-details/4/560290194",
+      "title": [
+        "Lahore Qalandars v Islamabad United",
+        "09/04/2026 15:00:00"
+      ],
+      "odds": [
+        {
+          "suspended": false,
+          "back": "1.73",
+          "lay": "2.32"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "1.76",
+          "lay": "2.38"
+        }
+      ]
+    },
+    {
+      "href": "/game-details/4/763976257",
+      "title": [
+        "Kolkata Knight Riders v Lucknow Super Giants",
+        "09/04/2026 19:30:00"
+      ],
+      "odds": [
+        {
+          "suspended": false,
+          "back": "2.06",
+          "lay": "2.18"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "1.85",
+          "lay": "1.94"
+        }
+      ]
+    },
+    {
+      "href": "/game-details/4/727528317",
+      "title": [
+        "Quetta Gladiators v Rawalpindi Pindiz",
+        "10/04/2026 19:30:00"
+      ],
+      "odds": [
+        {
+          "suspended": false,
+          "back": "1.69",
+          "lay": "1.72"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "2.4",
+          "lay": "2.46"
+        }
+      ]
+    },
+    {
+      "href": "/game-details/4/808409515",
+      "title": [
+        "Rajasthan Royals v RC Bengaluru",
+        "10/04/2026 19:30:00"
+      ],
+      "odds": [
+        {
+          "suspended": false,
+          "back": "2.04",
+          "lay": "2.34"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        },
+        {
+          "suspended": false,
+          "back": "1.75",
+          "lay": "1.96"
+        }
+      ]
+    },
+    {
+      "href": "/game-details/4/704512638",
+      "title": [
+        "Punjab Kings v Sunrisers Hyderabad",
+        "11/04/2026 15:30:00"
+      ],
+      "odds": [
+        {
+          "suspended": false,
+          "back": "1.79",
+          "lay": "1.81"
+        },
+        {
+          "suspended": false,
+          "back": "-",
+          "lay": "-"
+        }
+      ]
+    }
+  ],
+  "latest_events": [
+    {
+      "href": "/game-details/4/723272757",
+      "icon": 4,
+      "name": "Delhi Capitals v Gujarat Titans"
+    },
+    {
+      "href": "/game-details/4/836252815",
+      "icon": 4,
+      "name": "Hyderabad Kingsmen v Peshawar Zalmi"
+    },
+    {
+      "href": "/game-details/1/748441615",
+      "icon": 1,
+      "name": "Braga v Betis"
+    },
+    {
+      "href": "/game-details/2/649288583",
+      "icon": 2,
+      "name": "E Ruse v D Yastremska"
+    },
+    {
+      "href": "/game-details/2/515913405",
+      "icon": 2,
+      "name": "Lehecka v Tabilo"
+    }
+  ],
+  "latest_events_mobile": [
+    {
+      "href": "/game-details/4/723272757",
+      "icon": 4,
+      "name": "Delhi Capitals v Gujarat Titans"
+    },
+    {
+      "href": "/game-details/4/836252815",
+      "icon": 4,
+      "name": "Hyderabad Kingsmen v Peshawar Zalmi"
+    },
+    {
+      "href": "/game-details/1/748441615",
+      "icon": 1,
+      "name": "Braga v Betis"
+    },
+    {
+      "href": "/game-details/2/649288583",
+      "icon": 2,
+      "name": "E Ruse v D Yastremska"
+    },
+    {
+      "href": "/game-details/2/515913405",
+      "icon": 2,
+      "name": "Lehecka v Tabilo"
+    }
+  ],
+  "sidebar_others": [
+    {
+      "href": "/casino-list/LC/4",
+      "blink": true,
+      "label": "Our Casino"
+    },
+    {
+      "href": "/casino-list/LC/45",
+      "blink": true,
+      "label": "Our VIP Casino"
+    },
+    {
+      "href": "/casino-list/LC/52",
+      "blink": false,
+      "label": "Our Premium Casino"
+    },
+    {
+      "href": "/casino-list/LC/19",
+      "blink": false,
+      "label": "Our Virtual"
+    }
+  ]
+}

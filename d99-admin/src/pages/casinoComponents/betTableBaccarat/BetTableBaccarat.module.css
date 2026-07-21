@@ -1,0 +1,256 @@
+/* BetTableBaccarat – CSS module with styles from reference style.css */
+
+.baccaratBetsOdds {
+  width: 100%;
+  display: flex;
+  display: -webkit-flex;
+  flex-wrap: wrap;
+}
+
+.baccaratOdds {
+  display: flex;
+  display: -webkit-flex;
+  width: 100%;
+  margin-bottom: 50px;
+}
+
+.baccaratOddBlock {
+  flex: 1 1 auto;
+  margin-right: 16px;
+  position: relative;
+}
+
+.baccaratOddBlock:last-child {
+  margin-right: 0;
+}
+
+.baccaratOddName {
+  padding: 6px 2px;
+  text-align: center;
+  color: #fff;
+  background-color: #434343;
+  cursor: pointer;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.baccaratOddName:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.baccaratOddVal {
+  text-align: center;
+  line-height: 18px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 5px;
+  position: relative;
+}
+
+/* Bets Section */
+.baccaratBets {
+  display: flex;
+  display: -webkit-flex;
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.baccaratBetsName {
+  height: 100%;
+  display: flex;
+  display: -webkit-flex;
+  justify-content: center;
+  flex-direction: column;
+  color: #fff;
+  padding-left: 0;
+  text-align: center;
+  cursor: pointer;
+}
+
+.baccaratBetsVal {
+  font-size: 18px;
+  text-align: center;
+  line-height: 18px;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+/* Player Pair */
+.playerPair {
+  margin-right: 1%;
+  width: 16%;
+  height: 80px;
+  margin-top: 0;
+}
+
+.playerPair .baccaratBetsName {
+  border-radius: 30px 0 0 30px;
+  background-color: #509bff;
+}
+
+.playerPair .baccaratBetsName div {
+  margin-bottom: 0;
+}
+
+.playerPair .baccaratBetsName:hover {
+  background: #509bffc9;
+  cursor: pointer;
+}
+
+.playerPair .baccaratBetsVal {
+  text-align: center;
+  line-height: 18px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+/* Player */
+.player {
+  width: 22%;
+  height: 80px;
+  position: relative;
+}
+
+.player .baccaratBetsName {
+  background-color: #509bff;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  align-items: flex-start;
+  padding-left: 20px;
+}
+
+.player .baccaratBetsName:hover {
+  background: #509bffc9;
+  cursor: pointer;
+}
+
+.player .baccaratBetsVal {
+  text-align: center;
+  line-height: 18px;
+}
+
+.player span {
+  margin-left: 5px;
+}
+
+.player img {
+  width: 25px;
+}
+
+/* Tie */
+.tie {
+  width: 22%;
+  border-radius: 0;
+  z-index: 10;
+  height: 80px;
+}
+
+.tie .baccaratBetsName {
+  background-color: #11b24b;
+  border-radius: 0;
+}
+
+.tie .baccaratBetsName:hover {
+  background: #0c9a1d;
+  cursor: pointer;
+}
+
+.tie .baccaratBetsVal {
+  text-align: center;
+  line-height: 18px;
+  margin-top: 3px;
+}
+
+/* Banker */
+.banker {
+  width: 22%;
+  height: 80px;
+  position: relative;
+}
+
+.banker .baccaratBetsName {
+  background-color: #d3393d;
+  align-items: flex-end;
+  padding-right: 20px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.banker .baccaratBetsName:hover {
+  background-color: #d3393ddb;
+  cursor: pointer;
+}
+
+.banker .baccaratBetsVal {
+  text-align: center;
+  line-height: 18px;
+}
+
+.banker span {
+  margin-left: 5px;
+}
+
+.banker img {
+  width: 25px;
+}
+
+/* Banker Pair */
+.bankerPair {
+  width: 16%;
+  margin-left: 1%;
+  height: 80px;
+  margin-top: 0;
+  position: relative;
+}
+
+.bankerPair .baccaratBetsName {
+  border-radius: 0 30px 30px 0;
+  background-color: #d3393d;
+}
+
+.bankerPair .baccaratBetsName:hover {
+  background-color: #d3393ddb;
+  cursor: pointer;
+}
+
+.bankerPair .baccaratBetsVal {
+  text-align: center;
+  line-height: 18px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .baccaratBetsOdds {
+    width: 100%;
+  }
+
+  .baccaratOdds {
+    margin-bottom: 30px;
+  }
+
+  .baccaratOddBlock {
+    margin-right: 8px;
+  }
+
+  .baccaratOddName {
+    font-size: 11px;
+    padding: 4px 1px;
+  }
+
+  .player .baccaratBetsName {
+    padding-left: 10px;
+  }
+
+  .banker .baccaratBetsName {
+    padding-right: 10px;
+  }
+
+  .player img,
+  .banker img {
+    width: 20px;
+  }
+}

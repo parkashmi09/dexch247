@@ -1,0 +1,475 @@
+/* =====================================================================
+ * custom.css — project-local rules supplied by the user.
+ * Loaded LAST so it overrides everything in variables.css, Bootstrap,
+ * and the reference CSS.
+ * =====================================================================*/
+
+/* Mobile sidebar drawer — matches the reference CSS exactly. */
+@media only screen and (max-width: 1199px) {
+  .left-sidebar {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    width: 80%;
+    background: var(--bg-sidebar);
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .left-sidebar.visible {
+    display: block;
+  }
+}
+
+/* Backdrop behind the open drawer */
+.sidebar-backdrop {
+  display: none;
+}
+.left-sidebar.visible ~ .sidebar-backdrop {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Close button inside drawer */
+.close-sidebar {
+  cursor: pointer;
+  font-size: 22px;
+  color: var(--text-sidebar);
+}
+
+/* Sidebar search input */
+.sidebar-search .form-group {
+  width: 80%;
+}
+
+/* Suspended cell lock icon. The reference style.css points at
+ * `../img/icons/lock.svg` (a relative path that Vite can't resolve).
+ * Override it to the actual public asset path. */
+.suspended-box::before {
+  background-image: url("/assets/ic/lock.svg") !important;
+}
+
+.casino-video .casino-video-right-icons {
+  position: absolute;
+  right: 55px;
+  top: 5px;
+}
+.casino-video .casino-video-right-icons .mute {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  height: 40px;
+  width: 40px;
+  border: 1px solid #999;
+  border-radius: 50%;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.sportsbook iframe {
+  height: calc(100% - 1px);
+}
+
+.sportsbook .slot-iframe.show {
+  top: 125px;
+  height: calc(100vh - 125px);
+}
+
+.PhoneInput input:focus-visible {
+  outline: 0;
+}
+
+.PhoneInput input {
+  border: 0;
+}
+
+.login-auth-box {
+  width: 500px;
+  max-width: 90%;
+}
+
+.login-auth input {
+  padding: 10px;
+  width: 60px !important;
+  height: 60px !important;
+}
+
+.login-auth > div {
+  margin-top: 20px;
+  justify-content: space-between;
+}
+
+.live-casino-bets .game-name {
+  width: 110px;
+}
+
+.live-casino-bets .report-type {
+  width: 70px;
+}
+
+.live-casino-bets .report-amount {
+  width: 70px;
+}
+
+#floater {
+  position: absolute;
+  top: 50vh;
+  right: 0;
+  width: 50px;
+  height: auto;
+  -webkit-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
+  z-index: 10001;
+  border-radius: 3px 0 0 3px;
+  padding: 0px;
+  box-shadow: rgb(255 255 255 / 98%) -5px 0px 10px -5px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+#floater img {
+  width: 50px;
+  height: 50px;
+}
+
+.modal-18plus img {
+  height: 30px;
+}
+
+.login-page {
+  justify-content: flex-start;
+}
+.login-box {
+  margin: 2% 0;
+}
+.footer.footer-login {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  left: 0;
+}
+.grecaptcha-badge {
+  visibility: hidden;
+}
+
+.username-text .success-form {
+  width: 100%;
+  text-align: left;
+}
+.phnumber-text .success-form {
+  width: 100%;
+  text-align: left;
+}
+
+.blink-message {
+  display: flex;
+  align-items: center;
+  color: var(--text-sidebar);
+  padding: 5px;
+}
+.blink-message > div {
+  -moz-animation: blinktext normal 1s infinite ease-in-out;
+  -webkit-animation: blinktext normal 1s infinite ease-in-out;
+  -ms-animation: blinktext normal 1s infinite ease-in-out;
+  animation: blinktext normal 1s infinite ease-in-out;
+  text-decoration: underline;
+  line-height: 1.5;
+  font-size: 18px;
+}
+@-moz-keyframes blinktext {
+  0% { opacity: 1; color: red; }
+  50% { opacity: 1; color: yellow; }
+  100% { opacity: 1; color: red; }
+}
+@-webkit-keyframes blinktext {
+  0% { opacity: 1; color: red; }
+  50% { opacity: 1; color: yellow; }
+  100% { opacity: 1; color: red; }
+}
+@-ms-keyframes blinktext {
+  0% { opacity: 1; color: red; }
+  50% { opacity: 1; color: yellow; }
+  100% { opacity: 1; color: red; }
+}
+@keyframes blinktext {
+  0% { opacity: 1; color: red; }
+  50% { opacity: 1; color: yellow; }
+  100% { opacity: 1; color: red; }
+}
+
+.market-12.market-16 .market-nation-detail .market-nation-name {
+  font-weight: bold;
+  width: calc(100% - 100px);
+}
+.market-12.market-16 .market-book {
+  width: 100px;
+  display: flex;
+  justify-content: end;
+  gap: 5px;
+}
+
+@media screen and (max-width: 767px) {
+  .login-auth input {
+    padding: 10px;
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .sportsbook .slot-iframe.show {
+    top: 50px;
+    height: calc(100vh - 50px);
+    left: 0;
+    width: 100%;
+  }
+  .login-box img {
+    max-height: 70px;
+  }
+  .social-icon {
+    height: 30px;
+    width: 30px;
+  }
+  .social-icon img {
+    height: 20px;
+  }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1199px) {
+  .sportsbook .slot-iframe.show {
+    top: 60px;
+    height: calc(100vh - 60px);
+    left: 0;
+    width: 100%;
+  }
+}
+
+#whatsapp-support {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  background: transparent;
+}
+#whatsapp-support img {
+  width: 90px !important;
+  height: 90px !important;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.25s ease;
+}
+#whatsapp-support:hover img {
+  transform: scale(1.1);
+}
+
+/* ========================== Matka Calendar ========================== */
+/* Note: --w3-* tokens already live in variables.css. The light-theme
+ * scoped override is kept here so :root[data-theme="light"] / .light still
+ * win when applied. */
+:root[data-theme="light"],
+.light {
+  --w3-bg: #f5f7fb;
+  --w3-panel: #fff;
+  --w3-panel-2: #f2f4f8;
+  --w3-line: #e5e7eb;
+  --w3-text: #111827;
+  --w3-muted: #6b7280;
+  --w3-head: #b45309;
+  --w3-chip: #eef2f7;
+  --w3-date-bg: #111827;
+  --w3-date-ring: #f59e0b;
+  --w3-digit: #475569;
+  --w3-digit-bg: rgba(71, 85, 105, 0.14);
+  --w3-big-color: #333;
+}
+
+.calendar {
+  background: var(--w3-panel);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+  font: 14px/1.4 Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+.calendar .topbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--w3-line);
+}
+.calendar .left,
+.calendar .right {
+  font-size: 12px;
+  color: var(--w3-muted);
+}
+.calendar .right { text-align: right; }
+.calendar .left b,
+.calendar .right b { color: var(--w3-text); }
+.calendar .center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+.calendar .navbtn {
+  background: var(--w3-panel-2);
+  border: 1px solid var(--w3-line);
+  color: var(--w3-text);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.calendar .navbtn:hover { filter: brightness(1.1); }
+.calendar .navbtn[disabled] { opacity: 0.5; cursor: not-allowed; filter: none; }
+.calendar .navbtn[disabled]:hover { filter: none; }
+.calendar .month {
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  min-width: 200px;
+  text-align: center;
+}
+
+.calendar .cal-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+.calendar .cal-strip {
+  width: fit-content;
+  min-width: 100%;
+}
+
+.calendar .dow {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(var(--w3-cell-min), 1fr));
+}
+.calendar .dow > div {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--w3-head);
+  padding: 10px 0;
+  background: var(--w3-panel-2);
+  border-right: 1px solid var(--w3-line);
+  border-bottom: 1px solid var(--w3-line);
+}
+.calendar .dow > div:last-child { border-right: none; }
+
+.calendar .grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(var(--w3-cell-min), 1fr));
+  border-left: 1px solid var(--w3-line);
+}
+.calendar .cell {
+  min-height: 120px;
+  position: relative;
+  border-right: 1px solid var(--w3-line);
+  border-bottom: 1px solid var(--w3-line);
+  padding: 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.06));
+  overflow: hidden;
+}
+.calendar .cell:hover { outline: 1px solid #5b5f66; z-index: 1; }
+.calendar .cell.out.prev,
+.calendar .cell.out.next { opacity: 0.45; }
+
+.calendar .cell-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.calendar .date-badge {
+  padding: 4px 8px;
+  background: var(--w3-date-bg);
+  color: #fff;
+  font-weight: 900;
+  border-radius: 6px;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  border: 1px solid rgba(243, 181, 22, 0.45);
+  box-shadow: 0 0 0 2px rgba(243, 181, 22, 0.18) inset, 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.calendar .content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.calendar .oc-rows {
+  display: grid;
+  grid-template-columns: minmax(22px, 28px) 1fr minmax(22px, 28px);
+  gap: 10px;
+}
+.calendar .digits {
+  display: grid;
+  grid-auto-rows: min-content;
+  gap: 3px;
+  align-content: start;
+  justify-items: center;
+}
+.calendar .digits .d {
+  font-size: 15px;
+  line-height: 18px;
+  border-radius: 6px;
+  padding: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+.calendar .digits .d.has {
+  padding: 3px 6px;
+  font-weight: 900;
+  color: var(--w3-digit);
+  background: var(--w3-digit-bg);
+}
+.calendar .big {
+  text-align: center;
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--w3-big-color);
+  letter-spacing: 1px;
+  margin-top: 10px;
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  .calendar .month { min-width: 140px; }
+}
+@media (max-width: 720px) {
+  .calendar .topbar {
+    grid-template-columns: 1fr;
+    row-gap: 6px;
+    text-align: center;
+  }
+  .calendar .left,
+  .calendar .right { text-align: center; }
+  .calendar .center { justify-content: center; }
+  .calendar .month { min-width: 0; font-size: 16px; }
+  .calendar .navbtn { padding: 6px 8px; }
+  .calendar .cell { min-height: 110px; }
+  .calendar .oc-rows {
+    grid-template-columns: minmax(20px, 26px) 1fr minmax(20px, 26px);
+    gap: 8px;
+  }
+  .calendar .digits .d { font-size: 13px; line-height: 16px; }
+  .calendar .digits .d.has { padding: 3px 6px; }
+  .calendar .big { font-size: 30px; }
+  .calendar .date-badge { font-size: 13px; padding: 3px 7px; }
+}
+@media (max-width: 420px) {
+  .calendar .oc-rows {
+    grid-template-columns: minmax(18px, 24px) 1fr minmax(18px, 24px);
+    gap: 6px;
+  }
+  .calendar .digits .d { font-size: 11px; line-height: 13px; }
+  .calendar .digits .d.has { padding: 2px 4px; }
+  .calendar .big { font-size: 24px; }
+  .calendar .date-badge { font-size: 12px; }
+}

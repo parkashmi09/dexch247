@@ -1,0 +1,28 @@
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Mona+Sans:ital,wght@0,200..900;1,200..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Font Family Variables */
+:root {
+  --font-manrope: 'Manrope', sans-serif;
+  --font-mona-sans: 'Mona Sans', sans-serif;
+  --font-montserrat: 'Montserrat', sans-serif;
+  --font-roboto-condensed: 'Roboto Condensed', sans-serif;
+
+  /* Default Font Stack */
+  --font-primary: var(--font-roboto-condensed);
+  --font-secondary: var(--font-montserrat);
+  --font-heading: var(--font-manrope);
+}
+
+/* Base Font Settings */
+body {
+  font-family: var(--font-primary);
+  /* font-weight: 400;
+  line-height: 1.5; */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  /* font-weight: 600; */
+}
+

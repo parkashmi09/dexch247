@@ -1,0 +1,29 @@
+.App {
+  min-height: 100vh;
+}
+
+.form-control:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 1px solid #ced4da !important;
+}
+
+/* SweetAlert2 Toast Global Styles */
+.swal2-toast {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+}
+
+swal2-popup.swal2-toast {
+  flex-direction: row;
+  align-items: center;
+  width: auto;
+  max-width: 300px;
+  padding: .5em;
+  overflow-y: hidden;
+  box-shadow: 0 0 .625em #d9d9d9;
+}
+
+table {
+  border-collapse: collapse;
+}

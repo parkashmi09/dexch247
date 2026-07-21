@@ -1,0 +1,693 @@
+{
+  "$comment": "Each entry: { url, out }. Files land in frontend/public/assets/<out>. Reference from React as /assets/<out>.",
+  "assets": [
+    {
+      "url": "https://sitethemedata.com/sitethemes/d247.com/front/logo.png",
+      "out": "brand/logo.png"
+    },
+    {
+      "url": "https://sitethemedata.com/common/wel-banner/wel-1775673429867.png",
+      "out": "brand/welcome-banner.png"
+    },
+    {
+      "url": "https://g1ver.sprintstaticdata.com/v97/static/front/img/social-icons/facebook.png",
+      "out": "social/facebook.png"
+    },
+    {
+      "url": "https://g1ver.sprintstaticdata.com/v97/static/front/img/social-icons/instagram.png",
+      "out": "social/instagram.png"
+    },
+    {
+      "url": "https://g1ver.sprintstaticdata.com/v97/static/front/img/social-icons/telegram.png",
+      "out": "social/telegram.png"
+    },
+    {
+      "url": "https://g1ver.sprintstaticdata.com/v97/static/front/img/social-icons/twitter.png",
+      "out": "social/twitter.png"
+    },
+    {
+      "url": "https://wver.sprintstaticdata.com/v3/static/front/img/ssl.png",
+      "out": "brand/ssl.png"
+    },
+    {
+      "url": "https://g1ver.sprintstaticdata.com/v97/static/front/img/18plus.png",
+      "out": "brand/18plus.png"
+    },
+    {
+      "url": "https://g1ver.sprintstaticdata.com/v97/static/front/img/gamecare.png",
+      "out": "brand/gamcare.png"
+    },
+    {
+      "url": "https://g1ver.sprintstaticdata.com/v97/static/front/img/gt.png",
+      "out": "brand/gt.png"
+    },
+    {
+      "url": "https://g1ver.sprintstaticdata.com/v97/static/front/img/ic_fancy.png",
+      "out": "ic/ic_fancy.png"
+    },
+    {
+      "url": "https://g1ver.sprintstaticdata.com/v97/static/front/img/ic_bm.png",
+      "out": "ic/ic_bm.png"
+    },
+    {
+      "url": "https://g1ver.sprintstaticdata.com/v97/static/front/img/ic_vir.png",
+      "out": "ic/ic_vir.png"
+    },
+    {
+      "url": "https://g1ver.sprintstaticdata.com/v97/static/front/img/game-icon.svg",
+      "out": "ic/game-icon.svg"
+    },
+    {
+      "url": "https://g1ver.sprintstaticdata.com/v97/static/front/img/icons/lock.svg",
+      "out": "ic/lock.svg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/worli3.gif",
+      "out": "casino-icons/worli3.gif"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen62.gif",
+      "out": "casino-icons/teen62.gif"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/dolidana.gif",
+      "out": "casino-icons/dolidana.gif"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/mogambo.gif",
+      "out": "casino-icons/mogambo.gif"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen20v1.jpg",
+      "out": "casino-icons/teen20v1.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/lucky5.jpg",
+      "out": "casino-icons/lucky5.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/roulette12.jpg",
+      "out": "casino-icons/roulette12.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/roulette13.jpg",
+      "out": "casino-icons/roulette13.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/roulette11.jpg",
+      "out": "casino-icons/roulette11.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/poison.jpg",
+      "out": "casino-icons/poison.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teenunique.jpg",
+      "out": "casino-icons/teenunique.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/poison20.jpg",
+      "out": "casino-icons/poison20.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/joker120.jpg",
+      "out": "casino-icons/joker120.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/joker20.jpg",
+      "out": "casino-icons/joker20.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/joker1.jpg",
+      "out": "casino-icons/joker1.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen20c.jpg",
+      "out": "casino-icons/teen20c.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/btable2.jpg",
+      "out": "casino-icons/btable2.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/ourroullete.jpg",
+      "out": "casino-icons/ourroullete.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/superover3.jpg",
+      "out": "casino-icons/superover3.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/goal.jpg",
+      "out": "casino-icons/goal.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/ab4.jpg",
+      "out": "casino-icons/ab4.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/lucky15.jpg",
+      "out": "casino-icons/lucky15.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/superover2.jpg",
+      "out": "casino-icons/superover2.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen41.jpg",
+      "out": "casino-icons/teen41.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen42.jpg",
+      "out": "casino-icons/teen42.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/sicbo2.jpg",
+      "out": "casino-icons/sicbo2.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen33.jpg",
+      "out": "casino-icons/teen33.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/sicbo.jpg",
+      "out": "casino-icons/sicbo.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/ballbyball.jpg",
+      "out": "casino-icons/ballbyball.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/lottery/ball0.png",
+      "out": "img/lottery/ball0.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/lottery/ball1.png",
+      "out": "img/lottery/ball1.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/lottery/ball2.png",
+      "out": "img/lottery/ball2.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/lottery/ball3.png",
+      "out": "img/lottery/ball3.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/lottery/ball4.png",
+      "out": "img/lottery/ball4.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/lottery/ball5.png",
+      "out": "img/lottery/ball5.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/lottery/ball6.png",
+      "out": "img/lottery/ball6.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/lottery/ball7.png",
+      "out": "img/lottery/ball7.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/lottery/ball8.png",
+      "out": "img/lottery/ball8.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/lottery/ball9.png",
+      "out": "img/lottery/ball9.png"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen32.jpg",
+      "out": "casino-icons/teen32.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen.jpg",
+      "out": "casino-icons/teen.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen20.jpg",
+      "out": "casino-icons/teen20.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen9.jpg",
+      "out": "casino-icons/teen9.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen8.jpg",
+      "out": "casino-icons/teen8.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/poker.jpg",
+      "out": "casino-icons/poker.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/poker20.jpg",
+      "out": "casino-icons/poker20.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/poker6.jpg",
+      "out": "casino-icons/poker6.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/baccarat.jpg",
+      "out": "casino-icons/baccarat.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/baccarat2.jpg",
+      "out": "casino-icons/baccarat2.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/dt20.jpg",
+      "out": "casino-icons/dt20.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/dt6.jpg",
+      "out": "casino-icons/dt6.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/dtl20.jpg",
+      "out": "casino-icons/dtl20.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/dt202.jpg",
+      "out": "casino-icons/dt202.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/card32.jpg",
+      "out": "casino-icons/card32.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/card32eu.jpg",
+      "out": "casino-icons/card32eu.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/ab20.jpg",
+      "out": "casino-icons/ab20.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/abj.jpg",
+      "out": "casino-icons/abj.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/lucky7.jpg",
+      "out": "casino-icons/lucky7.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/lucky7eu.jpg",
+      "out": "casino-icons/lucky7eu.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/3cardj.jpg",
+      "out": "casino-icons/3cardj.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/war.jpg",
+      "out": "casino-icons/war.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/worli.jpg",
+      "out": "casino-icons/worli.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/worli2.jpg",
+      "out": "casino-icons/worli2.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/aaa.jpg",
+      "out": "casino-icons/aaa.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/btable.jpg",
+      "out": "casino-icons/btable.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/lottcard.jpg",
+      "out": "casino-icons/lottcard.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/cricketv3.jpg",
+      "out": "casino-icons/cricketv3.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/cmatch20.jpg",
+      "out": "casino-icons/cmatch20.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/cmeter.jpg",
+      "out": "casino-icons/cmeter.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen6.jpg",
+      "out": "casino-icons/teen6.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/queen.jpg",
+      "out": "casino-icons/queen.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/race20.jpg",
+      "out": "casino-icons/race20.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/lucky7eu2.jpg",
+      "out": "casino-icons/lucky7eu2.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/superover.jpg",
+      "out": "casino-icons/superover.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/trap.jpg",
+      "out": "casino-icons/trap.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/patti2.jpg",
+      "out": "casino-icons/patti2.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teensin.jpg",
+      "out": "casino-icons/teensin.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teenmuf.jpg",
+      "out": "casino-icons/teenmuf.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/race17.jpg",
+      "out": "casino-icons/race17.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen20b.jpg",
+      "out": "casino-icons/teen20b.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/trio.jpg",
+      "out": "casino-icons/trio.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/notenum.jpg",
+      "out": "casino-icons/notenum.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen120.jpg",
+      "out": "casino-icons/teen120.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen1.jpg",
+      "out": "casino-icons/teen1.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/ab3.jpg",
+      "out": "casino-icons/ab3.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/aaa2.jpg",
+      "out": "casino-icons/aaa2.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/race2.jpg",
+      "out": "casino-icons/race2.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/teen3.jpg",
+      "out": "casino-icons/teen3.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/dum10.jpg",
+      "out": "casino-icons/dum10.jpg"
+    },
+    {
+      "url": "https://nd.sprintstaticdata.com/casino-icons/lc/cmeter1.jpg",
+      "out": "casino-icons/cmeter1.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/1.jpg",
+      "out": "img/cards/1.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/A.png",
+      "out": "img/cards/A.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/2.png",
+      "out": "img/cards/2.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/3.png",
+      "out": "img/cards/3.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/4.png",
+      "out": "img/cards/4.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/5.png",
+      "out": "img/cards/5.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/6.png",
+      "out": "img/cards/6.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/7.png",
+      "out": "img/cards/7.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/8.png",
+      "out": "img/cards/8.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/9.png",
+      "out": "img/cards/9.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/10.png",
+      "out": "img/cards/10.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/J.png",
+      "out": "img/cards/J.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/Q.png",
+      "out": "img/cards/Q.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/K.png",
+      "out": "img/cards/K.png"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/ASS.jpg",
+      "out": "img/cards/ASS.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/2SS.jpg",
+      "out": "img/cards/2SS.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/3SS.jpg",
+      "out": "img/cards/3SS.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/4SS.jpg",
+      "out": "img/cards/4SS.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/5SS.jpg",
+      "out": "img/cards/5SS.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/6SS.jpg",
+      "out": "img/cards/6SS.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/7SS.jpg",
+      "out": "img/cards/7SS.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/8SS.jpg",
+      "out": "img/cards/8SS.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/9SS.jpg",
+      "out": "img/cards/9SS.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/10SS.jpg",
+      "out": "img/cards/10SS.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/JSS.jpg",
+      "out": "img/cards/JSS.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/QSS.jpg",
+      "out": "img/cards/QSS.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/KSS.jpg",
+      "out": "img/cards/KSS.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/AHH.jpg",
+      "out": "img/cards/AHH.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/2HH.jpg",
+      "out": "img/cards/2HH.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/3HH.jpg",
+      "out": "img/cards/3HH.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/4HH.jpg",
+      "out": "img/cards/4HH.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/5HH.jpg",
+      "out": "img/cards/5HH.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/6HH.jpg",
+      "out": "img/cards/6HH.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/7HH.jpg",
+      "out": "img/cards/7HH.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/8HH.jpg",
+      "out": "img/cards/8HH.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/9HH.jpg",
+      "out": "img/cards/9HH.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/10HH.jpg",
+      "out": "img/cards/10HH.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/JHH.jpg",
+      "out": "img/cards/JHH.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/QHH.jpg",
+      "out": "img/cards/QHH.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/KHH.jpg",
+      "out": "img/cards/KHH.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/ACC.jpg",
+      "out": "img/cards/ACC.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/2CC.jpg",
+      "out": "img/cards/2CC.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/3CC.jpg",
+      "out": "img/cards/3CC.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/4CC.jpg",
+      "out": "img/cards/4CC.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/5CC.jpg",
+      "out": "img/cards/5CC.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/6CC.jpg",
+      "out": "img/cards/6CC.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/7CC.jpg",
+      "out": "img/cards/7CC.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/8CC.jpg",
+      "out": "img/cards/8CC.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/9CC.jpg",
+      "out": "img/cards/9CC.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/10CC.jpg",
+      "out": "img/cards/10CC.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/JCC.jpg",
+      "out": "img/cards/JCC.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/QCC.jpg",
+      "out": "img/cards/QCC.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/KCC.jpg",
+      "out": "img/cards/KCC.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/ADD.jpg",
+      "out": "img/cards/ADD.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/2DD.jpg",
+      "out": "img/cards/2DD.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/3DD.jpg",
+      "out": "img/cards/3DD.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/4DD.jpg",
+      "out": "img/cards/4DD.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/5DD.jpg",
+      "out": "img/cards/5DD.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/6DD.jpg",
+      "out": "img/cards/6DD.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/7DD.jpg",
+      "out": "img/cards/7DD.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/8DD.jpg",
+      "out": "img/cards/8DD.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/9DD.jpg",
+      "out": "img/cards/9DD.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/10DD.jpg",
+      "out": "img/cards/10DD.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/JDD.jpg",
+      "out": "img/cards/JDD.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/QDD.jpg",
+      "out": "img/cards/QDD.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v103/static/front/img/cards/KDD.jpg",
+      "out": "img/cards/KDD.jpg"
+    },
+    {
+      "url": "https://versionobj.ecoassetsservice.com/v104/static/front/img/fav-icons/fav-icon.png",
+      "out": "brand/fav-icon.png"
+    }
+  ]
+}

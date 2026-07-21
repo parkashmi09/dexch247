@@ -1,0 +1,119 @@
+/* Main Container */
+.casinoDetail {
+  width: 100%;
+}
+
+.casinoTable {
+  background-color: var(--color-bg-alt);
+  color: var(--color-text-main);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.casinoTableFullBox {
+  width: 100%;
+  border-left: 1px solid var(--table-border);
+  border-right: 1px solid var(--table-border);
+  border-top: 1px solid var(--table-border);
+  background-color: var(--color-bg-row);
+}
+
+/* Table Header */
+.casinoTableHeader {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--table-border);
+}
+
+.casinoTableHeader .casinoNationDetail {
+  font-weight: bold;
+  min-height: unset;
+}
+
+.casinoNationDetail {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-left: 5px;
+  min-height: 46px;
+  width: 40%;
+}
+
+.casinoNationName {
+  font-weight: bold;
+}
+
+/* Table Body */
+.casinoTableBody {
+  width: 100%;
+}
+
+.casinoTableRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--table-border);
+}
+
+/* Odds Box */
+.casinoOddsBox {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  font-weight: bold;
+  border-left: 1px solid var(--table-border);
+  cursor: pointer;
+  min-height: 46px;
+  width: 20%;
+}
+
+.casinoTableHeader .casinoOddsBox {
+  cursor: unset;
+  padding: 2px;
+  min-height: unset;
+  height: auto !important;
+}
+
+.casinoOdds {
+  display: block;
+}
+
+/* Back (Blue) Background */
+.back {
+  background-color: var(--bg-back) !important;
+}
+
+/* Suspended Box (Locked) */
+.suspendedBox {
+  position: relative;
+  pointer-events: none;
+  cursor: not-allowed;
+  background-color: var(--color-overlay-lock) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+
+  .casinoNationDetail,
+  .casinoOddsBox {
+    padding: 8px 12px;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .casinoNationDetail,
+  .casinoOddsBox {
+    padding: 6px 8px;
+    font-size: 0.813rem;
+  }
+}

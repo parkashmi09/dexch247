@@ -1,0 +1,412 @@
+.casinoDetail {
+  width: 100%;
+  font-family: "Roboto Condensed", sans-serif;
+}
+
+.casinoTable {
+  width: 100%;
+  background-color: var(--bg-table, #1a1a1a);
+  color: var(--text-table, #ffffff);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.casinoTableBox {
+  display: flex;
+  width: 100%;
+  gap: 5px;
+}
+
+.casinoTableLeftBox {
+  width: calc(50% - 3px);
+  border-left: 1px solid var(--table-border, #333);
+  border-right: 1px solid var(--table-border, #333);
+  border-top: 1px solid var(--table-border, #333);
+  background-color: var(--bg-table-row, #2a2a2a);
+}
+
+.casinoTableRightBox {
+  width: calc(50% - 3px);
+  border-left: 1px solid var(--table-border, #333);
+  border-right: 1px solid var(--table-border, #333);
+  border-top: 1px solid var(--table-border, #333);
+  background-color: var(--bg-table-row, #2a2a2a);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.jokerOtherOdds {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Replaced JokerOtherOdds with Grid styles below */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--table-border, #333);
+  background-color: var(--bg-table-row, #2a2a2a);
+}
+
+.gridHeader {
+  font-weight: bold;
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--table-border, #333);
+  border-right: 1px solid var(--table-border, #333);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+}
+
+.gridHeaderFirst {
+  border-right: 1px solid var(--table-border, #333);
+  border-bottom: 1px solid var(--table-border, #333);
+}
+
+.gridRowLabel {
+  font-weight: bold;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--table-border, #333);
+  border-bottom: 1px solid var(--table-border, #333);
+  min-height: 46px;
+}
+
+.gridCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--table-border, #333);
+  border-bottom: 1px solid var(--table-border, #333);
+  background-color: var(--bg-back, #72bbef);
+  color: #000;
+  cursor: pointer;
+  font-weight: bold;
+  min-height: 46px;
+  position: relative;
+}
+
+.gridCell:hover {
+  background-color: #5dade2;
+}
+
+
+/* Left box generic styles */
+.casinoTableHeader,
+.casinoTableRow {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  border-bottom: 1px solid var(--table-border, #333);
+  width: 100%;
+}
+
+.jokerOtherOdds .casinoNationDetail {
+  width: 20%;
+  flex-shrink: 0;
+}
+
+.jokerOtherOdds .casinoOddsBox {
+  width: 20%;
+  flex-shrink: 0;
+  min-width: 20%;
+  max-width: 20%;
+}
+
+.poisonLabelCell {
+  position: static !important;
+  pointer-events: auto !important;
+  cursor: default !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.poisonLabelCell::before,
+.poisonLabelCell::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+.jokerOtherOdds .casinoNationDetail {
+  position: static !important;
+  pointer-events: auto !important;
+  cursor: default !important;
+  background: transparent !important;
+}
+
+.jokerOtherOdds .casinoNationDetail::before,
+.jokerOtherOdds .casinoNationDetail::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+/* Ensure casinoNationDetail never gets suspended styling */
+.casinoNationDetail.poisonSuspendedBox,
+.casinoNationDetail.suspendedBox {
+  position: static !important;
+  pointer-events: auto !important;
+  cursor: default !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.casinoNationDetail.poisonSuspendedBox::before,
+.casinoNationDetail.poisonSuspendedBox::after,
+.casinoNationDetail.suspendedBox::before,
+.casinoNationDetail.suspendedBox::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+.casinoTableLeftBox .casinoNationDetail {
+  width: 60%;
+}
+
+.casinoTableLeftBox .casinoOddsBox {
+  width: 20%;
+}
+
+.casinoTableBody {
+  display: flex;
+  flex-direction: column;
+}
+
+.casinoNationDetail {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-left: 5px;
+  min-height: 46px;
+}
+
+.casinoNationName {
+  font-weight: bold;
+}
+
+.casinoOddsBox {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  font-weight: bold;
+  border-left: 1px solid var(--table-border, #333);
+  cursor: pointer;
+  min-height: 46px;
+}
+
+.casinoTableHeader .casinoOddsBox {
+  cursor: unset;
+  padding: 2px;
+  min-height: unset;
+  height: auto !important;
+}
+
+.casinoOdds {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.back {
+  background-color: var(--bg-back, #72bbef) !important;
+}
+
+.lay {
+  background-color: #faa9ba !important;
+}
+
+.back:hover {
+  background-color: #5dade2 !important;
+}
+
+.lay:hover {
+  background-color: #f194a8 !important;
+}
+
+.suspendedBox {
+  position: relative;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.suspendedBox::before {
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  pointer-events: none;
+}
+
+.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock, rgba(0, 0, 0, 0.6));
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.suspendedBox .casinoOdds {
+  position: relative;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+.poisonSuspendedBox {
+  position: relative;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.poisonSuspendedBox::before {
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  pointer-events: none;
+}
+
+.poisonSuspendedBox::after {
+  content: "";
+  background-color: #373636d6;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.poisonSuspendedBox .casinoOdds {
+  position: relative;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+.cardIcon {
+  margin-left: 4px;
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.cardIconImg {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  display: inline-block;
+}
+
+.ms1 {
+  margin-left: 0.25rem !important;
+}
+
+.cardRed {
+  color: var(--color-text-danger, #dc3545);
+}
+
+.cardBlack {
+  color: var(--color-text-black, #000);
+}
+
+/* Responsive styles */
+@media only screen and (max-width: 1199px) {
+  .casinoNationName {
+    font-size: 12px;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+
+  .casinoTableLeftBox,
+  .casinoTableRightBox {
+    width: 100%;
+    padding: 0 5px;
+  }
+
+  .casinoTableBox {
+    flex-direction: column;
+  }
+
+  .casinoTableHeader {
+    font-size: 12px;
+  }
+
+  .casinoTableRow {
+    font-size: 12px;
+  }
+
+  /* Grid Responsive */
+  .cardGrid {
+    grid-template-columns: repeat(4, 1fr);
+    font-size: 12px;
+  }
+
+  .gridHeader,
+  .gridRowLabel,
+  .gridCell {
+    padding: 4px;
+    min-height: 35px;
+  }
+
+  .casinoOddsBox {
+    padding: 4px 0;
+    min-height: 35px;
+  }
+
+  .casinoNationDetail {
+    padding-left: 4px;
+    min-height: 35px;
+  }
+}

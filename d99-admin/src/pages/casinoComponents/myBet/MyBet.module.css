@@ -1,0 +1,167 @@
+/* Wrapper – full width of right sidebar, matches game-details .right-sidebar .my-bet */
+.myBetWrap {
+  border: none;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+/* Header – full width, same as game-details .right-sidebar .card-header */
+.myBetWrap :global(.card-header) {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--bg-secondary70);
+  color: var(--text-secondary);
+  padding: 4px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 42px;
+  border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.myBetWrap :global(.card-header .card-title) {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: var(--font-roboto-condensed);
+  overflow: visible;
+  flex: 1;
+  min-width: 0;
+}
+
+/* View More button – same as game-details .right-sidebar .btn-back */
+.myBetWrap :global(.btn-back) {
+  cursor: pointer;
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+  padding: 0.47rem 0.75rem;
+  text-decoration: none;
+  border-radius: 3px !important;
+  margin-right: 3px;
+  margin-left: 0;
+  text-transform: uppercase;
+  display: inline-block;
+  font-size: 12px;
+}
+
+.myBetWrap :global(.btn-back:hover) {
+  background-color: var(--bg-secondary85) !important;
+  border-color: var(--bg-secondary85) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Body – full width, same as game-details .right-sidebar .my-bet .card-body */
+.myBetWrap :global(.card-body1) {
+  padding: 0;
+  background-color: transparent;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.myBetWrap :global(.card-body1) :global(.tab-content) {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Table wrapper – full width so header and table take remaining space */
+.myBetWrap :global(.table-responsive1) {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+.myBetWrap :global(.tab-pane),
+.myBetWrap :global(.tab-content) {
+  width: 100%;
+}
+
+/* Table – full width (only for non–my-bets-table; my-bets-table has its own block below) */
+.myBetWrap :global(.table:not(.my-bets-table)),
+.myBetWrap :global(.coupon-table) {
+  width: 100%;
+  min-width: 100%;
+  margin-bottom: 0;
+  color: black;
+  font-size: 14px;
+}
+
+.myBetWrap :global(.table:not(.my-bets-table)) thead th,
+.myBetWrap :global(.coupon-table) thead th {
+  color: black;
+  border-bottom: 1px solid black;
+  padding: 0.5rem;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.myBetWrap :global(.table:not(.my-bets-table)) tbody td,
+.myBetWrap :global(.coupon-table) tbody td {
+  padding: 0.5rem;
+  border-top: 1px solid #dee2e6;
+  color: var(--text-table);
+}
+
+.myBetWrap :global(.table:not(.my-bets-table)) tbody td.text-center,
+.myBetWrap :global(.coupon-table) tbody td.text-center {
+  text-align: center;
+  padding: 1rem;
+  color: var(--text-table);
+}
+
+/* ========== My Bets table only – layout and borders ========== */
+.myBetWrap :global(.my-bets-table) {
+  width: 100%;
+  min-width: 100%;
+  margin-bottom: 0;
+  font-size: 14px;
+}
+
+.myBetWrap :global(.my-bets-table) thead th,
+.myBetWrap :global(.my-bets-table) tbody td {
+  border: 0 !important;
+  padding: 0.5rem;
+}
+
+.myBetWrap :global(.my-bets-table) thead th {
+  color: black;
+  border-bottom: 1px solid black !important;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.myBetWrap :global(.my-bets-table) th,
+.myBetWrap :global(.my-bets-table) td,
+.myBetWrap :global(.my-bets-table) b,
+.myBetWrap :global(.my-bets-table) .float-right {
+  color: #1e1e1e !important;
+}
+
+/* Gap row between strips */
+.myBetWrap :global(.my-bets-table) tr.my-bets-gap td {
+  border: 0 !important;
+  padding: 0 !important;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+/* game_type = back → .back-border; game_type = lay → .lay-border (left stripe + bg) */
+.myBetWrap :global(.my-bets-table) tbody tr.back-border,
+.myBetWrap :global(.my-bets-table) tbody tr.back-border td,
+.myBetWrap :global(.my-bets-table) tbody tr.back-border th {
+  box-shadow: inset 3px 0 0 var(--back);
+  border-left: 0;
+  background-color: #72bbef57 !important;
+}
+.myBetWrap :global(.my-bets-table) tbody tr.lay-border,
+.myBetWrap :global(.my-bets-table) tbody tr.lay-border td,
+.myBetWrap :global(.my-bets-table) tbody tr.lay-border th {
+  box-shadow: inset 3px 0 0 var(--lay);
+  border-left: 0;
+  background-color: #f994ba57 !important;
+}

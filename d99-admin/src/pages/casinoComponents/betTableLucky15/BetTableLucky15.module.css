@@ -1,0 +1,53 @@
+/* Use global classes from style.css: .bet-table, .bet-table-header, .bet-table-body,
+   .row5, .col-6, .col-md-4, .fancy-tripple, .bet-table-row, .nation-name, .bl-box, .back,
+   .bl-title, .back-title, .fancy-min-max, .book-red, .container-fluid-5 */
+
+/* Hide on mobile (reference: d-none-mobile) */
+.dNoneMobile {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .dNoneMobile {
+    display: none !important;
+  }
+}
+
+/* Display only – no bet placement */
+.betTable :global(.bl-box) {
+  cursor: default !important;
+  pointer-events: none;
+}
+/* Suspended: only padlock visible, no odds/limits text */
+.suspendedBox {
+  position: relative;
+  pointer-events: none;
+}
+
+.suspendedBox::before {
+  content: "";
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 20px 20px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+}
+
+.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock, rgba(0, 0, 0, 0.25));
+  position: absolute;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+}
+

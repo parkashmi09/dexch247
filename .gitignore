@@ -1,0 +1,25 @@
+node_modules/
+.env
+.env.*
+!.env.example
+
+# build output
+build/
+dist/
+.next/
+out/
+
+# logs
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# runtime / os
+.DS_Store
+Thumbs.db
+*.pid
+*.seed
+coverage/
+.cache/
+tmp/

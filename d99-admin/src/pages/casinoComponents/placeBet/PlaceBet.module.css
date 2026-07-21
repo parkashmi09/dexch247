@@ -1,0 +1,391 @@
+.sectionB {
+  padding-left: 0.3rem;
+  width: 100%;
+  margin-left: auto;
+  font-weight: bold;
+  font-size: 14px;
+
+  @media (max-width: 768px) {
+    padding-left: 0;
+  }
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: end;
+  width: 100%;
+}
+
+.section1 {
+  display: flex;
+  font-weight: 500;
+  background-color: var(--color-secondary);
+  color: var(--color-text-inverse);
+  justify-content: space-between;
+  padding: 0.3rem 0.3rem;
+  font-family: "Roboto", sans-serif;
+  font-size: 15px;
+
+  @media (max-width: 768px) {
+    background-color: var(--color-primary);
+  }
+}
+
+.smallText {
+  font-size: 13px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.close {
+  display: none;
+  color: white;
+  font-size: bold;
+  cursor: pointer;
+
+  @media (max-width: 768px) {
+    display: block;
+
+  }
+}
+
+.section2 {
+  display: flex;
+  background-color: var(--color-bg-row);
+  padding: 0.3rem;
+  font-weight: 500;
+  justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+  .section2 {
+    display: none;
+  }
+}
+
+.oddsText {
+  position: relative;
+  left: 31px;
+}
+
+.stakeText {
+  position: relative;
+  left: -6px;
+  gap: 6px
+}
+
+.wrapper {
+  background-color: var(--bg-back);
+}
+
+.section3 {
+  display: flex;
+  min-width: 10rem;
+  height: 2.45rem;
+  font-weight: 500;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.playerText {
+  width: 44%;
+}
+
+.stakeInput {
+  width: 20%;
+  height: 21px;
+  border: none;
+}
+
+.oddsInput {
+  width: 21%;
+  margin-left: 10%;
+  height: 21px;
+  border: none;
+}
+
+.placeBetButtons {
+  display: flex;
+  background-color: var(--bg-back);
+  flex-wrap: wrap;
+  padding: 4px;
+  gap: 2px;
+  justify-content: flex-start;
+}
+
+.btn {
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.btnPlaceBet {
+  width: 32.3%;
+  /* width: calc(20% - 2px); */
+  padding: 5px;
+  background-color: var(--bg-sidebar);
+  color: var(--text-sidebar);
+  border: 0;
+  border-radius: 0;
+}
+
+@media (max-width: 768px) {
+  .btnPlaceBet {
+    background-color: var(--bg-success);
+    color: var(--text-secondary);
+  }
+}
+
+.btnSm {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.btnLink {
+  background: transparent;
+  text-decoration: underline;
+  font-weight: 400;
+  color: var(--color-text-info);
+}
+
+.textDark {
+  color: var(--color-text-main);
+}
+
+.flexFill {
+  flex: 1 1 auto;
+}
+
+.textEnd {
+  text-align: right;
+}
+
+/* Legacy class for backward compatibility */
+.section4 {
+  display: flex;
+  background-color: var(--bg-back);
+  flex-wrap: wrap;
+  padding: 4px;
+  gap: 2px;
+  justify-content: flex-start;
+}
+
+.oddsButton {
+  width: calc(20% - 2px);
+  padding: 5px;
+  background-color: var(--bg-sidebar);
+  color: var(--text-sidebar);
+  border: 0;
+  border-radius: 0;
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.section5 {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.2rem 0.5rem 0.3rem 0.5rem;
+}
+
+.editButton {
+  width: 5rem;
+  padding: 8px 0;
+  font-weight: 500;
+  color: white;
+  text-align: center;
+  margin: 0 0.1rem;
+  background-color: var(--bg-info);
+  cursor: pointer;
+}
+
+.resetButton {
+  width: 5rem;
+  padding: 8px 0;
+  font-weight: 500;
+  color: white;
+  text-align: center;
+  margin: 0 0.1rem;
+  background-color: var(--bg-danger);
+  cursor: pointer;
+}
+
+.submitButton {
+  width: 5rem;
+  padding: 8px 0;
+  font-weight: 500;
+  color: white;
+  text-align: center;
+  margin: 0 0.1rem;
+  background-color: var(--bg-success);
+  cursor: pointer;
+}
+
+/* Mobile-specific styles */
+
+
+.lay {
+  background-color: var(--bg-lay) !important;
+}
+
+/* Mobile: Top row with bet name and Profit */
+.mobileTopRow {
+  display: none;
+}
+
+.mobileBetName {
+  flex: 1;
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-text-main);
+}
+
+.mobileProfit {
+  text-align: right;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--color-text-main);
+}
+
+/* Mobile: Reorganized inputs with labels */
+.oddStakeBox {
+  display: none;
+}
+
+.inputLabelsRow {
+  display: flex;
+  margin-top: 0.25rem;
+}
+
+.inputLabel {
+  flex: 0 0 50%;
+  width: 50%;
+  text-align: center;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--color-text-main);
+
+}
+
+.inputsRow {
+  display: flex;
+  margin-top: 0.25rem;
+  gap: 4px;
+}
+
+.inputWrapper {
+  flex: 0 0 50%;
+  width: 50%;
+}
+
+.floatEnd {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.stakeInputFull {
+  width: 100% !important;
+  height: 28px;
+  float: left;
+}
+
+/* Mobile: Action buttons box */
+.placeBetBtnBox {
+  display: none;
+}
+
+/* Button styles */
+.btnInfo {
+  background-color: var(--bg-info);
+  color: white;
+  border: none;
+}
+
+.btnDanger {
+  background-color: var(--bg-danger);
+  color: var(--color-text-inverse);
+  border-color: var(--bg-danger);
+}
+
+.btnSuccess {
+  background-color: var(--bg-success);
+  color: white;
+  border: none;
+}
+
+.btnSuccess:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Mobile: Range display at bottom */
+.mobileRange {
+  display: none;
+}
+
+/* Mobile media queries (max-width: 1199px) */
+@media only screen and (max-width: 1199px) {
+  .placeBetModal {
+    padding: 10px;
+  }
+
+  .mobileTopRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+    border-bottom: 1px solid transparent;
+    /* border-bottom: 1px solid rgba(0, 0, 0, 0.1); */
+  }
+
+  .oddStakeBox {
+    display: block;
+    background: var(--color-overlay);
+    padding: 4px;
+    /* margin-top: 0.5rem; */
+  }
+
+  .section3 {
+    display: none;
+  }
+
+  .placeBetModal .stakeInput:disabled {
+    background-color: #fff;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-main);
+  }
+
+  .btnPlaceBet {
+    width: calc(33.33% - 2px);
+    background-color: var(--bg-secondary85);
+    color: var(--text-secondary);
+  }
+
+  .placeBetBtnBox {
+    display: flex;
+    margin-top: 0.5rem;
+    /* gap: 2px; */
+  }
+
+  .placeBetBtnBox .btn {
+    width: 25%;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 8px 4px;
+  }
+
+  .section5 {
+    display: none;
+  }
+
+  .mobileRange {
+    display: flex;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+}

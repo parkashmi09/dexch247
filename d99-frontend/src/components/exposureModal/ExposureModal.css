@@ -1,0 +1,78 @@
+.exposure-modal .modal-dialog {
+  margin-top: 2% !important;
+}
+
+@media only screen and (max-width: 767px) {
+  .exposure-modal .modal-dialog {
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
+.exposure-modal-header {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.exposure-modal-header .btn-close {
+  filter: invert(1);
+}
+
+@media only screen and (max-width: 767px) {
+  .exposure-modal-header {
+    border-radius: 0 !important;
+  }
+}
+
+.exposure-modal-body {
+  background-color: var(--bg-body);
+  color: var(--text-body);
+  padding: 10px;
+  max-height: calc(98vh - 50px);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+@media only screen and (max-width: 767px) {
+  .exposure-modal-body {
+    max-height: calc(50vh - 60px);
+    padding: 0.5rem;
+  }
+}
+
+.exposure-table {
+  color: var(--text-table, #212529);
+  margin-bottom: 0;
+}
+
+.exposure-table thead th {
+  padding: 5px;
+  font-size: 16px;
+  white-space: nowrap;
+  font-weight: 600;
+  border: 0 !important;
+}
+
+.exposure-table tbody td {
+  background-color: var(--bg-table, #ffffff);
+  padding: 5px;
+  font-size: 16px;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-bottom: 1px solid #dee2e6 !important;
+  border-right: 0 !important;
+  border-left: 0 !important;
+  border-top: 1px solid #dee2e6 !important;
+}
+
+.exposure-table a {
+  color: #0d6efd;
+  text-decoration: underline;
+}
+
+.exposure-table a:hover {
+  text-decoration: none;
+}

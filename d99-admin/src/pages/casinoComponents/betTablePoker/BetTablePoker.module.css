@@ -1,0 +1,188 @@
+.betTable {
+  width: 100%;
+  font-family: "Roboto Condensed", sans-serif;
+  font-size: 15px;
+  font-weight: bold;
+  color: #000;
+  margin: 0 auto;
+}
+
+/* Table wrapper */
+.tableWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Table styles */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.tableRow {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+}
+
+.playerName {
+  width: 14.3rem;
+  text-align: start;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+}
+
+.backCell,
+.layCell {
+  width: 5.4rem;
+  padding: 0;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  height: 46px;
+  vertical-align: middle;
+  position: relative;
+  overflow: hidden;
+}
+
+.cellContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 0;
+  padding: 0;
+}
+
+.cellContent>span {
+  display: block;
+  line-height: 1.2;
+}
+
+.exposure {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  margin-top: -2px;
+}
+
+.backCell {
+  background-color: var(--bg-back);
+}
+
+.layCell {
+  background-color: var(--bg-lay);
+}
+
+.lockedCell {
+  width: 5.4rem;
+  background-color: var(--color-overlay-lock);
+  padding: 0;
+  text-align: center;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ddd;
+  height: 46px;
+  vertical-align: middle;
+}
+
+/* Bonus section (2 boxes) */
+.section2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+  width: 100%;
+  /* full width of container */
+}
+
+/* Individual bonus box */
+.bonusBox {
+  padding: 0;
+  text-align: center;
+  border: 1px solid #fff;
+  cursor: pointer;
+  color: black;
+  font-weight: bold;
+  background-color: var(--bg-back);
+  display: flex;
+  align-items: center;
+  height: 42px;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.bonusContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 0;
+  width: 100%;
+}
+
+.bonusContent>span {
+  display: block;
+  line-height: 1.2;
+}
+
+.bonusExposure {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  margin-top: -2px;
+}
+
+.bonusLock {
+  background-color: var(--color-overlay-lock);
+  color: #a7d3f2;
+  cursor: not-allowed;
+  flex-direction: column;
+}
+
+.lockIcon {
+  font-size: 1.5rem;
+  color: #ffffffbd;
+  margin-bottom: 4px;
+}
+
+.lockedText {
+  color: #a7d3f2;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Responsive adjustments for laptop/desktop */
+@media screen and (min-width: 768px) {
+  .tableWrapper {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .table {
+    width: 100%;
+  }
+
+  /* Make .section2 flex with 2 items only per player */
+  .section2 {
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    /* keep full container width */
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+
+  .bonusBox {
+    width: 48%;
+  }
+}

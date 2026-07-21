@@ -1,0 +1,29 @@
+/* Whitelabel theme template.
+ *
+ * Copy this file to themes/<brand>.css and override only the tokens you need.
+ * Loaded AFTER variables.css and the reference CSS, so it always wins.
+ *
+ * Activate with `VITE_BRAND=<brand>` in .env, or via hostname mapping in
+ * src/config.js.
+ */
+
+:root[data-brand="_template"] {
+  /* Brand palette */
+  --bg-primary: #0088cc;
+  --bg-primary65: #0088cca5;
+  --bg-primary90: #0088cce6;
+  --text-primary: #ffffff;
+
+  --bg-secondary: #2c3e50;
+  --text-secondary: #ffffff;
+
+  /* Surfaces */
+  --bg-body: #ffffff;
+  --text-body: #000000;
+  --bg-sidebar: #cccccc;
+  --text-sidebar: #000000;
+
+  /* Brand assets — paths under /assets/, downloaded by sync-assets */
+  --brand-logo: url("/assets/brand/_template/logo.svg");
+  --brand-favicon: url("/assets/brand/_template/favicon.svg");
+}

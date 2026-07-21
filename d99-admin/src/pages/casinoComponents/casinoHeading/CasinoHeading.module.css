@@ -1,0 +1,45 @@
+/* Scoped game header – uses root vars: --bg-secondary, --text-secondary */
+.gameHeader {
+  padding: 10px 20px;
+  color: var(--text-secondary);
+  width: 100%;
+  background-color: var(--bg-secondary);
+  margin-bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.gameHeaderName {
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-family: var(--font-roboto-condensed, "Roboto Condensed", sans-serif);
+}
+
+.gameHeaderDate {
+  float: right;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.smallText {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .gameHeader {
+    padding: 8px 12px;
+  }
+  .gameHeaderName {
+    font-size: 13px;
+  }
+  .gameHeaderDate {
+    font-size: 12px;
+  }
+}

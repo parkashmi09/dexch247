@@ -1,0 +1,129 @@
+.rouletteTable {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+
+  margin: 0 auto;
+}
+
+.tableWrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+}
+
+.zeroContainer {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  width: 6%;
+}
+
+.zeroContainer .cell {
+  height: calc(100% + 4px);
+  /* Account for the gaps between rows */
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 2rem 0 0 2rem
+}
+
+.numbersGrid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  /* Reduced to 13 since zero is now separate */
+  gap: 2px;
+  flex: 1;
+}
+
+.row {
+  display: contents;
+}
+
+.cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  border-radius: 4px;
+}
+
+.zero {
+  background-color: #008000;
+}
+
+.red {
+  background-color: #dc0000;
+}
+
+.black {
+  background-color: #000000;
+}
+
+.special {
+  background-color: #fff7d6;
+  color: #f70000;
+}
+
+.locked {
+  background-color: var(--color-overlay-lock);
+  color: #ffffff;
+}
+
+.bottomBets {
+  margin-top: 2px;
+}
+
+.dozens {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-bottom: 2px;
+}
+
+.otherBets {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 2px;
+}
+
+.dozens .cell,
+.otherBets .cell {
+  aspect-ratio: auto;
+  padding: 10px 0;
+}
+
+@media (max-width: 768px) {
+  .cell {
+    font-size: 14px;
+  }
+
+  .rouletteTable {
+    max-width: 100%;
+  }
+
+  .numbersGrid {
+    grid-template-columns: repeat(13, 1fr);
+  }
+
+  .dozens .cell,
+  .otherBets .cell {
+    padding: 8px 0;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cell {
+    font-size: 10px;
+  }
+
+  .dozens .cell,
+  .otherBets .cell {
+    padding: 6px 0;
+    font-size: 10px;
+  }
+}

@@ -1,0 +1,157 @@
+.result-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+
+.result-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #355E3B;
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+}
+
+.table th {
+  background: none !important;
+}
+
+.result-circle.yes {
+  color: yellow;
+}
+
+.result-circle.no {
+  color: red;
+}
+
+.result-circle:hover {
+  transform: scale(1.1);
+}
+
+/* Cricket Result Styles */
+.five-cricket-result {
+  padding: 10px;
+}
+
+.score-head {
+  background-color: var(--bg-secondary85, #2c3e50);
+  padding: 10px;
+  color: var(--text-secondary, #ffffff);
+  border-radius: 4px;
+}
+
+.text-fancy {
+  color: #ffd700;
+  font-weight: bold;
+}
+
+.five-cricket-result .table {
+  table-layout: fixed;
+  background-color: none;
+  color: var(--text-table, #212529);
+  margin-bottom: 0;
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.five-cricket-result h4 {
+  background-color: var(--bg-primary90, #2289d4);
+  color: var(--text-primary, #ffffff);
+  padding: 5px;
+}
+
+.five-cricket-result .table td,
+.five-cricket-result .table th {
+  padding: 5px;
+  font-size: 16px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.five-cricket-result .table thead {
+  background-color: none;
+}
+
+.five-cricket-result .table thead th {
+  background-color: none;
+  color: black;
+  border: 0 !important;
+  font-weight: 600;
+}
+
+.five-cricket-result .table tbody {
+  background-color: none;
+}
+
+.five-cricket-result .table tbody td {
+  /* background-color: var(--bg-table, #ffffff); */
+  border-bottom: 1px solid #dee2e6 !important;
+  border-right: 0 !important;
+  border-left: 0 !important;
+  border-top: 1px solid #dee2e6 !important;
+}
+
+.five-cricket-result tbody,
+.five-cricket-result td,
+.five-cricket-result tfoot,
+.five-cricket-result th,
+.five-cricket-result thead,
+.five-cricket-result tr {
+  border-color: var(--table-border, #dee2e6);
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mt-2 {
+  margin-top: 1rem;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile view - reduce font size and fix table scrolling */
+@media only screen and (max-width: 767px) {
+  .five-cricket-result .table td,
+  .five-cricket-result .table th {
+    font-size: 11px;
+    padding: 3px;
+  }
+
+  .five-cricket-result h4 {
+    font-size: 14px;
+    padding: 4px;
+  }
+
+  .score-head {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+
+  .five-cricket-result .table {
+    font-size: 11px;
+    min-width: 100%;
+  }
+}

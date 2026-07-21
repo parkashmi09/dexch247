@@ -1,0 +1,30 @@
+.tableContainer {
+  margin-top: 0.4rem;
+  width: 100%;
+}
+
+.blueBar {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background-color: #0088cc;
+  color: #ffffff;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.myBetContainerMobie {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .myBetContainerMobie {
+    width: 100%;
+    margin-left: 0;
+    display: block;
+  }
+
+  .blueBar {
+    display: flex;
+  }
+}

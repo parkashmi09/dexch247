@@ -1,0 +1,160 @@
+.tableContainer {
+  width: 100%;
+  border: 1px solid #ddd;
+  font-family: "Roboto Condensed", sans-serif;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: #fff;
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid #ddd;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+/* Row 1 Specifics */
+.labelCell {
+  flex: 1;
+  background: var(--color-bg-alt);
+  padding: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  color: #333;
+  font-size: 14px;
+}
+
+.oddsContainer {
+  flex: 1;
+  background: var(--bg-back);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.oddsContainer:hover {
+  background: #5dade2;
+}
+
+.oddsCell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  color: #000;
+  min-height: 45px;
+}
+
+/* Row 2 Specifics */
+.labelCellEmpty {
+  flex: 1;
+  /* Aligns with Daga/Teja label */
+  background: #fff;
+  border-right: 1px solid #ddd;
+}
+
+.labelCellTotal {
+  flex: 1;
+  /* Space for '3 Card Total' */
+  background: var(--color-bg-alt);
+  /* Or white based on image */
+  padding: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  /* Image shows left align */
+  color: #333;
+  font-size: 14px;
+  border-right: 1px solid #ddd;
+}
+
+.totalValues {
+  flex: 1;
+  /* Aligns with Mogambo Label */
+  display: flex;
+}
+
+.spacer {
+  flex: 1;
+  /* Aligns with Mogambo Odds */
+  background: #fff;
+}
+
+
+/* Boxes for Total */
+.pinkBox {
+  background: var(--bg-lay);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-right: 1px solid #ddd;
+  min-height: 45px;
+}
+
+.blueBox {
+  background: var(--bg-back);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  min-height: 45px;
+}
+
+.totalContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+}
+
+.bigNum {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.smallNum {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.locked {
+  background: var(--color-overlay-lock) !important;
+  color: #fff !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: not-allowed;
+  width: 100%;
+  height: 100%;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+
+  .labelCell,
+  .labelCellTotal {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .oddsCell,
+  .bigNum {
+    font-size: 14px;
+  }
+}

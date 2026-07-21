@@ -1,0 +1,44 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  font-weight: 500;
+  position: relative;
+  width: 100%;
+  gap: 0.25rem;
+}
+
+.leftSection {
+  flex: 0 0 65%;
+  min-width: 0;
+  width: 65%;
+}
+
+.rightSection {
+  flex: 0 0 35%;
+  min-width: 0;
+  width: 35%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Right section: .right-sidebar must fill the column (override refrercestyle.css 35% on .right-sidebar) */
+.rightSection > :global(.right-sidebar) {
+  flex: 1 1 100% !important;
+  min-width: 0;
+  max-width: 100% !important;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .leftSection {
+    width: 100%;
+  }
+
+  .rightSection {
+    display: none;
+  }
+}

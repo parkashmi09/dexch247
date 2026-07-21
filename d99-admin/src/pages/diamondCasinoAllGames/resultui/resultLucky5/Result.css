@@ -1,0 +1,48 @@
+.result-row {
+    display: flex;
+    gap: 6px;
+    /* margin: 10px 0; */
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+  
+  .result-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #355E3B;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+  }
+  
+  .result-circle:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Lucky7 specific result colors */
+  .lucky7.casino-last-results .result-circle {
+    background-color: #355E3B;
+    /* Common Dark Green Background */
+    border: 1px solid #355E3B;
+  }
+  
+  .lucky7.casino-last-results .result-circle.result-a {
+    color: #ff9800;
+    /* Orange for A */
+  }
+  
+  .lucky7.casino-last-results .result-circle.result-b {
+    color: #ffeb3b;
+    /* Yellow for B */
+  }
+  
+  .lucky7.casino-last-results .result-circle.result-c {
+    color: #00bcd4;
+    /* Cyan/Blue for C */
+  }

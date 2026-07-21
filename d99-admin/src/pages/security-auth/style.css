@@ -1,0 +1,228 @@
+/* Main Container */
+.security-auth-container {
+    padding: 20px;
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+    /* Default text color */
+}
+
+/* Page Header */
+.page-header h2 {
+    font-size: 24px;
+    font-weight: 400;
+    color: #333;
+    /* Assuming light theme based on screenshot */
+    margin-bottom: 20px;
+}
+
+/* Auth Card Area */
+.auth-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    /* Optional shadow if desired */
+    /* box-shadow: 0 2px 4px rgba(0,0,0,0.1); */
+    text-align: center;
+}
+
+/* Status Line */
+.status-line {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-badge-disabled {
+    background: #dc3545;
+    /* Red */
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+.status-badge-enabled {
+    background: #20c997;
+    /* Teal/Green matches screenshot 2 roughly */
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+/* Instruction Text */
+.instruction-text {
+    margin-bottom: 15px;
+    color: #555;
+    font-size: 14px;
+}
+
+/* Tabs */
+.auth-tabs {
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 20px;
+}
+
+.auth-tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-bottom: none;
+    font-size: 14px;
+    color: #555;
+}
+
+.auth-tab:hover {
+    color: #000;
+}
+
+.auth-tab.active {
+    border-color: #dee2e6 #dee2e6 #fff;
+    background: #fff;
+    margin-bottom: -1px;
+    color: #333;
+    font-weight: 500;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+/* Setup Step 1 */
+.setup-step-1 label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.input-with-button {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-control {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: #fdfdfd;
+}
+
+.btn-primary {
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.btn-primary:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Instructions Step 2 */
+.step-text {
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.bot-instructions {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.bot-instructions a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.cmd-badge {
+    background: #212529;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+/* Enabled / Verification View */
+.verification-section {
+    margin-top: 30px;
+}
+
+.verification-section h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.verification-section p {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.otp-input-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.otp-box {
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    font-size: 20px;
+    background: #212529;
+    /* Dark matches screenshot */
+    color: #fff;
+    border: 1px solid #333;
+    border-radius: 4px;
+}
+
+.otp-box:focus {
+    outline: none;
+    border-color: #0d6efd;
+}
+
+.resend-container {
+    margin-top: 10px;
+}
+
+.resend-link {
+    color: #0d6efd;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.resend-link:hover {
+    text-decoration: underline;
+}
+
+/* Dark Mode Overrides (if admin is dark mode, which the prev file suggested) */
+/* The user provided screenshot has a WHITE background. 
+   But the OTP boxes are DARK.
+   So let's stick to White Container, Dark OTP Boxes as per CSS above. 
+   If global variables force dark mode, we might need !important or specific scopes.
+   But assuming we can control local style. 
+*/

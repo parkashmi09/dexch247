@@ -1,0 +1,47 @@
+/* ============================================================================
+ * CENTRAL THEME FILE — every brand's palette lives here.
+ *
+ * The active brand comes from the whitelabel config (mock/whitelabel.json)
+ * or VITE_BRAND, and lands on <html data-brand="...">.
+ * Brand names are registered in src/styles/themes/index.js (resolveBrand).
+ *
+ * To add a brand: add a `:root[data-brand="<name>"] { ... }` block below
+ * and add the name to THEMES in styles/themes/index.js.
+ * ========================================================================== */
+
+/* ---- default ---- */
+:root {
+    --bg-primary: #0088CC;
+    --bg-primary90: #0088CCE6;
+    --text-primary: #FFFFFF;
+    --bg-secondary: #2C3E50;
+    --bg-secondary70: #2C3E50B3;
+    --bg-secondary85: #2C3E50D9;
+    --text-secondary: #FFFFFF;
+    --bg-news: ;
+}
+
+/* ---- demo ---- */
+:root[data-brand="demo"] {
+    --bg-primary: #051923;
+    --bg-primary90: #051923E6;
+    --text-primary: #FFFFFF;
+    --bg-secondary: #003554;
+    --bg-secondary70: #003554B3;
+    --bg-secondary85: #003554D9;
+    --text-secondary: #FFFFFF;
+    --bg-news: ;
+}
+
+
+/* ---- demo ---- */
+:root[data-brand="demo"] {
+    --bg-primary: #051923;
+    --bg-primary90: #051923E6;
+    --text-primary: #FFFFFF;
+    --bg-secondary: #003554;
+    --bg-secondary70: #003554B3;
+    --bg-secondary85: #003554D9;
+    --text-secondary: #FFFFFF;
+    --bg-news: ;
+}

@@ -1,0 +1,303 @@
+/* Main Container */
+.casinoTable {
+  background-color: var(--color-bg-alt);
+  color: var(--color-text-main);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+/* Casino Table Box - Container for Player A and Player B */
+.casinoTableBox {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-right: 4px;
+}
+
+/* Casino Table Left Box (Player A) */
+.casinoTableLeftBox {
+  width: calc(50% - 2px);
+  border-left: 1px solid var(--table-border);
+  border-right: 1px solid var(--table-border);
+  border-top: 1px solid var(--table-border);
+  background-color: var(--color-bg-row);
+}
+
+/* Casino Table Right Box (Player B) */
+.casinoTableRightBox {
+  width: calc(50% - 2px);
+  border-left: 1px solid var(--table-border);
+  border-right: 1px solid var(--table-border);
+  border-top: 1px solid var(--table-border);
+  background-color: var(--color-bg-row);
+}
+
+/* Divider between Player A and Player B */
+.casinoTableBoxDivider {
+  width: 2px;
+  background-color: var(--table-border);
+  min-height: 100%;
+}
+
+/* Table Header */
+.casinoTableHeader {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--table-border);
+}
+
+.casinoTableHeader .casinoNationDetail {
+  font-weight: bold;
+  min-height: unset;
+}
+
+.casinoNationDetail {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-left: 5px;
+  min-height: 46px;
+}
+
+/* Table Body */
+.casinoTableBody {
+  width: 100%;
+}
+
+.casinoTableRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--table-border);
+}
+
+/* Odds Box */
+.casinoOddsBoxLucky {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  font-weight: bold;
+  border-left: 1px solid var(--table-border);
+  cursor: pointer;
+  min-height: 46px;
+  width: 25%;
+  position: relative;
+}
+
+/* Odds Box */
+.casinoOddsBox {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  font-weight: bold;
+  border-left: 1px solid var(--table-border);
+  cursor: pointer;
+  min-height: 46px;
+  width: 25%;
+  position: relative;
+}
+
+.casinoTableHeader .casinoOddsBox {
+  cursor: unset;
+  padding: 2px;
+  min-height: unset;
+  height: auto !important;
+}
+
+.casinoOdds {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+  display: block;
+}
+
+.casinoNationBook {
+  display: block;
+}
+
+/* Back (Blue) Background */
+.back {
+  background-color: var(--bg-back) !important;
+}
+
+/* Lay (Pink) Background */
+.lay {
+  background-color: var(--bg-lay) !important;
+}
+
+/* Suspended Box (Locked) */
+.suspendedBox {
+  position: relative;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.suspendedBox::before {
+  content: "";
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 17px;
+  height: 17px;
+  pointer-events: none;
+}
+
+.suspendedBox .casinoOdds {
+  position: relative;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+/* Casino Table Full Box (Lucky 9) */
+.casinoTableFullBox {
+  width: 100%;
+  border-left: 1px solid var(--table-border);
+  border-right: 1px solid var(--table-border);
+  border-top: 1px solid var(--table-border);
+  background-color: var(--color-bg-row);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid var(--table-border);
+  position: relative;
+}
+
+.mt3 {
+  margin-top: 1rem !important;
+}
+
+.outerBoxContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  gap: 20px;
+}
+
+.lucky9Image {
+  height: 100px;
+  z-index: 10;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.casinoOddBoxContainer {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+
+.casinoOddBoxContainer .casinoOddsBox {
+  width: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  font-weight: bold;
+  border-left: 1px solid var(--table-border);
+  cursor: pointer;
+  min-height: 46px;
+  position: relative;
+}
+
+.textCenter {
+  text-align: center !important;
+}
+
+.w100 {
+  width: 100% !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+
+  .casinoTableLeftBox,
+  .casinoTableRightBox {
+    width: 100%;
+  }
+
+  .casinoTableBoxDivider {
+    display: none;
+  }
+
+  .casinoOddsBox {
+    width: 25%;
+    font-size: 14px;
+  }
+
+  .casinoOdds {
+    font-size: 16px;
+  }
+
+  .casinoTableFullBox {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .lucky9Image {
+    height: 80px;
+  }
+
+  .casinoOddBoxContainer {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .casinoOddsBox {
+    width: 25%;
+    font-size: 12px;
+    padding: 3px 0;
+    min-height: 40px;
+  }
+
+  .casinoOdds {
+    font-size: 14px;
+  }
+
+  .lucky9Image {
+    height: 60px;
+  }
+}

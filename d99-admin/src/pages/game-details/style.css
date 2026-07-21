@@ -1,0 +1,397 @@
+/* Game Details Page basic layout */
+
+.detail-page-container {
+  line-height: 15px;
+  letter-spacing: 0;
+  color: var(--text-black);
+  font-size: 14px;
+  padding: 0px 10px 70px;
+  margin-top: 0;
+}
+
+/* Banner Section - Event banner for Soccer/Football */
+.banner {
+  height: 290px;
+  border-radius: 0;
+  background: linear-gradient(0deg, #100b1e 0%, #160d27 26.42%, #11091d 48.45%, #030309 100%);
+  display: flex;
+  display: -webkit-flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.detail-page-container .banner.scorestats {
+  background-image: url(https://versionobj.ecoassetsservice.com/v81/static/admin/img/events-banner/1.png);
+  height: 250px;
+  background-position: center;
+  background-size: cover;
+}
+
+.detail-page-container .banner.scorestats,
+.detail-page-container .banner.scorestats img {
+  height: 250px;
+  background-position: center;
+  background-size: cover;
+}
+
+.detail-page-container .banner,
+.detail-page-container .banner img {
+  height: auto;
+}
+
+.detail-page-container .banner img {
+  max-width: 100%;
+  object-fit: cover;
+}
+
+.center-main-container {
+  display: flex;
+  flex-wrap: wrap;
+  /* padding: 10px; */
+}
+
+.center-content {
+  max-width: 65% !important;
+  -ms-flex: 0 0 65% !important;
+  flex: 0 0 65% !important;
+  padding-right: 17px;
+}
+
+.right-sidebar {
+  -ms-flex: 0 0 35% !important;
+  flex: 0 0 35% !important;
+  min-width: 250px;
+}
+
+.game-header {
+  padding: 10px 20px;
+  color: var(--text-secondary);
+  width: 100%;
+  background-color: var(--bg-secondary);
+  margin-bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.game-header-name {
+  max-width: calc(100% - 150px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.game-header-time {
+  font-size: 14px;
+  font-family: var(--font-roboto-condensed);
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+/* Book Summary Styles */
+.booksum-box-container {
+  margin-bottom: 0.5rem;
+}
+
+.booksum-title {
+  background: var(--bg-secondary70);
+  padding: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.booksum-box {
+  padding: 10px;
+  background: var(--bg-table);
+  color: var(--text-table);
+}
+
+.booksum-box span {
+  display: block;
+  text-align: center;
+}
+
+/* Score Card Styles */
+.detail-page-container .right-sidebar .card-header {
+  background-color: var(--bg-secondary70);
+  color: var(--text-secondary);
+  padding: 4px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 42px;
+  border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.detail-page-container .right-sidebar .card-header .card-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: var(--font-roboto-condensed);
+  overflow: visible;
+}
+
+/* View More Button Styles */
+.detail-page-container .right-sidebar .btn-back {
+  cursor: pointer;
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+  padding: 0.47rem 0.75rem;
+  text-decoration: none;
+  border-radius: 3px !important;
+  margin-right: 3px;
+  margin-left: 0;
+  text-transform: uppercase;
+  display: inline-block;
+  font-size: 12px;
+}
+
+/* .detail-page-container .right-sidebar .btn-back:hover {
+  background-color: var(--bg-secondary85) !important;
+  border-color: var(--bg-secondary85) !important;
+  color: var(--text-secondary) !important;
+} */
+
+/* My Bets Card Styles */
+.detail-page-container .right-sidebar .my-bet {
+  /* background-color: var(--bg-table); */
+  border: none;
+}
+
+.detail-page-container .right-sidebar .my-bet .card-body {
+  padding: 0;
+  background-color: transparent;
+}
+
+.detail-page-container .right-sidebar .my-bet>div:not(.card-header) {
+  padding: 0;
+  margin: 0;
+}
+
+/* Tabs Styles - Scoped specifically to game-details page My Bets section */
+.detail-page-container .right-sidebar .my-bet .tabs {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.detail-page-container .right-sidebar .my-bet .tabs .nav-tabs {
+  border-bottom: 1px solid #ced4da;
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 0;
+  margin-bottom: 0;
+  margin-top: 0;
+  list-style: none;
+  border-radius: 0;
+}
+
+.detail-page-container .right-sidebar .my-bet .tabs .nav-tabs .nav-item {
+  margin-bottom: -1px;
+}
+
+.detail-page-container .right-sidebar .my-bet .tabs .nav-tabs .nav-link {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #495057;
+  text-decoration: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.detail-page-container .right-sidebar .my-bet .tabs .nav-tabs .nav-link:hover {
+  color: #495057;
+  background-color: #e9ecef;
+  border-color: #e9ecef #e9ecef #dee2e6;
+}
+
+.detail-page-container .right-sidebar .my-bet .tabs .nav-tabs .nav-link.active {
+  color: #495057;
+  background-color: #fff;
+  border-color: #ced4da #ced4da #fff;
+  border-radius: 0;
+}
+
+.detail-page-container .right-sidebar .my-bet .tabs .nav-tabs.small .nav-link {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.detail-page-container .right-sidebar .my-bet .tab-content {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Table Styles */
+.detail-page-container .right-sidebar .table {
+  width: 100%;
+  margin-bottom: 0;
+  color: black;
+  /* background-color: var(--bg-table); */
+  font-size: 14px;
+}
+
+.detail-page-container .right-sidebar .table thead th {
+  /* background-color: var(--bg-table-header); */
+  color: black;
+  border-bottom: 1px solid black;
+  padding: 0.5rem;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.detail-page-container .right-sidebar .table tbody td {
+  padding: 0.5rem;
+  border-top: 1px solid #dee2e6;
+  /* background-color: var(--bg-table); */
+  color: var(--text-table);
+}
+
+.detail-page-container .right-sidebar .table tbody td.text-center {
+  text-align: center;
+  padding: 1rem;
+  color: var(--text-table);
+}
+
+/* My Bets table - no borders (colored left bar only per row) */
+.detail-page-container .right-sidebar .my-bet .my-bets-table thead th,
+.detail-page-container .right-sidebar .my-bet .my-bets-table tbody td {
+  border: 0 !important;
+}
+
+/* My Bets table - text color black (group headers and data rows) */
+.detail-page-container .right-sidebar .my-bet .my-bets-table th,
+.detail-page-container .right-sidebar .my-bet .my-bets-table td,
+.detail-page-container .right-sidebar .my-bet .my-bets-table b,
+.detail-page-container .right-sidebar .my-bet .my-bets-table .float-right {
+  color: #1e1e1e !important;
+}
+
+/* Gap row between strips - thin grey line */
+.detail-page-container .right-sidebar .my-bet .my-bets-table tr.my-bets-gap td {
+  /* background: #dee2e6 !important; */
+  border: 0 !important;
+  padding: 0 !important;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+/* Bet type row colors: back = blue tint, lay = pink tint */
+.detail-page-container .right-sidebar .my-bet .my-bets-table tr.back-border td,
+.detail-page-container .right-sidebar .my-bet .my-bets-table tr.back-border th {
+  background-color: #72bbef57 !important;
+}
+
+.detail-page-container .right-sidebar .my-bet .my-bets-table tr.lay-border td,
+.detail-page-container .right-sidebar .my-bet .my-bets-table tr.lay-border th {
+  background-color: #f994ba57 !important;
+}
+
+/* TV Button and Streaming Styles */
+.game-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-tv {
+  background: #333 !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 4px 12px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  transition: all 0.3s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-tv:hover {
+  background: #444 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-tv.active {
+  background: #dc3545 !important;
+  color: #fff !important;
+}
+
+.btn-tv::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: #28a745;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-live 1.5s infinite;
+}
+
+.btn-tv.active::before {
+  background: #fff;
+}
+
+@keyframes pulse-live {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(40, 167, 69, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+  }
+}
+
+.streaming-container {
+  background-color: #000;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  margin-top: 10px;
+}
+
+.streaming-container iframe {
+  border: none;
+}
+
+/* Scorecard box. Non-cricket keeps the original 11.5rem height; the cricket
+   v=5 widget is a compact card, so fit the box to it — taller on phones where
+   the columns stack, shorter on desktop where they sit side by side — to
+   avoid an empty gap below the scorecard. */
+.scorecard-frame {
+  width: 100%;
+  height: 11.5rem;
+  margin-bottom: 10px;
+}
+
+.scorecard-frame-cricket {
+  height: 105px;
+}
+
+@media (min-width: 768px) {
+  .scorecard-frame-cricket {
+    height: 70px;
+  }
+}

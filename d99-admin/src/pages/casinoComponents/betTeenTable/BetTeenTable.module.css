@@ -1,0 +1,226 @@
+/* Main Container */
+.casinoDetail {
+  width: 100%;
+}
+
+.casinoTable {
+  background-color: var(--color-bg-alt);
+  color: var(--color-text-main);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+/* Casino Table Box - Container for Player A and Player B */
+.casinoTableBox {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-right: 4px;
+}
+
+/* Casino Table Left Box (Player A) */
+.casinoTableLeftBox {
+  width: calc(50% - 2px);
+  border-left: 1px solid var(--table-border);
+  border-right: 1px solid var(--table-border);
+  border-top: 1px solid var(--table-border);
+  background-color: var(--color-bg-row);
+}
+
+/* Casino Table Right Box (Player B) */
+.casinoTableRightBox {
+  width: calc(50% - 2px);
+  border-left: 1px solid var(--table-border);
+  border-right: 1px solid var(--table-border);
+  border-top: 1px solid var(--table-border);
+  background-color: var(--color-bg-row);
+}
+
+/* Divider between Player A and Player B */
+.casinoTableBoxDivider {
+  width: 2px;
+  background-color: var(--table-border);
+  min-height: 100%;
+}
+
+/* Casino Table Full Box (Card Odd/Even) */
+.casinoTableFullBox {
+  width: 100%;
+  border-left: 1px solid var(--table-border);
+  border-right: 1px solid var(--table-border);
+  border-top: 1px solid var(--table-border);
+  background-color: var(--color-bg-row);
+}
+
+
+
+/* For teenpatti1day-other-odds, set casino-nation-detail width to 22% */
+.teenpatti1dayOtherOdds .casinoNationDetail {
+  width: 22%;
+}
+
+.mt3 {
+  margin-top: 1rem !important;
+}
+
+/* Table Header */
+.casinoTableHeader {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--table-border);
+}
+
+.casinoTableHeader .casinoNationDetail {
+  font-weight: bold;
+  min-height: unset;
+}
+
+.casinoNationDetail {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-left: 5px;
+  min-height: 46px;
+  width: 40%;
+}
+
+.casinoNationName {
+  font-weight: bold;
+}
+
+/* Table Body */
+.casinoTableBody {
+  width: 100%;
+}
+
+.casinoTableRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--table-border);
+}
+
+/* Odds Box */
+.casinoOddsBox {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  font-weight: bold;
+  border-left: 1px solid var(--table-border);
+  cursor: pointer;
+  min-height: 46px;
+  width: 30%;
+  position: relative;
+}
+
+/* For Card Odd/Even table, each card column should be equal width */
+/* With 22% for casino-nation-detail, remaining 78% is shared by 6 cards */
+.teenpatti1dayOtherOdds .casinoTableHeader .casinoOddsBox {
+  width: calc(78% / 6);
+  /* 6 cards share remaining 78% (22% for label) */
+  text-align: center;
+}
+
+.teenpatti1dayOtherOdds .casinoTableRow .casinoOddsBox {
+  width: calc(78% / 6);
+  /* 6 cards share remaining 78% (22% for label) */
+}
+
+.casinoTableHeader .casinoOddsBox {
+  cursor: unset;
+  padding: 2px;
+  min-height: unset;
+  height: auto !important;
+}
+
+.casinoOdds {
+  display: block;
+}
+
+/* Back (Blue) Background */
+.back {
+  background-color: var(--bg-back) !important;
+}
+
+/* Lay (Pink) Background */
+.lay {
+  background-color: var(--bg-lay) !important;
+}
+
+/* Suspended Row - Removed, we only suspend individual cells now */
+
+/* Suspended Box (Locked) */
+.suspendedBox {
+  position: relative;
+  pointer-events: none;
+  cursor: not-allowed;
+  background-color: var(--color-overlay-lock) !important;
+}
+
+.suspendedBox::before {
+  content: "";
+  /* background-image: url(../../../assets/img/lock.svg) !important; */
+  background-size: 17px 17px;
+  filter: invert(1);
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  pointer-events: none;
+}
+
+.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock);
+  position: absolute;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.suspendedBox .casinoOdds {
+  position: relative;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+
+  .casinoNationDetail,
+  .casinoOddsBox {
+    padding: 8px 12px;
+    font-size: 0.875rem;
+  }
+
+  .casinoTableLeftBox,
+  .casinoTableRightBox {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .casinoTableBoxDivider {
+    display: none;
+  }
+}

@@ -1,0 +1,54 @@
+ID | TableName | TableId
+---|---|---
+117 | mini super over | superover3
+114 | Goal | goal
+113 | Lucky 15 | lucky15
+107 | Super Over2 | superover2
+111 | Queen top open teenpatti | teen41
+108 | Sic Bo 2 | sicbo2
+104 | Instant Teenpatti 3.0 | teen33
+101 | Sic Bo | sicbo
+102 | Ball By Ball | ballbyball
+86 | Instant Teenpatti | teen32
+1 | Teenpatti 1-day | teen
+26 | 20-20 Teenpatti | teen20
+27 | Teenpatti Open | teen8
+2 | Poker 1-Day | poker
+24 | 20-20 Poker | poker20
+25 | Poker 6 Players | poker6
+7 | Baccarat | baccarat
+17 | 20-20 Dragon Tiger | dt20
+19 | 1 Day Dragon Tiger | dt6
+88 | Dus ka Dum | dum10
+83 | Race to 2nd | race2
+64 | 1 CARD ONE-DAY | teen1
+58 | Trio | trio
+56 | 20-20 Teenpatti B | teen20b
+55 | Race to 17 | race17
+51 | Muflis Teenpatti | teenmuf
+50 | 29Card Baccarat | teensin
+46 | The Trap | trap
+45 | Super Over | superover
+44 | Lucky 7 - C | lucky7eu2
+41 | Queen | queen
+23 | Lucky 7 - B | lucky7eu
+11 | 32 Cards B | card32eu
+10 | 32 Cards A | card32
+160 | V VIP Teenpatti 1-day | teen62
+154 | Dolidana | dolidana
+153 | Mogambo | mogambo
+152 | Lucky 6 | lucky5
+134 | Teenpatti Poison One Day | poison
+130 | Teenpatti Poison 20-20 | poison20
+128 | Teenpatti Joker 20-20 | joker20
+119 | 20-20 Teenpatti C | teen20c
+112 | Jack top open teenpatti | teen42
+28 | Teenpatti Test | teen9
+8 | Baccarat 2 | baccarat2
+162 | Dragon Tiger Lion | dtl20
+163 | Dragon Tiger 202 | dt202
+164 | Kaun Banega Crorepati | kbc
+59 | Note Number | notenum
+49 | 2 Cards Teenpatti | patti2
+165 | Race 20 | race20
+22 | Lucky 7 - A | lucky7

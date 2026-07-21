@@ -1,0 +1,274 @@
+/* Main Container */
+.betTableCard32b {
+  font-family: "Roboto Condensed", sans-serif;
+  font-weight: bold;
+  background: var(--color-bg-primary);
+  width: 100%;
+}
+
+/* Tables Container */
+.tablesContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* Table Section */
+.tableSection {
+  background: var(--color-bg-primary);
+}
+
+/* Table Styling */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-weight: bold;
+}
+
+/* Table Header Row */
+.tableHeaderRow {
+  background-color: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+}
+
+/* Empty Header Cell */
+.emptyHeader {
+  text-align: left;
+  padding: 12px;
+  font-weight: bold;
+  border: 1px solid var(--color-border);
+  width: 60%;
+}
+
+/* Back Header Cell */
+.backHeader {
+  background-color: var(--bg-back);
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid var(--color-border);
+}
+
+/* Lay Header Cell */
+.layHeader {
+  background-color: var(--bg-lay);
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid var(--color-border);
+}
+
+/* Odds Header Cell */
+.oddsHeader {
+  background-color: var(--bg-back);
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid var(--color-border);
+}
+
+/* Even Header Cell */
+.evenHeader {
+  background-color: var(--bg-back);
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid var(--color-border);
+}
+
+/* Table Row */
+.tableRow {
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Player Name Cell */
+.playerName {
+  background-color: var(--color-bg-alt);
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+  border: 1px solid var(--color-border);
+}
+
+/* Back Cell */
+.backCell {
+  background-color: var(--bg-back);
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+}
+
+/* Lay Cell */
+.layCell {
+  background-color: var(--bg-lay);
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+}
+
+/* Odds Cell */
+.oddsCell {
+  background-color: var(--bg-back);
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+}
+
+/* Even Cell */
+.evenCell {
+  background-color: var(--bg-back);
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+}
+
+/* Combo Name Cell */
+.comboName {
+  background-color: var(--color-bg-alt);
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+}
+
+/* Total Name Cell */
+.totalName {
+  background-color: var(--color-bg-alt);
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+}
+
+/* Locked Cell */
+.lockedCell {
+  background-color: var(--color-overlay-lock);
+  padding: 12px;
+  text-align: center;
+  color: var(--color-text-inverse);
+}
+
+/* Cell Content */
+.cellContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.cellContent>span {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Exposure Display */
+.exposure {
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* Number Cell Locked */
+.numberCellLocked {
+  background-color: var(--color-overlay-lock);
+  font-family: casino;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-text-inverse);
+  cursor: not-allowed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+/* Numbers Section */
+.numbersSection {
+  background: var(--color-bg-primary);
+  font-weight: bold;
+}
+
+.numbersHeader {
+  text-align: center;
+  padding: 12px;
+  font-weight: bold;
+  font-size: 20px;
+  color: var(--color-text-main);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.numbersGrid {
+  display: flex;
+  flex-direction: column;
+}
+
+.numbersRow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.numberCell {
+  background-color: var(--bg-back);
+  font-family: casino;
+  text-align: center;
+  font-size: 48px;
+  font-weight: bold;
+  color: var(--color-text-black);
+  border: 1px solid var(--color-text-inverse);
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tablesContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .emptyHeader,
+  .backHeader,
+  .layHeader,
+  .oddsHeader,
+  .evenHeader,
+  .playerName,
+  .backCell,
+  .layCell,
+  .oddsCell,
+  .evenCell,
+  .comboName,
+  .totalName,
+  .lockedCell {
+    padding: 8px;
+    font-size: 0.813rem;
+    width: 60%;
+  }
+
+  .numberCell {
+    padding: 12px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .betTableCard32b {
+    padding: 8px;
+  }
+
+  .tablesContainer {
+    gap: 8px;
+  }
+
+  .numberCell {
+    padding: 8px;
+    font-size: 0.875rem;
+  }
+}

@@ -1,0 +1,377 @@
+/* Sidebar Styles */
+
+/* Vertical Menu Container */
+.vertical-menu {
+  position: fixed;
+  top: 52px;
+  left: 0;
+  width: 300px;
+  height: calc(100vh - 52px);
+  background: #f9f9f9;
+  z-index: 1003;
+  transition: transform 0.3s ease;
+  overflow: hidden;
+  transform: translateX(-100%);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-primary);
+}
+
+/* Sidebar starts hidden by default */
+body.vertical-collpsed .vertical-menu {
+  transform: translateX(-100%);
+}
+
+/* Show sidebar when NOT collapsed - overlay on top */
+body:not(.vertical-collpsed) .vertical-menu {
+  transform: translateX(0);
+}
+
+/* Simplebar Offset */
+.simplebar-offset {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Sidebar Menu */
+#sidebar-menu {
+  padding: 10px 0 30px;
+}
+
+/* Metismenu Styles */
+.metismenu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.metismenu li {
+  display: block;
+  width: 100%;
+}
+
+.metismenu .menu-box {
+  position: relative;
+}
+
+.metismenu .menu-box > a {
+  display: block;
+  padding: 0rem 0.8rem;
+  color: var(--text-black);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.metismenu .menu-box > a:hover {
+  /* background-color: #f8f9fa; */
+  color: var(--text-black);
+}
+
+/* Sports heading font */
+.metismenu .menu-box > a > span {
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--text-black);
+}
+
+/* Cross icon (X) positioning */
+.metismenu .menu-box > a > i.fa-times {
+  float: right;
+  color: var(--text-black);
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
+
+.metismenu .menu-box > a > i.fa-times:hover {
+  color: var(--text-black);
+}
+
+.metismenu .sub-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: none;
+}
+
+.metismenu .sub-menu.mm-show {
+  display: block;
+}
+
+.metismenu .sub-menu li {
+  padding-left: 1.5rem;
+}
+
+.metismenu .sub-menu li {
+  cursor: pointer;
+  padding: 2px 0 2px 12px;
+}
+
+.metismenu .sub-menu li span {
+  display: flex;
+  align-items: center;
+  /* justify-content: space-between; */
+  gap: 0.5rem;
+  /* padding: 0.25rem 1rem; */
+  color: var(--text-black);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 12px;
+  font-weight: 450;
+}
+
+.metismenu .sub-menu li span:hover {
+  /* background-color: #f8f9fa; */
+  color: var(--text-black);
+}
+
+.metismenu .sub-menu li b {
+  font-weight: 400;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* Nested sub-menu items styling - blue dots and connecting lines */
+#sidebar-menu ul li ul.sub-menu li ul.sub-menu li {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+#sidebar-menu ul li ul.sub-menu li ul.sub-menu li::before {
+  background: var(--bg-primary);
+  bottom: auto;
+  content: "";
+  height: 8px;
+  left: 0px;
+  margin-top: 2px;
+  position: absolute;
+  right: auto;
+  width: 8px;
+  z-index: 1;
+  border-radius: 50%;
+}
+
+#sidebar-menu ul li ul.sub-menu li ul.sub-menu li::after {
+  border-left: 1px solid #000;
+  bottom: 0;
+  content: "";
+  left: 4px;
+  position: absolute;
+  top: 0px;
+}
+
+/* Ensure nested sub-menu is visible when parent is expanded */
+.metismenu .sub-menu li ul.sub-menu {
+  display: block !important;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.metismenu .sub-menu li ul.sub-menu.mm-show {
+  display: block !important;
+}
+
+.metismenu .sub-menu li ul.sub-menu li {
+  padding-left: 1.5rem;
+  position: relative;
+  display: block;
+}
+
+.metismenu .sub-menu li ul.sub-menu li span {
+  display: flex;
+  align-items: center;
+  /* justify-content: space-between; */
+  gap: 0.5rem;
+  /* padding: 0.15rem 1rem; */
+  color: var(--text-black);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 12px;
+}
+
+.metismenu .sub-menu li ul.sub-menu li b {
+  font-weight: 400;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* Third level nesting - matches/events */
+.metismenu .sub-menu li ul.sub-menu li ul.sub-menu {
+  display: block !important;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.metismenu .sub-menu li ul.sub-menu li ul.sub-menu li {
+  padding-left: 1.5rem;
+  position: relative;
+  display: block;
+}
+
+.metismenu .sub-menu li ul.sub-menu li ul.sub-menu li span {
+  display: flex;
+  align-items: center;
+  /* justify-content: space-between; */
+  gap: 0.5rem;
+  /* padding: 0.15rem 1rem; */
+  color: var(--text-black);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 12px;
+}
+
+.metismenu .sub-menu li ul.sub-menu li ul.sub-menu li b {
+  font-weight: 400;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* Styling for third level items - blue dots and lines */
+.metismenu .sub-menu li ul.sub-menu li ul.sub-menu li::before {
+  background: var(--bg-primary);
+  bottom: auto;
+  content: "";
+  height: 8px;
+  left: 0px;
+  margin-top: 2px;
+  position: absolute;
+  right: auto;
+  width: 8px;
+  z-index: 1;
+  border-radius: 50%;
+}
+
+.metismenu .sub-menu li ul.sub-menu li ul.sub-menu li::after {
+  border-left: 1px solid #000;
+  bottom: 0;
+  content: "";
+  left: 4px;
+  position: absolute;
+  top: 0px;
+}
+
+/* Simplebar Content Wrapper */
+.simplebar-content-wrapper {
+  direction: inherit;
+  box-sizing: border-box !important;
+  position: relative;
+  display: block;
+  height: 100%;
+  width: auto;
+  visibility: visible;
+  overflow: auto;
+  max-width: 100%;
+  max-height: 100%;
+  scrollbar-width: none;
+  padding: 0 !important;
+}
+
+.simplebar-content {
+  padding: 0;
+}
+
+/* Simplebar Mask */
+.simplebar-mask {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+
+/* Simplebar Track */
+.simplebar-track {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.simplebar-track.simplebar-vertical {
+  top: 0;
+  width: 11px;
+}
+
+.simplebar-track.simplebar-horizontal {
+  left: 0;
+  height: 11px;
+}
+
+/* Simplebar Scrollbar */
+.simplebar-scrollbar {
+  position: absolute;
+  right: 2px;
+  width: 7px;
+  min-height: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 7px;
+  opacity: 0;
+  transition: opacity 0.2s linear;
+}
+
+.simplebar-track:hover .simplebar-scrollbar {
+  opacity: 1;
+}
+
+.simplebar-scrollbar.simplebar-visible {
+  opacity: 1;
+}
+
+/* Main Content - No margin adjustment, sidebar overlays */
+.main-content {
+  margin-left: 0 !important;
+  transition: none;
+  margin-top: 1rem;
+}
+
+/* Ensure header doesn't get margin when sidebar opens - ALWAYS fixed */
+#page-topbar,
+.navbar-header,
+.navbar-header * {
+  /* margin-left: 0 !important; */
+  left: 0 !important;
+  right: 0 !important;
+  transform: none !important;
+}
+
+/* Prevent any body or html shifting */
+body,
+html {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  overflow-x: hidden;
+}
+
+/* Layout wrapper should not shift */
+#layout-wrapper {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+/* Ensure no margin is applied when sidebar opens */
+body:not(.vertical-collpsed) #page-topbar,
+body:not(.vertical-collpsed) .navbar-header,
+body:not(.vertical-collpsed) .main-content,
+body:not(.vertical-collpsed) #layout-wrapper {
+  margin-left: 0 !important;
+  left: 0 !important;
+  transform: none !important;
+}
+

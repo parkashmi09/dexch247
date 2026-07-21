@@ -1,0 +1,212 @@
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  background-color: var(--color-bg-alt);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  background-color: var(--color-bg-alt);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tab {
+  padding: 12px 20px;
+  background-color: var(--color-bg-alt);
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--color-text-main);
+  font-size: 14px;
+  transition: background-color 0.3s;
+  outline: none;
+}
+
+.tab:hover {
+  background-color: var(--color-border);
+}
+
+.activeTab {
+  background-color: var(--color-secondary);
+  color: var(--color-text-inverse);
+}
+
+/* Cards */
+.cardsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 15px;
+  gap: 10px;
+}
+
+.card {
+  width: 60px;
+  height: 80px;
+  background-color: var(--color-bg-primary);
+  border: 2px solid #ffd700;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5px;
+}
+
+.cardValue {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.suits {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 10px;
+}
+
+.blackSuit {
+  color: var(--color-text-black);
+  font-size: 14px;
+}
+
+.redSuit {
+  color: var(--color-text-danger);
+  font-size: 14px;
+}
+
+/* Random Bets */
+.randomBetsContainer {
+  background-color: var(--color-secondary);
+  margin: 15px;
+  border-radius: 10px;
+  padding: 10px;
+  color: var(--color-text-inverse);
+}
+
+.randomBetsHeader {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.betButtons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.betButton {
+  background-color: var(--bg-primary);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-weight: bold;
+  cursor: pointer;
+  min-width: 40px;
+  text-align: center;
+}
+
+.betButton:hover {
+  background-color: var(--bg-hover);
+}
+
+/* Double and Triple containers */
+.doubleContainer,
+.tripleContainer {
+  padding: 10px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .cardsContainer {
+    gap: 5px;
+  }
+
+  .card {
+    width: 50px;
+    height: 70px;
+  }
+
+  .cardValue {
+    font-size: 20px;
+  }
+
+  .suits {
+    padding: 0 5px;
+  }
+
+  .betButton {
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabs {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .tab {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  .card {
+    width: 40px;
+    height: 60px;
+  }
+
+  .cardValue {
+    font-size: 16px;
+  }
+
+  .suits {
+    font-size: 10px;
+  }
+
+  /* ✅ Keep bet buttons in one row in mobile too */
+  .betButtons {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .betButton {
+    width: auto;
+    padding: 8px 12px;
+    min-width: 40px;
+  }
+}
+
+/* Lock Overlay */
+.locked {
+  background-color: var(--color-overlay-lock);
+  pointer-events: none;
+  position: relative;
+}
+
+.lockOverlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 2rem;
+  color: var(--color-text-inverse);
+}
+
+.tabContent {
+  margin-top: 10px;
+}

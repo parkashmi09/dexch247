@@ -1,0 +1,369 @@
+/* Main Container */
+.casinoTable {
+  background-color: var(--bg-table);
+  color: var(--text-table);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+/* Casino Table Box - Container for rows */
+.casinoTableBox {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-right: 4px;
+}
+
+/* Container box for each row */
+.casinoOddBoxContainerBox {
+  width: calc(33.33% - 10px);
+  margin-right: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* Individual betting option container */
+.casinoOddBoxContainer {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* Nation name with card images */
+.casinoNationName {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 5px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.me2 {
+  margin-right: 0.5rem;
+}
+
+.cardIcon {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+}
+
+.suitIcon {
+  width: 30px;
+  height: 25px;
+  object-fit: contain;
+}
+
+/* Odds Box */
+.casinoOddsBox {
+  width: 49%;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  font-weight: bold;
+  border-left: 1px solid var(--table-border);
+  cursor: pointer;
+  min-height: 46px;
+  position: relative;
+}
+
+.casinoOdds {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+  display: block;
+}
+
+.casinoNationBook {
+  display: block;
+}
+
+.textCenter {
+  text-align: center !important;
+}
+
+.w100 {
+  width: 100% !important;
+}
+
+/* Back (Blue) Background */
+.back {
+  background-color: var(--bg-back) !important;
+}
+
+/* Lay (Pink) Background */
+.lay {
+  background-color: var(--bg-lay) !important;
+}
+
+/* Suspended Box (Locked) */
+.suspendedBox {
+  position: relative;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.suspendedBox::before {
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  pointer-events: none;
+}
+
+.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.suspendedBox .casinoOdds {
+  position: relative;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+/* Casino Table Full Box (Baccarat and Cards) */
+.casinoTableFullBox {
+  width: 100%;
+  border-left: 1px solid var(--table-border);
+  border-right: 1px solid var(--table-border);
+  border-top: 1px solid var(--table-border);
+  background-color: var(--bg-table-row);
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--table-border);
+  position: relative;
+}
+
+.mt3 {
+  margin-top: 1rem !important;
+}
+
+/* Left box for Baccarat */
+.casinoTableLeftBox {
+  width: 33%;
+  padding: 5px 5px 0 5px;
+  border-bottom: 1px solid var(--table-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* NotEnum Baccarat Section - Separate CSS */
+
+
+.notEnumBaccaratLeft {
+  width: 33%;
+  padding: 5px 5px 0 5px;
+  /* border-bottom: 1px solid var(--table-border); */
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.notEnumBaccaratContainer {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.notEnumBaccaratName {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 5px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.notEnumBaccaratOdds {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  font-weight: bold;
+  border-left: 1px solid var(--table-border);
+  cursor: pointer;
+  min-height: 46px;
+  position: relative;
+}
+
+/* Right box for Cards */
+.casinoTableRightBox {
+  width: 66%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 5px 5px 0 5px;
+  border-left: 1px solid var(--table-border);
+  border-bottom: 1px solid var(--table-border);
+}
+
+/* Individual card bet box */
+.cardOddBox {
+  display: flex;
+  /* flex-wrap: wrap; */
+  justify-content: flex-start;
+  flex-direction: column;
+  justify-content: center;
+
+  align-items: center;
+  margin-bottom: 4px;
+  margin-right: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+.cardOddBox .casinoOdds {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.cardBetImage2 {
+  height: 50px;
+  object-fit: contain;
+}
+
+@media only screen and (min-width: 1400px) and (max-width: 1599px) {
+  .cardOddBox img {
+    height: 50px;
+  }
+}
+
+/* NotEnum Card Section - Separate CSS with different names */
+.notEnumCardRightBox {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: start;
+  padding: 5px 5px 0 5px;
+  border-bottom: 1px solid var(--table-border);
+}
+
+.notEnumCardBox {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 4px;
+  margin-right: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+.notEnumCardBox.suspendedBox {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.notEnumCardOdds {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.notEnumCardImage {
+  height: 65px;
+  object-fit: contain;
+}
+
+@media only screen and (min-width: 1400px) and (max-width: 1599px) {
+  .notEnumCardImage {
+    height: 50px;
+  }
+}
+
+/* Tablet responsive */
+@media (max-width: 768px) {
+  .casinoOddBoxContainerBox {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .casinoTableFullBox {
+    flex-direction: column;
+  }
+
+  .casinoTableRightBox {
+    border-left: none;
+    border-top: 1px solid var(--table-border);
+    padding-left: 0;
+    padding-top: 10px;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .cardIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .suitIcon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .casinoOdds {
+    font-size: 16px;
+  }
+
+  .cardBetImage {
+    /* width: 40px; */
+    height: 48px;
+  }
+
+  .notEnumCardImage {
+    height: 48px;
+  }
+
+  .casinoTableFullBox {
+    flex-direction: column;
+  }
+
+  .casinoTableLeftBox {
+    width: 100%;
+  }
+}

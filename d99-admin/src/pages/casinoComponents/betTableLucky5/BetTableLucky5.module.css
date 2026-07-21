@@ -1,0 +1,458 @@
+.lucky7Container {
+    background-color: var(--color-bg-alt);
+    font-family: Arial, sans-serif;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  
+  /* Casino Table Full Box */
+  .casinoTableFullBox {
+    display: flex;
+    /* flex-wrap: wrap; */
+    padding: 4px;
+    border: 0;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    /* border-left: 1px solid var(--table-border, #333);
+    border-right: 1px solid var(--table-border, #333);
+    border-top: 1px solid var(--table-border, #333);
+    background-color: var(--bg-table-row, #2a2a2a); */
+  }
+  
+  @media (max-width: 768px) {
+    .casinoTableFullBox {
+      /* flex-wrap: wrap; */
+      padding: 0;
+    }
+  }
+  /* Lucky7 Low and High Sections */
+  .lucky7low,
+  .lucky7high {
+    width: 45%;
+  }
+  
+  .lucky7 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+  }
+  
+  .centerCardImage {
+    height: 65px;
+    width: auto;
+    object-fit: contain;
+  }
+  
+  /* Casino Odds (text) */
+  .casinoOdds {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1;
+    display: block;
+  }
+  
+  .textCenter {
+    text-align: center !important;
+  }
+  
+  /* Casino Odds Box */
+  .casinoOddsBox {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 0;
+    font-weight: bold;
+    border-left: 1px solid var(--color-border);
+    cursor: pointer;
+    min-height: 46px;
+    width: 100%;
+    position: relative;
+    margin: 5px 0;
+  }
+  
+  /* Back (Blue) Background */
+  .back {
+    background-color: var(--bg-back) !important;
+  }
+  
+  /* Casino Odds Box Theme */
+  .casinoOddsBoxTheme {
+    background-image: linear-gradient(to right, var(--bg-primary, #3b82f6), var(--bg-secondary, #ef4444));
+    color: var(--text-primary, #ffffff);
+    border-radius: 0;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+    border: 0;
+    width: 100%;
+  }
+  
+  /* Suspended Box (Locked) */
+  .suspendedBox {
+    position: relative;
+    pointer-events: none;
+    cursor: not-allowed;
+    background-color: #373636d6 !important;
+  }
+  
+  .suspendedBox::before {
+    content: "";
+    background-image: url(../../../assets/img/lock.svg);
+    background-size: 17px 17px;
+    filter: invert(1);
+    -webkit-filter: invert(1);
+    background-repeat: no-repeat;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    pointer-events: none;
+  }
+  
+  .suspendedBox::after {
+    content: "";
+    background-color: #373636d6;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    cursor: not-allowed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+  }
+  
+  .suspendedBox .casinoOdds {
+    position: relative;
+    z-index: 0;
+    opacity: 0.6;
+  }
+  
+  /* Casino Nation Book */
+  .casinoNationBook {
+    font-size: 12px;
+    font-weight: bold;
+    min-height: 18px;
+  }
+  
+  .card {
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .cardImage {
+    height: 65px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+  }
+  
+  .suits {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    font-size: 16px;
+  }
+  
+  .spade,
+  .club {
+    color: var(--color-text-black);
+  }
+  
+  .heart,
+  .diamond {
+    color: var(--color-text-danger);
+  }
+  
+  /* Casino Table Box */
+  .casinoTableBox {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-right: 4px;
+  }
+  
+  .mt3 {
+    margin-top: 1rem !important;
+  }
+  
+  /* Casino Table Left/Right Box */
+  .casinoTableLeftBox,
+  .casinoTableRightBox {
+    display: flex;
+    /* flex-direction: column; */
+    /* flex-wrap: wrap; */
+    padding: 10px;
+    gap: 10px;
+    border: 0;
+    width: calc(50% - 2px);
+  }
+  
+  /* Lucky7 Odds */
+  .lucky7odds {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .lucky7odds:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* Card Icons */
+  .cardIcon {
+    margin-left: 4px;
+  }
+  
+  .ms1 {
+    margin-left: 0.25rem !important;
+  }
+  
+  .cardRed {
+    color: var(--color-text-danger);
+  }
+  
+  .cardBlack {
+    color: var(--color-text-black);
+  }
+  
+  /* Lock Overlay */
+  .lockOverlay {
+    /* position: absolute; */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #373636d6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  
+  /* Lucky7 Cards */
+  .lucky7cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 24%;
+    background-color: var(--color-bg-row);
+    padding: 10px 0 0 0;
+    height: 130px;
+    align-content: flex-start;
+  }
+  
+  @media (max-width: 768px) {
+    .lucky7cards {
+      width: 49%;
+    }
+  }
+  
+  .w100 {
+    width: 100%;
+    display: block;
+  }
+  
+  /* Card Odd Box Container */
+  .cardOddBoxContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    padding: 5px;
+  }
+  
+  /* Card Odd Box */
+  .cardOddBox {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+  }
+  
+  .cardOddBox>div {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .cardOddBox img {
+    height: 40px;
+    display: block;
+    width: auto;
+    object-fit: contain;
+  }
+  
+  /* Suspended Box for Cards */
+  .cardOddBox.suspendedBox {
+    position: relative;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+  
+  .cardOddBox.suspendedBox>div {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .cardOddBox.suspendedBox>div::after {
+    content: "";
+    background-color: var(--color-overlay);
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    cursor: not-allowed;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  .cardOddBox.suspendedBox>div::before {
+    content: "";
+    background-image: url(../../../assets/img/lock.svg);
+    background-size: 17px 17px;
+    filter: invert(1);
+    -webkit-filter: invert(1);
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  
+  .miniSuits {
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+  }
+  
+  /* Lucky7 Cards (Bottom Cards) */
+  .lucky7acards {
+    display: flex;
+    flex-wrap: wrap;
+    /* justify-content: flex-start; */
+    align-items: flex-start;
+    width: 100%;
+  }
+  
+  .lucky7acards .casinoOdds {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .lucky7acards .cardOddBox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 4px;
+    margin-right: 4px;
+    cursor: pointer;
+  }
+  
+  .lucky7acards .cardOddBox>.suspendedBox {
+    position: relative;
+    pointer-events: none;
+    cursor: none;
+  }
+  
+  .lucky7acards .cardOddBox>.suspendedBox::before {
+    content: "";
+    background-image: url(../../../assets/img/lock.svg);
+    background-size: 17px 17px;
+    filter: invert(1);
+    -webkit-filter: invert(1);
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+  }
+  
+  .lucky7acards .cardOddBox>.suspendedBox::after {
+    content: "";
+    background-color: #373636d6;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    cursor: not-allowed;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  .cardValue {
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  /* Exposure */
+  .exposure {
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 1;
+    margin-top: 2px;
+    text-align: center;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .cardGroups {
+      flex-wrap: wrap;
+    }
+  
+    .group {
+      flex: 1 1 45%;
+    }
+  
+    .bottomCards {
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 4rem;
+    }
+  
+    .smallCard {
+      min-width: 30px;
+      padding: 3px 6px;
+    }
+  
+    .cardImage {
+      height: 50px;
+    }
+  
+    .centerCardImage {
+      height: 50px;
+    }
+  }
+  
+  @media only screen and (min-width: 1400px) and (max-width: 1599px) {
+    .cardImage {
+      height: 50px;
+    }
+  
+    .centerCardImage {
+      height: 50px;
+    }
+  }

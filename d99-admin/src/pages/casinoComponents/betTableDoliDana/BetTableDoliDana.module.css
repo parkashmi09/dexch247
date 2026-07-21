@@ -1,0 +1,423 @@
+.betTable {
+    width: 100%;
+    font-family: "Roboto Condensed", sans-serif;
+    color: #000;
+}
+
+/* Common headers */
+.headerTitle {
+    background-color: var(--color-bg-row);
+    padding: 5px 10px;
+    font-weight: bold;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 14px;
+    color: var(--color-text-main);
+}
+
+@media (max-width: 768px) {
+    .headerTitle {
+        font-size: 9px;
+    }
+}
+/* Top Layout Container */
+.topMainContainer {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    background: var(--color-bg-alt);
+    padding: 2px;
+}
+
+.playersSection {
+    flex: 0 0 35%;
+    /* Fixed width for players on desktop */
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+}
+
+
+/* Top Section: Player A/B rows */
+.playerRow {
+    display: flex;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg-primary);
+    font-weight: bold;
+    font-size: 14px;
+    height: 50px;
+}
+
+.playerRow:last-child {
+    border-bottom: none;
+}
+
+.playerName {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+}
+
+@media (max-width: 768px) {
+    .playerName {
+        font-size: 12px;
+    }
+}
+
+.playerOdds {
+    width: 120px;
+    background: var(--bg-back);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    cursor: pointer;
+    border-left: 1px solid var(--color-bg-primary);
+    color: var(--color-text-black);
+}
+
+.playerOdds:hover {
+    background: var(--bg-hover);
+}
+
+/* Suspended Box (Locked) */
+.suspendedBox {
+    position: relative;
+    pointer-events: none;
+    cursor: not-allowed;
+    background-color: var(--color-overlay-lock) !important;
+}
+
+.suspendedBox::before {
+    background-image: url(../../../assets/img/lock.svg);
+    background-size: 17px 17px;
+    filter: invert(1);
+    -webkit-filter: invert(1);
+    background-repeat: no-repeat;
+    content: "";
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 17px;
+    height: 17px;
+    pointer-events: none;
+}
+
+.suspendedBox::after {
+    content: "";
+    background-color: var(--color-overlay);
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    cursor: not-allowed;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.playerOdds.suspendedBox {
+    background-color: var(--color-overlay-lock) !important;
+}
+
+.value {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.sub {
+    font-size: 10px;
+    font-weight: normal;
+    opacity: 0.8;
+}
+
+/* Middle Section (Markets) */
+.middleSection {
+    flex: 1;
+    /* Takes remaining space */
+    display: flex;
+    gap: 10px;
+    /* padding: 10px 0; */
+    margin-top: 0;
+    align-items: center;
+    /* Center visually if needed */
+}
+
+.middleBox {
+    background: #0000000a;
+    /* padding: 5px; */
+    border-radius: 4px;
+    /* border: 1px solid #e0e0e0; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Center content vertically */
+    height: 100%;
+}
+
+/* Buttons */
+.blueBtn {
+    background: var(--bg-back);
+    width: 100%;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.blueBtn:hover {
+    background: var(--bg-hover);
+}
+
+.bigBlueBtn {
+    background: var(--bg-back);
+    width: 100%;
+    height: 50px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-black);
+}
+
+.midBlueBtn {
+    background: var(--bg-back);
+    flex: 1;
+    height: 45px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-black);
+}
+
+.smallBlueBtn {
+    background: var(--bg-back);
+    width: 100%;
+    height: 40px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-black);
+}
+
+/* Suspended Box (Locked) */
+.suspendedBox {
+    position: relative;
+    pointer-events: none;
+    cursor: not-allowed;
+    background-color: var(--color-secondary) !important;
+}
+
+.suspendedBox::before {
+    background-image: url(../../../assets/img/lock.svg);
+    background-size: 17px 17px;
+    filter: invert(1);
+    -webkit-filter: invert(1);
+    background-repeat: no-repeat;
+    content: "";
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 17px;
+    height: 17px;
+    pointer-events: none;
+}
+
+.suspendedBox::after {
+    content: "";
+    background-color: var(--color-overlay-lock);
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    cursor: not-allowed;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.bigBlueBtn.suspendedBox,
+.midBlueBtn.suspendedBox,
+.smallBlueBtn.suspendedBox,
+.gridItem.suspendedBox {
+    background-color: var(--color-overlay-lock) !important;
+    cursor: not-allowed;
+}
+
+
+.flexRow {
+    display: flex;
+    gap: 5px;
+    width: 100%;
+}
+
+.luckySevenIcon {
+    width: 55px;
+    height: 55px;
+    background: #f1c40f;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    border: 1px solid #d4ac0d;
+}
+
+.sevenText {
+    font-family: serif;
+    font-size: 40px;
+    font-weight: 900;
+    color: #c0392b;
+    text-shadow: 1px 1px 0px #fff, -1px -1px 0px #fff, 1px -1px 0px #fff, -1px 1px 0px #fff;
+}
+
+
+/* Bottom Grids */
+.bottomSection {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.gridContainer {
+    background: var(--color-bg-alt);
+    /* padding: 5px; */
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+}
+
+.sumTotalContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px;
+}
+
+.grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    padding: 5px;
+}
+
+.grid6 {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 5px;
+}
+
+.grid5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+}
+
+.gridItem {
+    background: var(--bg-back);
+    padding: 5px;
+    text-align: center;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 45px;
+    color: var(--color-text-black);
+}
+
+.gridItem:hover {
+    background: var(--bg-hover);
+}
+
+.itemLabel {
+    font-size: 11px;
+    margin-bottom: 2px;
+    font-weight: bold;
+    color: var(--color-text-main);
+}
+
+.gridItem.suspendedBox .itemLabel {
+    color: var(--color-text-light);
+}
+
+.btnValue {
+    font-size: 16px;
+    font-weight: bold;
+    position: relative;
+    z-index: 0;
+}
+
+.btnContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+}
+
+/* Exposure */
+.exposure {
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 1;
+    margin-top: 2px;
+    display: block;
+    text-align: center;
+    z-index: 4;
+    position: relative;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .topMainContainer {
+        flex-direction: column;
+        /* Stack vertically on mobile */
+    }
+
+    .playersSection {
+        flex: auto;
+        width: 100%;
+    }
+
+    .middleSection {
+        flex-direction: column;
+        /* Stack markets vertically on mobile */
+        gap: 5px;
+    }
+
+    .middleBox {
+        width: 100%;
+        /* Full width for mobile market boxes */
+    }
+
+    .bottomSection {
+        flex-direction: column;
+    }
+
+    .grid6,
+    .grid5 {
+        grid-template-columns: repeat(3, 1fr);
+        /* Wrap on mobile */
+    }
+}

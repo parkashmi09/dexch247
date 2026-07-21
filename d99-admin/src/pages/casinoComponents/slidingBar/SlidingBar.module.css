@@ -1,0 +1,72 @@
+.slidingContainer {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  width: 100%;
+  background-color: var(--bg-lay);
+  font-size: 16px;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.slidingBar {
+  overflow-x: hidden;
+  width: calc(100% - 80px);
+  /* Adjust based on button size */
+  position: relative;
+}
+
+.slidingContent {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  white-space: nowrap;
+}
+
+.tab {
+  padding: 6px 16px;
+  color: var(--color-text-inverse);
+  text-decoration: none;
+  font-weight: 500;
+  text-align: center;
+  font-size: 14px;
+  font-family: "Roboto", sans-serif;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+/* Active Tab Styling */
+.tab.active {
+  background-color: var(--bg-lay);
+  /* Darker blue background for active state */
+  color: var(--color-text-inverse);
+  font-weight: bold;
+  width: fit-content;
+  padding: 7px 15px;
+}
+
+.slideBtn {
+  background: linear-gradient(to right, #028dd234, #eddacbe1);
+  padding: 0 1.6rem;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--color-text-inverse);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.2rem;
+}
+
+.icon {
+  color: var(--color-text-main);
+  position: relative;
+  bottom: 2px;
+}
+
+.prevBtn .icon {
+  bottom: 3px;
+  height: 15px;
+}
+
+.nextBtn .icon {
+  bottom: 2px;
+}

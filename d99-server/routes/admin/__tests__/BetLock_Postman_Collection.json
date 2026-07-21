@@ -1,0 +1,510 @@
+{
+  "info": {
+    "name": "BetLock Routes Testing",
+    "description": "Comprehensive testing collection for BetLock Admin Routes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET - All Bet Locks",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "url": "{{base_url}}/api/admin/betlock/",
+        "description": "Fetch all users' bet lock records from the system"
+      },
+      "response": []
+    },
+    {
+      "name": "GET - Single User Bet Lock (User 101)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "url": "{{base_url}}/api/admin/betlock/101",
+        "description": "Get bet lock status for a specific user (user_id: 101)"
+      },
+      "response": []
+    },
+    {
+      "name": "GET - Single User Bet Lock (User 999 - Not Found)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "url": "{{base_url}}/api/admin/betlock/999",
+        "description": "Get bet lock status for a user that doesn't exist (returns default state)"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Lock Single User (Match Odds Only)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 101,\n  \"match_odds\": true,\n  \"other_markets\": false\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/lock/user",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "lock", "user"]
+        },
+        "description": "Lock match odds for user 101 while keeping other markets unlocked"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Lock Single User (Both Markets)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 102,\n  \"match_odds\": true,\n  \"other_markets\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/lock/user",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "lock", "user"]
+        },
+        "description": "Lock both match odds and other markets for user 102"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Lock Single User (Other Markets Only)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 103,\n  \"match_odds\": false,\n  \"other_markets\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/lock/user",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "lock", "user"]
+        },
+        "description": "Lock only other markets, keep match odds unlocked"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Lock Single User (String Booleans)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 104,\n  \"match_odds\": \"true\",\n  \"other_markets\": \"1\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/lock/user",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "lock", "user"]
+        },
+        "description": "Test with string boolean values ('true') and numeric values ('1')"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Lock Single User (Error - Missing user_id)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"match_odds\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/lock/user",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "lock", "user"]
+        },
+        "description": "Test error handling - missing required user_id"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Unlock Single User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 101\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/unlock/user",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "unlock", "user"]
+        },
+        "description": "Unlock both match odds and other markets for user 101"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Unlock Non-Existent User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 999\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/unlock/user",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "unlock", "user"]
+        },
+        "description": "Unlock a user that doesn't exist (creates default record)"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Lock Multiple Users",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"users\": [\n    {\n      \"user_id\": 201,\n      \"match_odds\": true,\n      \"other_markets\": false\n    },\n    {\n      \"user_id\": 202,\n      \"match_odds\": false,\n      \"other_markets\": true\n    },\n    {\n      \"user_id\": 203,\n      \"match_odds\": true,\n      \"other_markets\": true\n    },\n    {\n      \"user_id\": 204,\n      \"match_odds\": false,\n      \"other_markets\": false\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/lock/multiple",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "lock", "multiple"]
+        },
+        "description": "Lock bets for multiple users with different configurations"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Lock Multiple Users (With Partial Failures)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"users\": [\n    {\n      \"user_id\": 301,\n      \"match_odds\": true\n    },\n    {\n      \"match_odds\": true\n    },\n    {\n      \"user_id\": 303,\n      \"match_odds\": true\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/lock/multiple",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "lock", "multiple"]
+        },
+        "description": "Test partial failures - one user missing user_id, others valid"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Lock Multiple Users (Empty Array - Error)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"users\": []\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/lock/multiple",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "lock", "multiple"]
+        },
+        "description": "Test error - empty users array"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Unlock Multiple Users",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_ids\": [201, 202, 203, 204]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/unlock/multiple",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "unlock", "multiple"]
+        },
+        "description": "Unlock multiple users by their IDs"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Unlock Multiple Users (Single User)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_ids\": [101]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/unlock/multiple",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "unlock", "multiple"]
+        },
+        "description": "Unlock a single user using the multiple endpoint"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Unlock Multiple Users (Error - Empty Array)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_ids\": []\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/unlock/multiple",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "unlock", "multiple"]
+        },
+        "description": "Test error - empty user_ids array"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Lock All Match Odds",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/lock/all/matchodds",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "lock", "all", "matchodds"]
+        },
+        "description": "Lock match odds for ALL users in the system - Emergency lockdown feature"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Lock All Other Markets",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/lock/all/othermarkets",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "lock", "all", "othermarkets"]
+        },
+        "description": "Lock other markets for ALL users in the system - Emergency lockdown feature"
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Unlock All Users",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/admin/betlock/unlock/all",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "betlock", "unlock", "all"]
+        },
+        "description": "Unlock ALL users - Reset all locks to false for the entire system"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "YOUR_AUTH_TOKEN_HERE",
+      "type": "string"
+    }
+  ]
+}

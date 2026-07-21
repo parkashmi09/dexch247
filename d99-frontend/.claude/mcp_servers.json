@@ -1,0 +1,13 @@
+{
+  "chrome-devtools": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "chrome-devtools-mcp@latest",
+      "--userDataDir",
+      "/Users/dev_miku/Library/Application Support/Google/Chrome",
+      "--chromeArg",
+      "--profile-directory=Profile 1"
+    ]
+  }
+}

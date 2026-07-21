@@ -1,0 +1,46 @@
+.result-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+
+.result-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #355E3B;
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+}
+
+.result-circle:hover {
+  transform: scale(1.1);
+}
+
+/* Race2 specific result colors */
+.race2 .casino-last-results .result-circle.result-player-a {
+  background-color: #086cb8;
+  color: #fff;
+}
+
+.race2 .casino-last-results .result-circle.result-player-b {
+  background-color: #ae2130;
+  color: #fff;
+}
+
+.race2 .casino-last-results .result-circle.result-player-c {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.race2 .casino-last-results .result-circle.result-player-d {
+  background-color: #ff9800;
+  color: #fff;
+}

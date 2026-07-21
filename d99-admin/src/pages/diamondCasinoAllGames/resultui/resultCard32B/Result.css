@@ -1,0 +1,47 @@
+.result-row {
+  display: flex;
+  gap: 6px;
+  /* margin: 10px 0; */
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+
+.result-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #355E3B;
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+}
+
+.result-circle:hover {
+  transform: scale(1.1);
+}
+
+/* Card32B specific result colors */
+.card32 .casino-last-results .result-circle.result-player-8 {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.card32 .casino-last-results .result-circle.result-player-9 {
+  background-color: #2196f3;
+  color: #fff;
+}
+
+.card32 .casino-last-results .result-circle.result-player-10 {
+  background-color: #ff9800;
+  color: #fff;
+}
+
+.card32 .casino-last-results .result-circle.result-player-11 {
+  background-color: #4caf50;
+  color: #fff;
+}

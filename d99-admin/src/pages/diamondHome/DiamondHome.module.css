@@ -1,0 +1,170 @@
+.container {
+  width: 100%;
+}
+
+.section1 {
+  display: flex;
+  overflow-x: scroll;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
+}
+
+.section1::-webkit-scrollbar {
+  display: none;
+}
+
+.section2 {
+  display: flex;
+}
+
+.liveBoard {
+  margin-top: 0.3rem;
+}
+
+.bar1 {
+  width: calc(20% - 5px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 5px 0;
+  background-color: var(--color-secondary);
+  margin-right: 5px;
+  border-radius: 0;
+  color: var(--color-text-black);
+  font-family: Robeto Condensed, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 1px;
+}
+
+.no_events {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 5px 0;
+  background-color: #2C3E50;
+  border-radius: 0;
+  color: white;
+  font-family: Robeto Condensed, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 1px;
+}
+
+.blink_container {
+  width: 100%;
+  animation: blink 1.1s infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+.eventText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 8px;
+  max-width: 100%;
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+.bar2 {
+  min-width: 4.5rem;
+  width: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-weight: 500;
+  font-size: 15px;
+  text-align: center;
+  font-family: Robeto Condensed, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: #cccccc;
+  border-right: 1px solid black;
+  border-radius: 0;
+  color: black;
+}
+
+.bar2 div {
+  width: max-content;
+  height: 2rem;
+  padding: 5px 14px;
+}
+
+.bar2-active {
+  background-color: var(--color-secondary);
+  color: var(--color-text-on-secondary);
+}
+
+.section3 {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 1px;
+}
+
+.section3 div {
+  padding: 2px;
+}
+
+.bar1:hover,
+.bar2:hover {
+  cursor: pointer;
+}
+
+.navbar {
+  display: block;
+}
+
+@media (min-width: 769px) {
+  .navbar {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .section1 {
+    display: none;
+  }
+}
+
+/* Mobile and Tablet View */
+@media (max-width: 768px) {
+  .section2 {
+    display: flex;
+    overflow-x: auto;
+    /* Enable horizontal scrolling for mobile */
+  }
+
+  .bar1 {
+    width: calc(50% - 5px);
+    flex-shrink: 0;
+  }
+}
+
+/* PC View */
+@media (min-width: 769px) {
+  .section2 {
+    margin-top: 3px;
+    display: flex;
+    justify-content: center;
+    /* Center the slider in PC view */
+  }
+}

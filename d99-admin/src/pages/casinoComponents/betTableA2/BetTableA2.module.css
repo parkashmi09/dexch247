@@ -1,0 +1,354 @@
+.betTableContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: var(--color-bg-alt);
+  font-family: Arial, sans-serif;
+}
+
+/* Casino Table Box */
+.casinoTableBox {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-right: 4px;
+}
+
+/* Casino Odd Box Container */
+.casinoOddBoxContainer {
+  width: calc(33.33% - 7.5px);
+  margin-right: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.casinoOddBoxContainer:last-child {
+  margin-right: 0;
+}
+
+/* Casino Nation Name */
+.casinoNationName {
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 8px 0;
+}
+
+.casinoNationBookMobile {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .casinoNationBookMobile {
+    display: none;
+  }
+}
+
+.casinoNationBookDesktop {
+  display: none;
+  text-align: center;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .casinoNationBookDesktop {
+    display: block;
+  }
+}
+
+/* Casino Odds Box - Base styles */
+.casinoOddsBox {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  font-weight: bold;
+  cursor: pointer;
+  min-height: 46px;
+  position: relative;
+}
+
+/* Player Section Odds Box - Keep original styling */
+.casinoOddBoxContainer .casinoOddsBox {
+  width: 49%;
+  border-left: 1px solid var(--table-border);
+}
+
+.casinoOdds {
+  display: block;
+}
+
+.cellContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 0;
+  padding: 0;
+}
+
+.cellContent>span {
+  display: block;
+  line-height: 1.2;
+}
+
+.exposure {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  margin-top: -2px;
+}
+
+/* Back (Blue) Background */
+.back {
+  background-color: var(--bg-back) !important;
+}
+
+/* Lay (Pink) Background */
+.lay {
+  background-color: var(--bg-lay) !important;
+}
+
+/* Suspended Box (Locked) */
+.suspendedBox {
+  position: relative;
+  pointer-events: none;
+  cursor: none;
+  background-color: var(--color-overlay-lock) !important;
+}
+
+.suspendedBox::before {
+  content: "";
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  pointer-events: none;
+}
+
+.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.suspendedBox .casinoOdds {
+  position: relative;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+/* Casino Table Box with margin-top */
+.mt3 {
+  margin-top: 1rem !important;
+}
+
+/* Casino Table Left/Center/Right Box */
+.casinoTableLeftBox,
+.casinoTableCenterBox,
+.casinoTableRightBox {
+  width: calc(33.3% - 2px);
+  padding: 4px 4px 0 4px;
+  border-bottom: 1px solid var(--table-border);
+  border-left: 1px solid var(--table-border);
+  border-right: 1px solid var(--table-border);
+  border-top: 1px solid var(--table-border);
+  background-color: var(--bg-table-row);
+}
+
+/* AAA Odd Box */
+.aaaOddBox {
+  margin-bottom: 4px;
+  min-height: 92px;
+}
+
+/* Casino Odds (text) */
+.casinoOdds {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.textCenter {
+  text-align: center !important;
+}
+
+/* Casino Odds Box in AAA sections */
+.casinoTableLeftBox .casinoOddsBox,
+.casinoTableCenterBox .casinoOddsBox,
+.casinoTableRightBox .casinoOddsBox {
+  width: 100%;
+  margin: 5px 0;
+}
+
+/* AAA Betting Options Theme - Only apply to AAA sections */
+.casinoTableLeftBox .casinoOddsBoxTheme,
+.casinoTableCenterBox .casinoOddsBoxTheme,
+.casinoTableRightBox .casinoOddsBoxTheme {
+  background-image: linear-gradient(to right, var(--bg-primary), var(--bg-secondary));
+  color: var(--text-primary);
+  border-radius: 0;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+  border: 0;
+}
+
+/* Card Icons */
+.cardIcon {
+  margin-left: 4px;
+}
+
+.cardRed {
+  color: red;
+}
+
+.cardBlack {
+  color: black;
+}
+
+/* Casino Nation Book */
+.casinoNationBook {
+  font-size: 12px;
+  font-weight: bold;
+  min-height: 18px;
+}
+
+/* Casino Table Full Box */
+.casinoTableFullBox {
+  width: 100%;
+}
+
+/* AAA Cards Section */
+.aaacards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  border: 0;
+  padding: 10px 10px 0 10px;
+}
+
+.w100 {
+  width: 100%;
+}
+
+.mb2 {
+  margin-bottom: 0.5rem;
+}
+
+/* Cards Container */
+.cardsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+}
+
+/* Card Odd Box */
+.cardOddBox {
+  position: relative;
+  cursor: pointer;
+}
+
+.cardOddBox img {
+  height: 50px;
+  display: block;
+}
+
+.cardOddBox>div:first-child {
+  position: relative;
+}
+
+/* Suspended Box for Cards */
+.cardOddBox .suspendedBox {
+  position: relative;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.cardOddBox .suspendedBox::before {
+  content: "";
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  pointer-events: none;
+}
+
+.cardOddBox .suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+/* Card Exposure */
+.cardExposure {
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 4px;
+  line-height: 1;
+  display: block;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+
+  .casinoTableLeftBox,
+  .casinoTableCenterBox,
+  .casinoTableRightBox {
+    width: calc(50% - 2px);
+  }
+
+  .casinoOddBoxContainer {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .cardOddBox img {
+    height: 50px;
+  }
+}

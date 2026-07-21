@@ -1,0 +1,171 @@
+:root {
+  /* Body (reference) */
+  --body-bg: #f8f8fb;
+  --body-color: #495057;
+  --font-body-size: 0.8125rem;
+  --font-body-family: 'Roboto Condensed', sans-serif;
+
+  /* Text Colors */
+  --text-white: #ffffff;
+  --text-black: #000000;
+  --text-yellow: #ef910f;
+  --text-red: #fc4242;
+  --text-green: #03b37f;
+
+  /* Background Colors - Status */
+  --bg-success: #03b37f;
+  --bg-success-hover: #008e64;
+  --bg-warning: #ef910f;
+  --bg-danger: #fc4242;
+  --bg-info: #f18521;
+
+  /* Background Colors - UI Elements */
+  --bg-bet: #03b37f52;
+  --bg-tabs: #03b37f33;
+
+  /* Bookmaker Colors */
+  --book-green: #128412;
+  --book-red: #bb2834;
+
+  /* Back/Lay Colors */
+  --back: #72bbef;
+  --back-hover: #4fa1dc;
+  --back1: #72bbefcc;
+  --back2: #72bbefa3;
+  --back-title: #72bbef80;
+
+  --lay: #f994ba;
+  --lay-hover: #e16f9a;
+  --lay1: #f994bacc;
+  --lay2: #f994baa3;
+  --lay-title: #f994ba80;
+
+  /* Sports Colors */
+  --football: #03b37f;
+  --football_75: #03b37fbf;
+  --football_50: #03b37f80;
+
+  --tennis: #f18521;
+  --tennis_75: #f18521bf;
+  --tennis_50: #f1852180;
+
+  --boxing: #e44e23;
+  --boxing_75: #e44e23bf;
+  --boxing_50: #e44e2380;
+
+  --cricket: #20327b;
+  --cricket_75: #20327bbf;
+  --cricket_50: #20327b80;
+
+  --golf: #015900;
+  --golf_75: #015900bf;
+  --golf_50: #01590080;
+
+  --beach-volleyball: #ff9c63;
+  --beach-volleyball_75: #ff9c63bf;
+  --beach-volleyball_50: #ff9c6380;
+
+  --table-tennis: #db2752;
+  --table-tennis_75: #db2752bf;
+  --table-tennis_50: #db275280;
+
+  --futsal: #74c94b;
+  --futsal_75: #74c94bbf;
+  --futsal_50: #74c94b80;
+
+  --horse-racing: #9e4025;
+  --horse-racing_75: #9e4025bf;
+  --horse-racing_50: #9e402580;
+
+  /* Theme Colors */
+  --bg-primary: #0088CC;
+  --bg-primary90: #0088CCE6;
+  --text-primary: #FFFFFF;
+
+  --bg-secondary: #2C3E50;
+  --bg-secondary70: #2C3E50B3;
+  --bg-secondary85: #2C3E50D9;
+  --text-secondary: #FFFFFF;
+
+  --bg-news: ;
+
+  /* Body and Layout Colors */
+  --bg-body: #23292e;
+  --text-body: #aaafb5;
+  --bg-sidebar: #16191c;
+  --text-sidebar: #aaafb5;
+  --text-highlight: #ffffff;
+
+  /* Table Colors */
+  --bg-table: #2e3439;
+  --text-table: #aaafb5;
+  --bg-table-header: #3c444b;
+  --text-table-header: #aaafb5;
+
+  /* Fancy Colors */
+  --text-fancy: #fdcf13;
+
+  /* Button Colors */
+  --btn-primary: #03b37f;
+  --btn-secondary: #03b37f52;
+  --btn-reset: #fc4242;
+
+  /* W3 Theme Variables */
+  --w3-bg: #f5f7fb;
+  --w3-panel: #fff;
+  --w3-panel-2: #f2f4f8;
+  --w3-line: #e5e7eb;
+  --w3-text: #111827;
+  --w3-muted: #6b7280;
+  --w3-head: #b45309;
+  --w3-chip: #eef2f7;
+  --w3-date-bg: #111827;
+  --w3-date-ring: #f59e0b;
+  --w3-digit: #475569;
+  --w3-digit-bg: rgba(71, 85, 105, 0.14);
+  --w3-big-color: #333;
+  --w3-cell-min: 130px;
+
+  /* Bootstrap Color Variables */
+  --blue: #556ee6;
+  --indigo: #564ab1;
+  --purple: #6f42c1;
+  --red: #f46a6a;
+  --orange: #f1734f;
+  --yellow: #f1b44c;
+  --green: #34c38f;
+  --teal: #050505;
+  --cyan: #50a5f1;
+  --white: #fff;
+  --gray: #74788d;
+  --gray-dark: #343a40;
+  --primary: #556ee6;
+  --secondary: #74788d;
+  --success: #34c38f;
+  --info: #50a5f1;
+  --warning: #f1b44c;
+  --danger: #f46a6a;
+  --light: #eff2f7;
+  --dark: #343a40;
+  --pink: #e83e8c;
+
+  /* Flipper / timer card */
+  --bg-timer-color: #333;
+  --bg-timer: var(--bg-timer-color);
+  --card-bg: var(--bg-timer);
+
+  /* Bootstrap Override Colors */
+  --bs-primary: var(--bg-primary);
+  --bs-secondary: var(--bg-secondary);
+  --bs-success: var(--bg-success);
+  --bs-warning: var(--bg-warning);
+  --bs-danger: var(--bg-danger);
+  --bs-info: var(--bg-info);
+
+  /* Breakpoints */
+  --breakpoint-xs: 0;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+}

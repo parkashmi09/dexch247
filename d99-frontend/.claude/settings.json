@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run preview:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run sync-assets:*)",
+      "Bash(npm create vite:*)",
+      "Bash(npx vite:*)",
+      "Bash(npx eslint:*)",
+      "Bash(node scripts/*)",
+      "Bash(node ./scripts/*)",
+      "Bash(node /Users/dev_miku/Developer/cfz/diamond-exch99/old-frontend/d99-latest/new-d99-frontend/frontend/scripts/*)",
+      "Bash(ls:*)",
+      "Bash(pwd)",
+      "Bash(mkdir -p:*)",
+      "Bash(cp:*)",
+      "Bash(touch:*)",
+      "Read(//Users/dev_miku/Developer/cfz/diamond-exch99/**)",
+      "Edit(//Users/dev_miku/Developer/cfz/diamond-exch99/old-frontend/d99-latest/new-d99-frontend/frontend/**)",
+      "Write(//Users/dev_miku/Developer/cfz/diamond-exch99/old-frontend/d99-latest/new-d99-frontend/frontend/**)",
+      "Edit(//Users/dev_miku/Developer/cfz/diamond-exch99/.claude/**)",
+      "Write(//Users/dev_miku/Developer/cfz/diamond-exch99/.claude/**)",
+      "WebFetch(domain:sitethemedata.com)",
+      "WebFetch(domain:sprintstaticdata.com)"
+    ],
+    "deny": [
+      "Edit(//Users/dev_miku/Developer/cfz/diamond-exch99/old-frontend/**)",
+      "Write(//Users/dev_miku/Developer/cfz/diamond-exch99/old-frontend/**)",
+      "Edit(//Users/dev_miku/Developer/cfz/diamond-exch99/reference/**)",
+      "Write(//Users/dev_miku/Developer/cfz/diamond-exch99/reference/**)",
+      "Read(//Users/dev_miku/Developer/cfz/diamond-exch99/old-frontend/d99-latest/new-d99-frontend/frontend/.env)",
+      "Bash(rm -rf:*)",
+      "Bash(git push:*)",
+      "Bash(git push --force:*)"
+    ]
+  },
+  "env": {
+    "NODE_OPTIONS": "--max-old-space-size=4096"
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /Users/dev_miku/Developer/cfz/diamond-exch99/old-frontend/d99-latest/new-d99-frontend/frontend/scripts/auto-localize-images.mjs \"$CLAUDE_TOOL_INPUT_file_path\""
+          }
+        ]
+      }
+    ]
+  }
+}

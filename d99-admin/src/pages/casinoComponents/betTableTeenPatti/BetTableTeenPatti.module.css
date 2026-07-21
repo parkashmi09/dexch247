@@ -1,0 +1,138 @@
+/* Main Table Container */
+.betTable {
+  width: 100%;
+  font-family: "Roboto Condensed", sans-serif;
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--color-text-main);
+  margin: 0 auto;
+}
+
+/* Table Styling */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+/* Table Header Row */
+.tableHeaderRow {
+  background-color: var(--color-bg-row);
+}
+
+/* Player Name Header */
+.playerName {
+  width: 15.7rem;
+  text-align: start;
+  padding-left: 0.5rem;
+  border: 1px solid #ddd;
+}
+
+/* Back Header */
+.backHeader {
+  width: 5.4rem;
+  background-color: var(--bg-back);
+  border: 1px solid #ddd;
+  padding: 8px 0;
+}
+
+/* Lay Header */
+.layHeader {
+  width: 5.4rem;
+  background-color: var(--bg-lay);
+  border: 1px solid #ddd;
+  padding: 8px 0;
+}
+
+/* Table Row */
+.tableRow {
+  border-bottom: 1px solid #ddd;
+}
+
+/* Main Cell */
+.mainCell {
+  width: 15.7rem;
+  text-align: start;
+  padding-left: 0.5rem;
+  background-color: var(--color-bg-row);
+  height: 46px;
+  border: 1px solid #ddd;
+}
+
+/* Back Cell */
+.backCell {
+  width: 5.4rem;
+  background-color: var(--bg-back);
+  text-align: start;
+  padding-left: 0.5rem;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+/* Lay Cell */
+.layCell {
+  width: 5.4rem;
+  background-color: var(--bg-lay);
+  text-align: start;
+  padding-left: 0.5rem;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+/* Locked Cell */
+.lockedCell {
+  width: 5.4rem;
+  background-color: var(--color-overlay-lock);
+  text-align: center;
+  border: 1px solid #ddd;
+  padding: 8px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .playerName {
+    width: 10rem;
+    /* Adjust width for smaller screens */
+  }
+
+  .backHeader,
+  .layHeader {
+    width: 4rem;
+    /* Adjust width for smaller screens */
+    padding: 6px 0;
+    /* Adjust padding for smaller screens */
+  }
+
+  .mainCell,
+  .backCell,
+  .layCell,
+  .lockedCell {
+    padding-left: 0.3rem;
+    /* Adjust padding for smaller screens */
+    font-size: 14px;
+    /* Reduce font size for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .playerName {
+    width: 8rem;
+    /* Further adjust width for very small screens */
+  }
+
+  .backHeader,
+  .layHeader {
+    width: 3.5rem;
+    /* Further adjust width for very small screens */
+    padding: 4px 0;
+    /* Further adjust padding for very small screens */
+  }
+
+  .mainCell,
+  .backCell,
+  .layCell,
+  .lockedCell {
+    font-size: 12px;
+    /* Further reduce font size for very small screens */
+  }
+}

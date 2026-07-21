@@ -1,0 +1,70 @@
+/* Main Table Container */
+.betTable {
+  font-weight: bold;
+  width: 100%;
+  font-size: 15px;
+  font-family: "Roboto", sans-serif;
+}
+
+/* Header */
+.head {
+  background-color: var(--color-bg-row);
+  border: 1px solid #c7c8ca;
+  padding-left: 3px;
+  padding-top: 2px;
+  font-family: "Roboto", sans-serif;
+}
+
+/* Section 1 */
+.section1 {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Row 1 */
+.row1 {
+  display: flex;
+  background-color: var(--color-bg-row);
+  border-left: 1px solid #c7c8ca;
+  border-right: 1px solid #c7c8ca;
+  border-bottom: 1px solid #c7c8ca;
+}
+
+/* Row 2 */
+.row2 {
+  display: flex;
+  background-color: var(--bg-back);
+  border-left: 1px solid #c7c8ca;
+  border-right: 1px solid #c7c8ca;
+  border-bottom: 1px solid #c7c8ca;
+}
+
+/* Cell Styling */
+.cell {
+  width: 33.33%;
+  padding: 0.5rem;
+  border-right: 1px solid #c7c8ca;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Locked Cell Styling */
+.lockedCell {
+  width: 33.33%;
+  padding: 1rem;
+  border-right: 1px solid #c7c8ca;
+  background-color: var(--color-overlay-lock);
+  color: white;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Remove border from the last cell in each row */
+.row1 .cell:last-child,
+.row2 .cell:last-child,
+.row2 .lockedCell:last-child {
+  border-right: none;
+}

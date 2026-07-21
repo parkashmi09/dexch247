@@ -1,0 +1,176 @@
+/* Add Account Page Styles */
+
+.add-account {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin: 0;
+    border-radius: 4px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+  }
+  
+  .add-account h2 {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #1e1e1e;
+    font-family: var(--font-primary);
+  }
+  
+  .m-b-20 {
+    margin-bottom: 20px !important;
+  }
+  
+  .m-t-20 {
+    margin-top: 20px !important;
+  }
+  
+  .add-account h4 {
+    font-weight: 500;
+    color: var(--text-secondary);
+    background-color: var(--bg-secondary);
+    font-family: var(--font-primary);
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 18px;
+    padding-left: 15px;
+    margin-bottom: 1rem;
+    /* border-radius: 4px 4px 0 0; */
+  }
+  
+  .add-account .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .add-account .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-family: var(--font-primary);
+    color: #1e1e1e;
+  }
+  
+  .add-account .form-control {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    font-family: var(--font-primary);
+  }
+  
+  .add-account .form-control:focus {
+    color: #212529;
+    background-color: #fff;
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+  
+  .add-account .form-control:disabled {
+    background-color: #e9ecef;
+    opacity: 1;
+    cursor: not-allowed;
+  }
+  
+  .add-account .table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    font-family: var(--font-primary);
+    background-color: #fff;
+  }
+  
+  .add-account .table-striped tbody tr:nth-of-type(2n + 1) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .add-account .table-bordered,
+  .add-account .table-bordered td,
+  .add-account .table-bordered th {
+    border: 1px solid #eff2f7;
+  }
+  
+  .add-account .table td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #eff2f7;
+  }
+  
+  .add-account .table td input {
+    margin: 0;
+    border: 1px solid #ced4da;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    border-radius: 0.25rem;
+    width: 100%;
+    font-family: var(--font-primary);
+  }
+  
+  .add-account .table td input:disabled {
+    background-color: #e9ecef;
+    opacity: 1;
+    cursor: not-allowed;
+  }
+  
+  .add-account .btn-submit {
+    background-color: var(--bg-primary) !important;
+    border-color: var(--bg-primary) !important;
+    color: var(--text-white) !important;
+    padding: 6px 12px;
+    font-size: 1rem;
+    font-family: var(--font-primary);
+    border-radius: 0.25rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  
+  .add-account .btn-submit:hover,
+  .add-account .btn-submit:focus,
+  .add-account .btn-submit:active {
+    background-color: var(--bg-primary) !important;
+    border-color: var(--bg-primary) !important;
+    color: var(--text-white) !important;
+    opacity: 0.9;
+  }
+  
+  .add-account .btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .float-right {
+    float: right !important;
+  }
+  
+  .col-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+  
+  @media (max-width: 768px) {
+    .add-account .col-6 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+    
+    .add-account .col-3 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+  
+  

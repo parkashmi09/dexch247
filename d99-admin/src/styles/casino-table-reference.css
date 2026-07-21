@@ -1,0 +1,708 @@
+/**
+ * Casino table layout reference – matches teen1day structure and shared casino box styles.
+ * Use with BetTable+GameName components (e.g. BetTableTeen, BetTableTeen1).
+ * Exposure: consistently mapped; initially 0.
+ */
+
+/* Teenpatti 1day container and columns */
+.teen1daycasino-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.teen1dayleft,
+.teen1dayright {
+  width: 49%;
+}
+
+.teen1daycenter {
+  width: 2px;
+  background-color: grey;
+}
+
+.teen1dayother {
+  width: 100%;
+  margin-top: 15px;
+}
+
+/* Teenpatti 1day – nation name and bl-box widths */
+.teenpatti1day .casino-nation-name {
+  width: 50%;
+  position: relative;
+  background-color: #ddd;
+}
+
+.teenpatti1day .casino-bl-box {
+  width: 50%;
+}
+
+.teenpatti1day .casino-bl-box-item {
+  width: calc(50% - 2px);
+}
+
+.teenpatti1day .teen1dayother .casino-nation-name {
+  width: 22%;
+}
+
+.teenpatti1day .teen1dayother .casino-bl-box {
+  width: 13%;
+}
+
+.teenpatti1day .teen1dayother .casino-bl-box-item {
+  width: calc(100% - 4px);
+  height: 40px;
+}
+
+/* Casino box row and items (shared) */
+.casino-box-row {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 2px 0;
+  align-items: center;
+  position: relative;
+}
+
+.casino-bl-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.casino-bl-box-item {
+  margin-right: 4px;
+  border-radius: 0;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  cursor: pointer;
+  color: var(--text-black);
+  height: 40px;
+}
+
+.casino-bl-box-item:last-child {
+  margin-right: 0;
+}
+
+.casino-nation-name {
+  padding: 4px;
+  /* background-color: #ddd; */
+}
+
+.casino-detail .casino-nation-name.no-border {
+  background-color: transparent;
+  padding: 0;
+}
+
+.casino-bl-box-title .playera {
+  color: var(--text-red) !important;
+}
+
+.casino-bl-box-title .playerb {
+  color: var(--text-yellow) !important;
+}
+
+.casino-bl-box-title .casino-bl-box-item {
+  color: var(--text-black);
+  height: 24px !important;
+  font-size: var(--font-caption, 14px);
+  flex-direction: row;
+}
+
+.casino-bl-box-item > span,
+.casino-rb-box-player > span {
+  display: block;
+  width: 100%;
+  line-height: 14px;
+}
+
+.casino-bl-box-item .casino-box-odd,
+.casino-rb-box-player .casino-box-odd {
+  font-weight: bold;
+  font-size: var(--font-odds, 16px);
+  height: 16px;
+  line-height: 16px;
+  margin-bottom: 2px;
+  width: 100%;
+  color: #333;
+}
+
+.casino-bl-box-title .casino-bl-box-item span {
+  width: auto;
+}
+
+/* Casino table back/lay (transparent + border) */
+.casino-table .back,
+.casino-table .lay {
+  background-color: transparent;
+}
+
+.casino-table .back {
+  border: 2px solid var(--back);
+}
+
+.casino-table .back:hover {
+  border: 2px solid var(--back);
+}
+
+.casino-table .lay {
+  border: 2px solid var(--lay);
+}
+
+.casino-table .lay:hover {
+  border: 2px solid var(--lay);
+}
+
+/* Suspended (lock overlay) */
+.suspended {
+  position: relative;
+  cursor: not-allowed;
+}
+
+.suspended.lock-top::before {
+  background-position: top 3px center;
+}
+
+.suspended::before {
+  content: "";
+  background-image: url("../assets/img/lock.svg");
+  background-size: 15px 15px;
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 100;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background-position: center;
+}
+
+.suspended::after {
+  content: "";
+  background-color: rgba(255, 255, 255, 0.7);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  border-radius: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Book (exposure) and range */
+.casino-book {
+  font-size: 18px;
+  line-height: 18px;
+}
+
+.book-red {
+  color: var(--book-red) !important;
+  z-index: 10;
+  font-weight: bold;
+}
+
+.book-green {
+  color: var(--book-green) !important;
+  z-index: 10;
+  font-weight: bold;
+}
+
+.fa-info-circle {
+  color: #4a4a4a !important;
+  font-size: var(--font-caption, 14px);
+  cursor: pointer;
+  transition: 0.5s;
+  z-index: 1;
+}
+
+.icon-range {
+  position: absolute;
+  top: 100%;
+  background-color: var(--bg-sidebar, #16191c);
+  padding: 4px;
+  max-width: 100%;
+  word-wrap: break-word;
+  font-size: var(--font-small, 12px);
+  z-index: 10;
+  right: 0;
+  transition: 0.1s;
+  text-transform: capitalize;
+  color: var(--text-table, #aaafb5);
+  z-index: 150;
+}
+
+/* Collapse/show toggle for range (info icon): hidden by default, visible when .show */
+.icon-range.collapse {
+  display: none;
+  max-height: 0;
+  overflow: hidden;
+}
+
+.icon-range.collapse.show {
+  display: block;
+  max-height: 100px;
+  overflow: visible;
+}
+
+.d-none-small {
+  display: flex;
+}
+
+@media (max-width: 767px) {
+  .d-none-small {
+    display: none;
+  }
+}
+
+/* Mogambo – single back cell full width, range line, 3 Card Total row */
+.casino-bl-box.casino-bl-boxfull {
+  width: 100%;
+}
+
+.casino-bl-boxfull .casino-bl-box-item {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Mogambo – row layout: nation-name and bl-box side-by-side (like reference HTML) */
+.mogambo .teen1dayleft .casino-box-row,
+.mogambo .teen1dayright .casino-box-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  padding: 2px 0;
+  position: relative;
+}
+
+.mogambo .teen1dayleft .casino-box-row .casino-nation-name,
+.mogambo .teen1dayright .casino-box-row .casino-nation-name {
+  width: 50%;
+  flex: 0 0 50%;
+  padding: 4px;
+  background-color: #ddd;
+}
+
+.mogambo .teen1dayleft .casino-box-row .casino-bl-box.casino-bl-boxfull,
+.mogambo .teen1dayright .casino-box-row .casino-bl-box.casino-bl-boxfull {
+  width: 50%;
+  flex: 0 0 50%;
+}
+
+.mogambo .casino-box-row .casino-bl-boxfull .casino-bl-box-item {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Mogambo 3 Card Total row – centered below Daga/Teja and Mogambo */
+.mogambo .casino-box-row.three-card-total {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 50%;
+  margin-top: 6px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mogambo .casino-box-row.three-card-total .casino-nation-name {
+  width: 50%;
+  flex: 0 0 50%;
+  padding: 4px;
+  background-color: #ddd;
+}
+
+.mogambo .casino-box-row.three-card-total .casino-bl-box {
+  width: 50%;
+  flex: 0 0 50%;
+}
+
+.casino-min-max {
+  font-size: var(--font-small, 12px);
+  color: var(--text-table, #aaafb5);
+  padding: 2px 4px;
+  text-transform: capitalize;
+}
+
+.casino-box-row.three-card-total {
+  width: 50%;
+  margin-top: 6px;
+}
+
+.casino-box-row.three-card-total .casino-bl-box {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+}
+
+.casino-box-row.three-card-total .casino-bl-box-item {
+  flex: 1;
+}
+
+/* Result visuals card overlay – top right of video box, width fits cards */
+.casino-video-cards {
+  position: absolute;
+  right: 0;
+  left: auto;
+  top: 12px;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 5px 5px 5px 20px;
+  display: inline-block;
+  width: fit-content;
+  min-width: min-content;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+  transition: 1s;
+  /* border-radius: 8px 0 0 8px; */
+}
+
+/* Force card images to keep proper width/height so they don’t collapse */
+.casino-video-cards img {
+  width: 3rem !important;
+  min-width: 3rem !important;
+  height: 4rem !important;
+  min-height: 2.5rem !important;
+  object-fit: contain;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .casino-video-cards img {
+    width: 1.8rem !important;
+    min-width: 1.8rem !important;
+    height: 2.5rem !important;
+    min-height: 1.8rem !important;
+  }
+}
+
+/* ========== Teenpatti 20-20 (Premium 20-20) – reference structure ========== */
+.teen20casino-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.teen20left,
+.teen20right {
+  width: 49%;
+}
+
+.teen20center {
+  width: 2px;
+  background-color: #e0e0e0;
+}
+
+.teenpatti20 .casino-bl-box-item .casino-book {
+  position: absolute;
+  bottom: -20px;
+}
+
+.teenpatti20 .casino-bl-box-item {
+  width: calc(25% - 3px);
+  height: 40px;
+  text-transform: uppercase;
+  position: relative;
+}
+
+.teenpatti20 .casino-rb-box-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.teenpatti20 .casino-rb-box {
+  width: calc(50% - 4px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  position: relative;
+  flex-direction: column;
+}
+
+.teenpatti20 .casino-rb-box-player {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-highlight, #fff);
+  min-height: 46px;
+  cursor: pointer;
+  border-radius: 4px;
+  position: relative;
+}
+
+.teenpatti20 .casino-rb-box-player .casino-book {
+  position: absolute;
+  bottom: -20px;
+  text-align: center;
+  left: 0;
+  width: calc(100% - 20px);
+}
+
+.teenpatti20 .casino-rb-box-player > div {
+  padding: 0 8px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.teenpatti20 .casino-rb-box-player img {
+  height: 25px;
+  max-height: 25px;
+  margin-left: 5px;
+  width: 22px;
+}
+
+.teenpatti20 .casino-rb-box-player-range {
+  justify-content: flex-end;
+  display: flex;
+  width: 100%;
+  margin-top: 5px;
+}
+
+.teenpatti20 .casino-bl-box.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.teenpatti20 .casino-rb-box-container.mb-3 {
+  margin-bottom: 0.75rem;
+}
+
+.teenpatti20 .blackcontainer .casino-rb-box-player {
+  border: 2px solid var(--back);
+}
+
+.teenpatti20 .redcontainer .casino-rb-box-player {
+  border: 2px solid var(--lay);
+}
+
+.teenpatti20 .text-right {
+  text-align: right;
+}
+
+.teenpatti20 .d-block {
+  display: block;
+}
+
+/* ========== Dragon Tiger 20-20 (dt20) – reference structure ========== */
+.text-playera {
+  color: var(--text-red, #fc4242);
+}
+
+.text-playerb {
+  color: var(--text-yellow, #fdcf13);
+  font-weight: bold;
+}
+
+.casino-table.dt20 .casino-detail,
+.dt20.casino-detail {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 10px 10px 40px;
+  background-color: #f8f8fb;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 2px 6px #e2e2e2;
+}
+
+.dt20 .dtobx-top {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 20px;
+  position: relative;
+}
+
+.dt20 .dragon-box {
+  width: 40%;
+  padding: 6px;
+  padding-right: 6px;
+  border: 2px solid var(--text-red, #fc4242);
+  background-color: #fc42422e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 60px;
+  padding-right: 60px;
+  position: relative;
+  cursor: pointer;
+}
+
+.dt20 .tiebox {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  left: 40%;
+  transform: translateX(-50%);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-success, #03b37f);
+  color: var(--text-white, #fff);
+  flex-direction: column;
+  justify-content: center;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.dt20 .tiger-box {
+  width: 40%;
+  padding: 6px;
+  padding-left: 6px;
+  border: 2px solid var(--text-fancy, #fdcf13);
+  background-color: #fdcf132e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 60px;
+  padding-left: 60px;
+  position: relative;
+  cursor: pointer;
+}
+
+.dt20 .pair-box {
+  width: 18%;
+  margin-left: 2%;
+  background-color: #434343;
+  padding: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 60px;
+  flex-wrap: wrap;
+  position: relative;
+  color: #fff;
+  cursor: pointer;
+}
+
+.dt20 .dragon-box .casino-book,
+.dt20 .tiger-box .casino-book,
+.dt20 .tiebox .casino-book,
+.dt20 .pair-box .casino-book {
+  position: absolute;
+  bottom: -20px;
+}
+
+.dt20 .dragon-box .casino-book {
+  left: 0;
+}
+
+.dt20 .tiebox .casino-book {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.dt20 .tiger-box .casino-book {
+  right: 0;
+}
+
+.dt20 .pair-box .casino-book {
+  right: 0;
+}
+
+.dt20 .teen1daycasino-container {
+  margin-top: 20px;
+}
+
+.dt20 .casino-bl-box {
+  width: calc(25% - 3px);
+  margin-right: 4px;
+}
+
+.dt20 .casino-bl-box:last-child {
+  margin-right: 0;
+}
+
+.dt20 .casino-bl-box-item {
+  width: 100%;
+  height: 50px;
+}
+
+.dt20 .casino-bl-box-item .casino-book {
+  position: absolute;
+  bottom: -20px;
+}
+
+.dt20 .suspended.tiebox::after {
+  border-radius: 50%;
+}
+
+.dt20 .casino-title {
+  background-color: #ddd;
+  padding: 7px;
+  margin-bottom: 5px;
+}
+
+.dt20 .casino-cards-odds-title {
+  margin-top: 30px;
+}
+
+/* dt20 cards section – matches reference .casino-box.cards-box */
+.dt20 .casino-box.cards-box {
+  width: 100%;
+}
+
+.dt20 .casino-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.dt20 .casino-card-item {
+  margin-right: 5px;
+  margin-left: 5px;
+  margin-bottom: 10px;
+  width: auto;
+  min-width: 80px;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.dt20 .casino-card-item .card-image {
+  display: inline-block;
+}
+
+.dt20 .casino-card-item .card-image img {
+  width: 48px;
+  height: auto;
+  object-fit: contain;
+}
+
+.dt20 .casino-card-item .casino-book {
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+.dt20 .casino-odds.casino-cards-odds-title {
+  background-color: #ddd;
+  color: #000;
+  padding: 5px;
+}
+
+.dt20 .casino-card-img img {
+  width: 30px;
+  height: auto;
+  margin-left: 5px;
+}

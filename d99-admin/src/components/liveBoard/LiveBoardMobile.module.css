@@ -1,0 +1,110 @@
+.mobileContainer {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    max-height: 16.25rem;
+    overflow-y: auto;
+    min-height: 2rem;
+}
+
+.gameItem {
+    padding: 2px 4px;
+    padding-bottom: 3px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #b1adad;
+    background-color: var(--bg-table-row);
+}
+
+.gameHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+}
+
+.gameName {
+    font-weight: 700;
+    font-size: 14px;
+    font-size: 14px;
+    padding-left: 2px;
+    color: var(--color-text-main);
+}
+
+.icons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-right: 1.5rem;
+}
+
+/* small image icon used in mobile game icons */
+.iconImg {
+    width: 12px;
+    height: 12px;
+    object-fit: contain;
+    display: inline-block;
+}
+
+.gameTime {
+    font-size: 12px;
+    color: var(--color-text-main);
+    margin-bottom: -3px;
+    margin-top: -3px;
+    /* margin-bottom: 4px; */
+}
+
+.marketHeaders {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    text-align: center;
+    font-weight: 700;
+    font-size: 13px;
+    color: #000;
+
+}
+
+.oddsRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+}
+
+.oddsPair {
+    display: flex;
+    height: 1.5rem;
+    /* Adjusted height */
+}
+
+.backBox {
+    flex: 1;
+    background-color: var(--bg-back);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: #000;
+    border-right: 1px solid #fff;
+    /* White separator */
+}
+
+.layBox {
+    flex: 1;
+    background-color: var(--bg-lay);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: #000;
+    border-right: 1px solid #fff;
+    /* White separator */
+}
+
+/* Remove border from the last item in a pair if needed, 
+   but usually the grid gap or container handles visual separation. 
+   In the screenshot, there is no gap between pairs, just continuous blocks. 
+*/
+.oddsPair:last-child .layBox {
+    border-right: none;
+}

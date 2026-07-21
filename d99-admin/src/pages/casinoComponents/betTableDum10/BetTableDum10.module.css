@@ -1,0 +1,285 @@
+/* Main Container */
+.casinoTableBox {
+  width: 100%;
+}
+
+.boxWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.casinoTable {
+  background-color: var(--color-bg-row);
+  color: var(--color-text-main);
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--color-border);
+  justify-content: space-between;
+  margin-top: 5px;
+  width: 70%;
+}
+
+@media (max-width: 768px) {
+  .casinoTable {
+    width: 100%;
+  }
+}
+
+/* Table Header */
+.casinoTableHeader {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border);
+  width: 100%;
+}
+
+.casinoTableHeader .casinoNationDetail {
+  font-weight: bold;
+  min-height: unset;
+}
+
+.casinoNationDetail {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-left: 5px;
+  min-height: 46px;
+  width: 60%;
+}
+
+.casinoNationName {
+  font-weight: bold;
+}
+
+/* Table Body */
+.casinoTableBody {
+  width: 100%;
+}
+
+.casinoTableRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Odds Box */
+.casinoOddsBox {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  font-weight: bold;
+  border-left: 1px solid var(--color-border);
+  cursor: pointer;
+  min-height: 46px;
+  width: 20%;
+  position: relative;
+}
+
+.casinoTableHeader .casinoOddsBox {
+  cursor: unset;
+  padding: 2px;
+  min-height: unset;
+  height: auto !important;
+}
+
+.casinoOdds {
+  display: block;
+}
+
+/* Back (Blue) Background */
+.back {
+  background-color: var(--bg-back) !important;
+}
+
+/* Lay (Pink) Background */
+.lay {
+  background-color: var(--bg-lay) !important;
+}
+
+/* Suspended Box (Locked) */
+.suspendedBox {
+  position: relative;
+  pointer-events: none;
+  cursor: not-allowed;
+  background-color: var(--color-overlay-lock) !important;
+}
+
+.suspendedBox::before {
+  content: "";
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 17px;
+  height: 17px;
+  pointer-events: none;
+}
+
+.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.lockedOdds {
+  position: relative;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+/* Divider */
+.divider {
+  height: 2px;
+  background-color: #0077be;
+  width: 60%;
+  margin: 20px auto;
+}
+
+/* Bottom Grid */
+.bottomGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 5px 10px 5px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--color-border);
+}
+
+.betOption {
+  display: flex;
+  flex-direction: column;
+}
+
+.oddsValue {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 10px 0;
+  color: var(--color-text-main);
+}
+
+.betButton {
+  background-image: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+  color: var(--color-text-inverse);
+  padding: 15px;
+  text-align: center;
+  font-weight: bold;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.redSuits {
+  color: var(--color-text-danger);
+  font-size: 16px;
+}
+
+.blackSuits {
+  color: var(--color-text-black);
+  font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .topSection {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+
+  .odds {
+    font-size: 16px;
+  }
+
+  .oddsValue {
+    font-size: 16px;
+  }
+
+  .betButton {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bottomGrid {
+    grid-template-columns: 1fr 1fr;
+    /* ✅ Two columns per row on mobile */
+    gap: 8px;
+  }
+
+  .divider {
+    width: 80%;
+  }
+
+  .column {
+    border: 1px solid var(--color-border);
+  }
+
+  .topSection {
+    width: 100%;
+    /* ✅ Increased width for mobile view */
+  }
+}
+
+
+/* Exposure */
+.exposure {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  margin-top: 2px;
+  display: block;
+  text-align: center;
+  z-index: 2;
+  position: relative;
+}
+
+.exposureLocked {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  margin-top: 2px;
+  display: block;
+  text-align: center;
+  z-index: 4;
+  position: relative;
+  pointer-events: none;
+}
+
+/* Optional: Suit styles */
+.redSuits {
+  color: var(--color-text-danger);
+}
+
+.blackSuits {
+  color: var(--color-text-black);
+}

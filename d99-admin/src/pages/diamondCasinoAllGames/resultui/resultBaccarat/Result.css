@@ -1,0 +1,68 @@
+/* casino-video-last-results – from reference style.css */
+.casino-video-last-results {
+  display: flex;
+  display: -webkit-flex;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  transition: 1s;
+  padding: 5px;
+  justify-content: flex-end;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.casino-video-last-results span {
+  width: 30px;
+  margin-left: 2px;
+  height: 30px;
+  background-color: #0088cc;
+  cursor: pointer;
+  border-radius: 50%;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.casino-video-last-results span.resulta {
+  color: #ff4500;
+  background-color: #355e3b;
+}
+
+.casino-video-last-results span.resultb {
+  background: #355e3b;
+  color: #ffff33;
+}
+
+/* Baccarat-specific overrides */
+.baccarat .casino-video-last-results span.resulta {
+  color: #fff;
+  background-color: #086cb8;
+}
+
+.baccarat .casino-video-last-results span.resultb {
+  color: #fff;
+  background-color: #ae2130;
+}
+
+/* Result modal styles */
+.casino-result-cards img {
+  width: 50px;
+  margin: 0 3px;
+}
+
+.casino-winner-icon {
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+.casino-winner-icon .fa-trophy {
+  color: #ffd700;
+  font-size: 24px;
+}
+
+.result-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}

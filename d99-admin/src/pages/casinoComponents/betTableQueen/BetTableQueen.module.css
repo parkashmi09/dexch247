@@ -1,0 +1,212 @@
+.betTable {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin: 0 auto;
+  font-family: "Roboto-Condensed", sans-serif;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.playerOption {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 140px;
+  /* Ensures minimum size for mobile grid layout */
+}
+
+.label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.betOptions {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.betBox {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  height: 40px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.back {
+  background-color: var(--bg-back);
+  color: black;
+}
+
+.lay {
+  background-color: var(--bg-lay);
+  color: black;
+}
+
+.odds {
+  font-size: 14px;
+}
+
+/* ========== Tablet View ========== */
+@media (max-width: 768px) {
+  .betTable {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 per row */
+    gap: 8px;
+  }
+
+  .playerOption {
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    background-color: var(--color-bg-row);
+    border: 1px solid #d7d7d7;
+    gap: 4px;
+  }
+
+  .label {
+    font-size: 12px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .betOptions {
+    gap: 4px;
+  }
+
+  .betBox {
+    padding: 5px 10px;
+    height: 35px;
+    min-width: 60px;
+  }
+
+  .odds {
+    font-size: 12px;
+  }
+}
+
+/* ========== Mobile View ========== */
+@media (max-width: 480px) {
+  .betTable {
+    grid-template-columns: repeat(2, 1fr);
+    /* Still 2 per row */
+    gap: 6px;
+  }
+
+  .playerOption {
+    padding: 6px;
+  }
+
+  .label {
+    font-size: 10px;
+  }
+
+  .betBox {
+    padding: 4px 8px;
+    height: 30px;
+    min-width: 50px;
+  }
+
+  .odds {
+    font-size: 10px;
+  }
+}
+
+.locked {
+  background-color: var(--color-overlay-lock);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Suspended Box (Locked) */
+.suspendedBox {
+  position: relative;
+  pointer-events: none;
+  cursor: not-allowed;
+  background-color: var(--color-overlay-lock) !important;
+}
+
+.suspendedBox::before {
+  content: "";
+  background-image: url(../../../assets/img/lock.svg);
+  background-size: 17px 17px;
+  filter: invert(1);
+  -webkit-filter: invert(1);
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 17px;
+  height: 17px;
+  pointer-events: none;
+}
+
+.suspendedBox::after {
+  content: "";
+  background-color: var(--color-overlay-lock);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  cursor: not-allowed;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.betBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.odds {
+  position: relative;
+  z-index: 0;
+}
+
+.suspendedBox .odds {
+  opacity: 0.6;
+  position: relative;
+  z-index: 0;
+}
+
+/* Exposure */
+.exposure {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  margin-top: 2px;
+  display: block;
+  text-align: center;
+  z-index: 4;
+  position: relative;
+}
+
+.exposureLocked {
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  margin-top: 2px;
+  display: block;
+  text-align: center;
+  z-index: 4;
+  position: relative;
+  pointer-events: none;
+}

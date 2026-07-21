@@ -1,0 +1,96 @@
+.rulesSection {
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.rulesSection .pl4 {
+  padding-left: 0rem !important;
+}
+
+.rulesSection .pr4 {
+  padding-right: 1rem !important;
+}
+
+.rulesSection .listStyle,
+.rulesSection .listStyle li {
+  list-style: disc;
+}
+
+.rulesSection ul li,
+.rulesSection p {
+  margin-bottom: 5px;
+  color: var(--text-body);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.rulesSection ul li b {
+  font-weight: bold;
+  color: var(--text-body);
+  color: #000;
+}
+
+.rulesSection .imgFluid {
+  max-width: 100%;
+  height: auto;
+  margin-top: 15px;
+  display: block;
+  padding: 0 10px;
+}
+
+.rulesSection::-webkit-scrollbar {
+  width: 8px;
+}
+
+.rulesSection::-webkit-scrollbar-track {
+  background: #666666;
+}
+
+.rulesSection::-webkit-scrollbar-thumb {
+  background-color: #333333;
+}
+
+.rulesSection .rulesHighlight {
+  color: var(--bg-primary) !important;
+  font-weight: bold;
+  font-size: 18px !important;
+  margin-top: 20px;
+  padding: 0 10px;
+  margin-bottom: 10px;
+}
+
+.rulesSection .rulesSubHighlight {
+  color: #FDCF13;
+  font-size: 14px;
+}
+
+.rulesSection .ruleCard {
+  height: 20px;
+  margin-left: 5px;
+}
+
+.rulesSection .cardCharacter {
+  font-family: Card Characters;
+}
+
+.rulesSection .redCard {
+  color: red;
+}
+
+.rulesSection .blackCard {
+  color: black;
+}
+
+.rulesSection .cardsBox {
+  background: #fff;
+  padding: 6px;
+  display: inline-block;
+  color: #000;
+  min-width: 150px;
+}
+
+@media (max-width: 768px) {
+  .rulesSection ul li {
+    font-size: 12px;
+  }
+}

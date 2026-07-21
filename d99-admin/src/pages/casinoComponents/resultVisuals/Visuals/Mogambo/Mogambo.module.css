@@ -1,0 +1,75 @@
+.mogamboContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0 5px;
+    align-items: flex-start;
+    position: relative;
+    box-sizing: border-box;
+    gap: 15px;
+}
+
+.leftSection {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+}
+
+.rightSection {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    align-items: flex-start;
+}
+
+.headerTitle {
+    color: var(--color-text-inverse);
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+    margin-bottom: 2px;
+}
+
+.cardRow {
+    display: flex;
+    gap: 5px;
+}
+
+.cardImage {
+    width: 3rem;
+    height: 4.2rem;
+    object-fit: fill;
+    border-radius: 4px;
+    background-color: var(--color-bg-primary);
+    animation: flipIn 0.5s ease-out both;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+.totalBox {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: var(--bg-highlight);
+    color: var(--color-text-black);
+    font-weight: bold;
+    padding: 2px 5px;
+    font-size: 0.8rem;
+    border-radius: 2px;
+    z-index: 10;
+}
+
+@keyframes flipIn {
+    from {
+        transform: perspective(600px) rotateY(90deg);
+        opacity: 0;
+    }
+
+    to {
+        transform: perspective(600px) rotateY(0deg);
+        opacity: 1;
+    }
+}

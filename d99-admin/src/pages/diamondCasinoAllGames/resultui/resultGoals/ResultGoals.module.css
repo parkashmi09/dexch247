@@ -1,0 +1,164 @@
+.modalDialogCustom {
+  margin-top: 2% !important;
+  margin-bottom: auto !important;
+  transform: none !important;
+  top: 0 !important;
+}
+
+@media only screen and (max-width: 767px) {
+  .modalDialogCustom {
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    /* height: 50vh !important;
+    max-height: 50vh !important; */
+  }
+}
+
+.modalHeader {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  border-top-left-radius: calc(0.3rem - 1px);
+  border-top-right-radius: calc(0.3rem - 1px);
+}
+
+@media only screen and (max-width: 767px) {
+  .modalHeader {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+  }
+}
+
+.modalTitle {
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+.modalBody {
+  background-color: var(--bg-body);
+  color: var(--text-body);
+  padding: 10px;
+  max-height: calc(98vh - 50px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+  flex: 1 1 auto;
+}
+
+@media only screen and (max-width: 767px) {
+  .modalBody {
+    max-height: calc(50vh - 60px);
+    /* height: calc(50vh - 60px); */
+    padding: 0.5rem;
+    overflow-y: auto;
+  }
+  
+  .casinoResultRoundId {
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 12px;
+  }
+  
+  .resultTitle {
+    font-size: 16px;
+  }
+  
+  .cardImage {
+    height: 35px;
+  }
+  
+  .casinoResultDesc {
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+  }
+  
+  .casinoResultDescItem {
+    font-size: 14px;
+    padding: 0.4rem 0;
+  }
+}
+
+.casinoResultModal {
+  width: 100%;
+}
+
+.casinoResultRoundId {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  font-size: 14px;
+}
+
+.casinoResultRoundId span {
+  display: inline-block;
+}
+
+.resultTitle {
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 0.5rem;
+}
+
+.casinoResultCards {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.casinoWinnerIcon {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  color: #4caf50;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardImage {
+  width: auto;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.casinoResultDesc {
+  background-color: var(--bg-body);
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.casinoResultDescItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.casinoResultDescItem:last-child {
+  border-bottom: none;
+}
+
+.casinoResultDescItem > div:first-child {
+  font-weight: 500;
+  flex: 0 0 auto;
+}
+
+.casinoResultDescItem > div:last-child {
+  text-align: right;
+  flex: 1;
+  margin-left: 1rem;
+}

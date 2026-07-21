@@ -1,0 +1,690 @@
+/* Users/Account List Page Styles */
+
+.listing-grid {
+  background-color: #f9f9f9;
+  padding: 10px;
+  margin: 0;
+  position: relative;
+  font-family: var(--font-primary);
+}
+
+.account-list {
+  width: 100%;
+  font-family: var(--font-primary);
+}
+.row{
+    padding: 0 !important;
+}
+.page-title-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+
+.page-title-box h4 {
+  text-transform: unset;
+  color: #1e1e1e;
+  font-size: 1.6rem !important;
+  font-weight: 500;
+  font-family: var(--font-primary) !important;
+  margin: 0;
+}
+
+.page-title-right {
+  display: flex;
+  align-items: center;
+}
+
+.page-title-right .d-inline-block {
+  display: inline-block;
+}
+
+/* Button Primary Styles */
+.btn-primary {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--bg-primary) !important;
+  color: var(--text-white) !important;
+  padding: 6px 12px;
+  font-size: 1rem;
+  font-family: var(--font-primary);
+  border-radius: 0.25rem;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--bg-primary) !important;
+  color: var(--text-white) !important;
+  opacity: 0.9;
+}
+
+/* Button Secondary Styles */
+.btn-secondary-action {
+  background-color: #444!important;
+  border-color: #444 !important;
+  color: #fff !important;
+  padding: 6px 12px;
+  font-size: 1rem;
+  font-family: var(--font-primary);
+  border-radius: 0.25rem;
+  text-decoration: none;
+  font-weight: 500 !important;
+  display: inline-block;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active {
+  background-color: #5a6268 !important;
+  border-color: #545b62 !important;
+  color: #fff !important;
+}
+
+.col-12 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+}
+
+/* Card Styles */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 0 solid #f6f6f6;
+  border-radius: 0.25rem;
+  margin-bottom: 24px;
+  box-shadow: 0 0.75rem 1.5rem rgba(18, 38, 63, 0.03);
+}
+
+.account-list .card {
+  background-color: transparent;
+}
+
+.card-body {
+  flex: 1 1 auto;
+  min-height: 1px;
+}
+
+.account-list .card .card-body {
+  padding: 0;
+}
+
+/* Row5 Styles */
+.row.row5 {
+  margin-left: -5px;
+  margin-right: -5px;
+}
+
+/* Export Buttons */
+.buttons-pdf {
+  background-color: #cb0606 !important;
+  border-color: #cb0606 !important;
+  color: #fff !important;
+  box-shadow: 0px 5px 6px -6px #000;
+  cursor: pointer;
+  font-size: 1rem;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttons-pdf:hover {
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
+}
+
+.buttons-pdf i,
+.buttons-pdf .fa-file-pdf {
+  margin-right: 0.25rem !important;
+  font-size: 1rem;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.buttons-excel {
+  background-color: #217346 !important;
+  border-color: #217346 !important;
+  color: #fff !important;
+  box-shadow: 0px 5px 6px -6px #000;
+  cursor: pointer;
+  font-size: 1rem;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttons-excel:hover {
+  background-color: #218838 !important;
+  border-color: #1e7e34 !important;
+}
+
+.buttons-excel i,
+.buttons-excel .fa-file-excel {
+  margin-right: 0.25rem !important;
+  font-size: 1rem;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+/* DataTables Styles */
+.dataTables_length,
+.dataTables_filter {
+  font-family: var(--font-primary);
+}
+
+.dataTables_length label,
+.dataTables_filter label {
+  margin-bottom: 0;
+  font-weight: 500;
+  font-family: var(--font-primary);
+  display: inline-flex;
+  align-items: center;
+}
+
+.dataTables_filter {
+  text-align: right;
+}
+
+@media (max-width: 767.98px) {
+  .dataTables_filter {
+    text-align: left;
+  }
+}
+
+.custom-select {
+  display: inline-block;
+  width: auto;
+  padding: 0.25rem 1.75rem 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #495057;
+  vertical-align: middle;
+  background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  appearance: none;
+  font-family: var(--font-primary);
+}
+
+.custom-select-sm {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.form-control-sm {
+  height: calc(1.5em + 0.5rem + 4px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+  font-family: var(--font-primary);
+}
+
+/* Table Styles */
+.table-responsive {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+  font-family: var(--font-primary);
+}
+
+.table th,
+.table td {
+  font-size: 14px;
+  color: #1e1e1e;
+}
+
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 500;
+  color: #495057;
+  background-color: transparent !important;
+}
+
+.table tbody td {
+  vertical-align: middle;
+  border-top: 1px solid #dee2e6;
+  font-size: 14px;
+  color: #1e1e1e;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.table-bordered {
+  border: 1px solid #dee2e6;
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #dee2e6;
+}
+
+/* Account List Table Specific Styles */
+.account-list .table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 0;
+}
+
+.account-list .table thead tr {
+  background-color:transparent;
+  border: 0;
+  border-bottom: 1px solid #111;
+}
+
+.account-list .table thead th {
+  background-color: #fff;
+
+}
+
+.account-list .table tbody tr {
+  background-color: #fff;
+}
+
+/* Striped table rows for account list */
+.account-list .table-striped tbody tr:nth-of-type(odd) {
+  background-color: #fff;
+}
+
+.account-list .table-striped tbody tr:nth-of-type(even) {
+  background-color: #f8f9fa;
+}
+
+.account-list .table-bordered.table {
+  border: 0;
+}
+
+.account-list .table-bordered.table thead th,
+.account-list .table-bordered.table thead td {
+  border: 0 !important;
+  border-bottom: 1px solid #111 !important;
+}
+
+.account-list .table-bordered,
+.account-list .table-bordered td,
+.account-list .table-bordered th {
+  border: 1px solid #dee2e6;
+}
+
+.account-list .table th,
+.account-list .table td {
+  font-size: 14px;
+  color: #1e1e1e;
+}
+
+/* Override Bootstrap table padding and styles */
+.account-list .table > :not(caption) > * > * {
+  padding: 0.2rem 0.5rem;
+  color: #1e1e1e;
+}
+
+/* First row bold text for list-clients */
+.list-clients tr:first-child td {
+  font-weight: bold;
+}
+
+/* Action Buttons */
+.action-button {
+  cursor: pointer;
+  background: #444;
+  border-color: #444;
+  padding: 5px 10px;
+  text-decoration: none;
+  color: #fff;
+  border-radius: 3px !important;
+  margin-right: 6px;
+  margin-left: 0;
+  text-transform: uppercase;
+  display: inline-block;
+  font-size: 1rem;
+  line-height: 1;
+  font-family: var(--font-primary);
+}
+
+.action-button:hover,
+.action-button:focus,
+.action-button:active {
+  background: #333;
+  border-color: #333;
+  color: #fff;
+}
+
+.btn-group {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+  flex-wrap: nowrap;
+}
+
+.btn-group .btn {
+  position: relative;
+  flex: 0 1 auto;
+}
+
+.btn-group .btn + .btn {
+  margin-left: -1px;
+}
+
+/* Override for action buttons in btn-group */
+.btn-group .action-button {
+  margin-left: 0 !important;
+  margin-right: 6px;
+  flex: 0 0 auto;
+}
+
+.btn-group .action-button:last-child {
+  margin-right: 0;
+}
+
+.btn-group .action-button + .action-button {
+  margin-left: 0 !important;
+}
+
+/* Checkbox Styles - Scoped to account-list and users pages only */
+.account-list .custom-control,
+.listing-grid .account-list .custom-control {
+  position: relative;
+  display: block;
+  min-height: 1.5rem;
+  padding-left: 1.75rem;
+}
+
+.account-list .custom-control-input,
+.listing-grid .account-list .custom-control-input {
+  position: absolute;
+  left: 0;
+  z-index: -1;
+  width: 1.25rem;
+  height: 1.25rem;
+  opacity: 0;
+}
+
+.account-list .custom-control-label,
+.listing-grid .account-list .custom-control-label {
+  position: relative;
+  margin-bottom: 0;
+  vertical-align: top;
+}
+
+.account-list .custom-control-label::before,
+.listing-grid .account-list .custom-control-label::before {
+  position: absolute;
+  top: 0;
+  left: -1.75rem;
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  pointer-events: none;
+  content: "";
+  background-color: #000;
+  border: 1px solid #000;
+  border-radius: 0 !important;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.account-list .custom-control-input:checked ~ .custom-control-label::before,
+.listing-grid .account-list .custom-control-input:checked ~ .custom-control-label::before {
+  color: #fff;
+  border-color: #000;
+  background-color: #000;
+  border-radius: 0 !important;
+}
+
+.account-list .custom-control-input:checked ~ .custom-control-label::after,
+.listing-grid .account-list .custom-control-input:checked ~ .custom-control-label::after {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26l2.974 2.99L8 2.193z'/%3E%3C/svg%3E");
+  background-size: 50% 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.account-list .custom-control-label::after,
+.listing-grid .account-list .custom-control-label::after {
+  position: absolute;
+  top: 0;
+  left: -1.75rem;
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  content: "";
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.account-list .custom-control-input:disabled ~ .custom-control-label,
+.account-list .custom-control-input[disabled] ~ .custom-control-label,
+.listing-grid .account-list .custom-control-input:disabled ~ .custom-control-label,
+.listing-grid .account-list .custom-control-input[disabled] ~ .custom-control-label {
+  color: #74788d;
+  cursor: not-allowed;
+}
+
+.account-list .custom-control-input:disabled ~ .custom-control-label::before,
+.account-list .custom-control-input[disabled] ~ .custom-control-label::before,
+.listing-grid .account-list .custom-control-input:disabled ~ .custom-control-label::before,
+.listing-grid .account-list .custom-control-input[disabled] ~ .custom-control-label::before {
+  background-color: #000;
+  border-color: #000;
+  cursor: not-allowed;
+}
+
+.account-list .custom-control-input:disabled:checked ~ .custom-control-label::before,
+.account-list .custom-control-input[disabled]:checked ~ .custom-control-label::before,
+.listing-grid .account-list .custom-control-input:disabled:checked ~ .custom-control-label::before,
+.listing-grid .account-list .custom-control-input[disabled]:checked ~ .custom-control-label::before {
+  background-color: #000;
+  border-color: #000;
+}
+
+.account-list .custom-control-input:disabled:checked ~ .custom-control-label::after,
+.account-list .custom-control-input[disabled]:checked ~ .custom-control-label::after,
+.listing-grid .account-list .custom-control-input:disabled:checked ~ .custom-control-label::after,
+.listing-grid .account-list .custom-control-input[disabled]:checked ~ .custom-control-label::after {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26l2.974 2.99L8 2.193z'/%3E%3C/svg%3E");
+  background-size: 50% 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  padding-left: 0;
+  list-style: none;
+  border-radius: 0.25rem;
+  font-family: var(--font-primary);
+}
+
+.pagination-rounded .page-link {
+  border-radius: 0.25rem;
+  margin: 0 0.125rem;
+}
+
+.page-link {
+  position: relative;
+  display: block;
+  padding: 0.5rem 0.75rem;
+  margin-left: -1px;
+  line-height: 1.25;
+  color: var(--bg-primary);
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  text-decoration: none;
+}
+
+.page-link:hover {
+  z-index: 2;
+  color: #0056b3;
+  text-decoration: none;
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+}
+
+.page-item.active .page-link {
+  z-index: 3;
+  color: #fff;
+  font-weight: 500;
+  background-color: var(--bg-primary);
+  border-color: var(--bg-primary);
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  pointer-events: none;
+  cursor: auto;
+  background-color: #fff;
+  border-color: #dee2e6;
+}
+
+/* Text Utilities */
+.wrape-text {
+  cursor: pointer;
+  background: #444;
+  padding: 2px 10px;
+  text-decoration: none;
+  color: #fff;
+  border-radius: 3px;
+  margin-right: 3px;
+  text-transform: uppercase;
+  display: inline-block;
+  max-width: unset;
+  white-space: unset;
+  font-weight: 500 !important;
+  font-family: var(--font-primary);
+}
+
+.wrape-text:hover {
+  background: #333;
+  color: #fff;
+  text-decoration: none;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-md-right {
+  text-align: right !important;
+}
+
+@media (max-width: 767.98px) {
+  .text-md-right {
+    text-align: left !important;
+  }
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem !important;
+}
+
+.mt-2 {
+  margin-top: 0.5rem !important;
+}
+
+.ml-2 {
+  margin-left: 0.5rem !important;
+}
+
+.mr-2 {
+  margin-right: 0.5rem !important;
+}
+
+.mr-1 {
+  margin-right: 0.25rem !important;
+}
+
+.pt-3 {
+  padding-top: 1rem !important;
+}
+
+.float-right {
+  float: right !important;
+}
+
+/* Multi Login Privileges Styles */
+.previlages {
+  margin-top: 0.5rem;
+}
+
+.previlages h5 {
+  font-weight: 600;
+  color: #1e1e1e;
+  margin-bottom: 1rem;
+}
+
+.previlage-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-bottom: 1rem;
+}
+
+.previlage-item {
+  min-width: 180px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.previlage-master {
+  margin-top: 0.5rem;
+}
+
+.previlage-master .form-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.previlage-master .form-group .form-control.mpass-text {
+  width: 200px;
+  display: inline-block;
+}
+
+.previlage-master .form-group .btn {
+  margin-left: 0;
+}
+
