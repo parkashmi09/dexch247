@@ -1,16 +1,19 @@
 import { useMemo } from "react";
 import { Modal } from "react-bootstrap";
-import { SPORTS_QUICK_STAKES, calcProfitLoss, calcOutcomeProjection, isFancyType } from "../../utils/gameDetailsUtils.js";
+import { SPORTS_QUICK_STAKES, calcProfitLoss, calcOutcomeProjection, stepOdds } from "../../utils/gameDetailsUtils.js";
+import { isOddsInRange, isOddsLocked } from "../../utils/sportsBetRules.js";
 
 export default function PlaceBetMobile({
   betState, exposures, onOddsChange, onStakeChange, onQuickStake, onClear, onReset, onClose, onSubmit, placing
 }) {
-  const { open, market, marketType, runner, betType, odds, stake } = betState;
+  const { open, market, marketType, runner, betType, odds, stake, isCashout } = betState;
 
   const stakeNum = Number(stake) || 0;
   const oddsNum = Number(odds) || 0;
-  const { profit } = calcProfitLoss(marketType, betType, oddsNum, stakeNum);
-  const spinnerEnabled = !isFancyType(marketType);
+  const clickedSize = Number(runner?.odds?.find?.((o) => Number(o?.odds) === oddsNum)?.size) || 0;
+  const { profit } = calcProfitLoss(marketType, betType, oddsNum, stakeNum, market, clickedSize);
+  // Manual editing is only possible on `gtype: 'match'` markets (spec §6.4).
+  const oddsEditable = !!market && !isOddsLocked(market) && !isCashout;
   const selectionName = runner?.nat || runner?.name || "";
 
   // Normal / Ball By Ball / Over By Over: no real-time profit number (matches old frontend)
@@ -20,20 +23,20 @@ export default function PlaceBetMobile({
 
   // Projected book per outcome = existing exposure (by market mid) + this pending bet
   const runnerPL = useMemo(() => {
-    if (stakeNum <= 0 || oddsNum < 1.01) return null;
-    return calcOutcomeProjection({ market, marketType, selectedRunner: runner, betType, odds: oddsNum, stake: stakeNum, exposures });
-  }, [market, marketType, runner, betType, oddsNum, stakeNum, exposures]);
+    if (stakeNum <= 0 || !isOddsInRange(market, oddsNum)) return null;
+    return calcOutcomeProjection({ market, marketType, selectedRunner: runner, betType, odds: oddsNum, stake: stakeNum, exposures, rate: clickedSize });
+  }, [market, marketType, runner, betType, oddsNum, stakeNum, exposures, clickedSize]);
 
   function handleSpinUp() {
-    if (!spinnerEnabled) return;
-    onOddsChange(String(Math.min(1000, Math.round((oddsNum + 0.01) * 100) / 100)));
+    if (!oddsEditable) return;
+    onOddsChange(stepOdds(odds, +1));
   }
   function handleSpinDown() {
-    if (!spinnerEnabled) return;
-    onOddsChange(String(Math.max(1.01, Math.round((oddsNum - 0.01) * 100) / 100)));
+    if (!oddsEditable) return;
+    onOddsChange(stepOdds(odds, -1));
   }
 
-  const submitDisabled = placing || stakeNum <= 0 || oddsNum < 1.01;
+  const submitDisabled = placing || stakeNum <= 0 || !isOddsInRange(market, oddsNum);
 
   return (
     <Modal show={open} onHide={onClose}>
@@ -61,13 +64,23 @@ export default function PlaceBetMobile({
             <div className="row row5 mt-1">
               <div className="col-6">
                 <div className="float-end">
-                  {spinnerEnabled && (
+                  {oddsEditable && (
                     <button className="stakeactionminus btn" type="button" onClick={handleSpinDown}>
                       <span className="fa fa-minus"></span>
                     </button>
                   )}
-                  <input type="text" className="stakeinput" disabled value={oddsNum} />
-                  {spinnerEnabled && (
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    className="stakeinput"
+                    disabled={!oddsEditable}
+                    value={odds}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === "" || /^\d*\.?\d{0,2}$/.test(v)) onOddsChange(v);
+                    }}
+                  />
+                  {oddsEditable && (
                     <button className="stakeactionminus btn" type="button" onClick={handleSpinUp}>
                       <span className="fa fa-plus"></span>
                     </button>

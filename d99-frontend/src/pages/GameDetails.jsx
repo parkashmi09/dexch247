@@ -22,6 +22,28 @@ import {
   INITIAL_BET_STATE,
   deriveBetSizes,
 } from "../utils/gameDetailsUtils.js";
+import {
+  TOASTS,
+  BET_BUFFER_SECONDS,
+  FANCY_BUFFER_SECONDS,
+  getOddsFormat,
+  getGameType,
+  getBetCategory,
+  isFancyCategory,
+  isOddsLocked,
+  getStakeLimits,
+  getOddsBounds,
+  isRateCapped,
+  isLimitedOvers,
+} from "../utils/sportsBetRules.js";
+import { manualBetGate, manualBetLiveCheck, autoBetCheck, EPS } from "../utils/bookieFavour.js";
+import {
+  monitorOddsBuffer,
+  getFinalSuspensionStatus,
+  hasFancyDrift,
+} from "../utils/placeBetLiveChecks.js";
+import { registerBetAttempt } from "../utils/betAttemptTracker.js";
+import { getPlatformBufferSeconds } from "../utils/bufferTime.js";
 import MarketSection from "../components/sports/markets/MarketSection.jsx";
 import RightSidebar from "../components/sports/RightSidebar.jsx";
 import PlaceBetMobile from "../components/sports/PlaceBetMobile.jsx";
@@ -65,6 +87,8 @@ export default function GameDetails() {
   const latestMarketsRef = useRef([]); // always-fresh markets for submit-time odds/suspended checks
 
   // --- Bet click handler (passed down to market components) ---
+  // X (the clicked price) is frozen into `originalOdds` here and never touched
+  // again — every bookie-favour comparison downstream is relative to it.
   const handleBetClick = useCallback(({ market, marketType, runner, betType, odds }) => {
     setBetState({
       open: true,
@@ -75,6 +99,8 @@ export default function GameDetails() {
       odds: String(odds),
       originalOdds: String(odds),
       stake: "",
+      isUserModifiedOdds: false,
+      isCashout: false,
     });
   }, []);
 
@@ -108,13 +134,15 @@ export default function GameDetails() {
       odds: String(result.odds),
       originalOdds: String(result.odds),
       stake: String(result.stake),
+      isUserModifiedOdds: false,
+      isCashout: true,
     });
     if (window.innerWidth < 1200) setActiveTab("bets");
   }, [user, exposures]);
 
-  // --- Odds change from spinner ---
+  // --- Odds change (typed or stepped) — this is what makes a bet MANUAL ---
   const handleOddsChange = useCallback((val) => {
-    setBetState((prev) => ({ ...prev, odds: val }));
+    setBetState((prev) => ({ ...prev, odds: val, isUserModifiedOdds: true }));
   }, []);
 
   // --- Stake change (A3: allow empty or a number with up to 2 decimals) ---
@@ -124,12 +152,14 @@ export default function GameDetails() {
     }
   }, []);
 
-  // --- Quick stake: ADDS to current stake (A4: cap at market max) ---
+  // --- Quick stake: ADDS to current stake (capped at the market max) ---
   const handleQuickStake = useCallback((val) => {
-    const max = betState.runner?.max ?? betState.market?.max ?? 0;
+    const { max } = getStakeLimits(betState.market, betState.runner, {
+      isCashout: betState.isCashout,
+    });
     const next = (Number(betState.stake) || 0) + val;
     if (max && next > max) {
-      toast.error(`Maximum stake is ${max}.`);
+      toast.error(TOASTS.MAX_BET_LIMIT);
       return;
     }
     setBetState((prev) => ({ ...prev, stake: String(next) }));
@@ -145,178 +175,283 @@ export default function GameDetails() {
     setBetState(INITIAL_BET_STATE);
   }, []);
 
-  // --- Submit bet ---
+  // --- Submit bet — pipeline order is spec §5.2 and must not be reordered ---
   const handleSubmit = useCallback(async () => {
     if (!user) {
       toast.error("Please log in to place a bet.");
       return;
     }
 
-    const { market, marketType, runner, betType, odds, stake } = betState;
+    const { market, runner, betType, odds, stake, isCashout } = betState;
+    if (!market) return;
+
+    // The market list is read from the ref on EVERY access, never snapshotted:
+    // the 2s poll mutates it while the buffer is running, and a snapshot would
+    // make the buffer blind to the very move it exists to catch.
+    const getMarkets = () => latestMarketsRef.current || [];
+
     const oddsNum = Number(odds);
     const stakeNum = Number(stake);
+    const marketId = market?.mid;
+    const selectionId = runner?.sid;
+    const selectionName = runner?.nat || runner?.name || "";
+    const oddsLocked = isOddsLocked(market);
+    const eventName = matchInfo.name || "";
 
+    // ── Step 0: anti-spam — 4 attempts per market per 60s ──
+    if (!registerBetAttempt(marketId || `${market?.mname}:${selectionName}`)) {
+      toast.error(TOASTS.MULTIPLE_BET_NOT_ALLOWED);
+      return;
+    }
+
+    // ── Step 1: stake + odds validation ──
     if (!stakeNum || stakeNum <= 0) {
-      toast.error("Please enter a valid stake amount.");
+      toast.error(TOASTS.ENTER_VALID_STAKE);
+      return;
+    }
+    if (stakeNum >= 1e16) {
+      setPlacing(true);
+      setTimeout(() => {
+        setPlacing(false);
+        toast.error(TOASTS.SERVER_ERROR);
+      }, 1500);
+      return;
+    }
+    if (stakeNum >= 1e12) {
+      toast.error(TOASTS.BET_NOT_VALID);
       return;
     }
 
-    if (oddsNum < 1.01) {
-      toast.error("Odds must be at least 1.01.");
+    const bounds = getOddsBounds(market);
+    if (!Number.isFinite(oddsNum) || oddsNum <= 0 || oddsNum < bounds.min || oddsNum > bounds.max) {
+      toast.error(TOASTS.INVALID_BET);
       return;
     }
 
-    if (oddsNum > 1000) {
-      toast.error("Odds must be ≤ 1000.");
+    const { min, max } = getStakeLimits(market, runner, { isCashout });
+    if (min > 0 && stakeNum < min) {
+      toast.error(TOASTS.MIN_BET_LIMIT);
+      return;
+    }
+    if (max > 0 && stakeNum > max) {
+      toast.error(TOASTS.MAX_BET_LIMIT);
       return;
     }
 
-    // A7: don't let the user move the price in their own favour past the offered rate
-    // (back/yes can't go above original, lay/no can't go below).
-    const origOdds = Number(betState.originalOdds) || 0;
-    if (origOdds > 0 && oddsNum !== origOdds) {
-      const isBackSide = betType === "back" || betType === "yes";
-      if ((isBackSide && oddsNum > origOdds) || (!isBackSide && oddsNum < origOdds)) {
-        toast.error("Bet not allowed.");
+    // ── Step 1b: ODI/T20 MATCH_ODDS rate cap on the ENTERED odds ──
+    if (isRateCapped({ sid, market, eventName, odds: oddsNum })) {
+      toast.error(TOASTS.RATE_OVER_LIMIT);
+      return;
+    }
+
+    // X = the clicked price, E = what the user asked for.
+    const selOdds = Number(betState.originalOdds) || oddsNum;
+
+    // ── Step 2: manual edit → Gate 1, decided instantly (no loader, no call) ──
+    // Editing back to the same price is not an edit — that flows down the auto
+    // path. Odds-locked markets and cashouts can never be manual.
+    const isEdited =
+      !isCashout && !oddsLocked && betState.isUserModifiedOdds &&
+      Math.abs(oddsNum - selOdds) > EPS;
+
+    if (isEdited) {
+      const gate = manualBetGate({ betType, selectedOdds: selOdds, editedOdds: oddsNum });
+      if (!gate.accept) {
+        toast.error(gate.reason);
         return;
       }
     }
 
-    const min = runner?.min ?? market?.min ?? 0;
-    const max = runner?.max ?? market?.max ?? 0;
-    if (min && stakeNum < min) {
-      toast.error(`Minimum stake is ${min}.`);
-      return;
-    }
-    if (max && stakeNum > max) {
-      toast.error(`Maximum stake is ${max}.`);
-      return;
-    }
+    setPlacing(true);
+    // Everything past this point MUST clear `placing` before returning.
+    try {
+      // ── Step 3: buffer — watch the feed, then take the last live price Y ──
+      const platformBuffer = oddsLocked ? 0 : await getPlatformBufferSeconds();
+      const bufferSeconds = oddsLocked
+        ? FANCY_BUFFER_SECONDS
+        : platformBuffer > 0
+          ? platformBuffer
+          : BET_BUFFER_SECONDS;
 
-    // A8/A9: re-check against the freshest live market at submit time. Reject if the
-    // runner is suspended now, or the slip odds no longer match a live price tier on
-    // the user's side. Lenient when the live runner can't be resolved (backend still
-    // does the authoritative check) — only block on a positive suspended/mismatch.
-    let pricedRunner = runner;
-    {
-      const wantMid = String(market?.mid ?? "");
-      const wantSid = String(runner?.sid ?? "");
-      const wantNat = String(runner?.nat ?? runner?.name ?? "").trim().toLowerCase();
-      const liveMarket = (latestMarketsRef.current || []).find((m) => String(m?.mid ?? "") === wantMid);
-      const liveRunner = liveMarket?.section?.find(
-        (s) => (wantSid && String(s?.sid ?? "") === wantSid) ||
-               String(s?.nat ?? "").trim().toLowerCase() === wantNat
-      );
-      // Prefer the LIVE runner for size/bhav derivation (same source the drift
-      // check below trusts); fall back to the click-time snapshot if the feed
-      // can't be resolved.
-      pricedRunner = liveRunner || runner;
-      if (liveMarket && liveRunner) {
-        const gs = String(liveRunner.gstatus || liveRunner.status || "").toUpperCase();
-        if (gs === "SUSPENDED" || gs === "BALL RUNNING" || gs === "BALLRUNNING") {
-          toast.error("Market is not available");
+      const clickedSizes = deriveBetSizes(runner, betType, oddsNum);
+      const buffer = await monitorOddsBuffer({
+        getMarkets,
+        market,
+        marketId,
+        selectionId,
+        selectionName,
+        betType,
+        initialOdds: oddsNum,
+        initialSize: clickedSizes.size,
+        bufferSeconds,
+      });
+      let finalOdds = Number(buffer.finalOdds);
+      let finalSize = Number(buffer.finalSize) || 0;
+
+      // ── Step 4: final suspension read ──
+      const susp = getFinalSuspensionStatus({
+        markets: getMarkets(),
+        marketId,
+        selectionId,
+        selectionName,
+      });
+      if (susp.suspended) {
+        setPlacing(false);
+        toast.error(susp.reason === "ball_running" ? TOASTS.BALL_RUNNING : TOASTS.GAME_NOT_ACTIVE);
+        return;
+      }
+
+      // ── Step 5: strict drift check on odds-locked (fancy) markets ──
+      if (oddsLocked &&
+          hasFancyDrift({ markets: getMarkets(), marketId, selectionName, betType, odds: oddsNum })) {
+        setPlacing(false);
+        toast.error(TOASTS.ODDS_CHANGED);
+        return;
+      }
+
+      // ── Step 6: bookie favour ──
+      if (buffer.blocked) {
+        setPlacing(false);
+        toast.error(TOASTS.GAME_NOT_ACTIVE);
+        return;
+      }
+
+      if (isCashout) {
+        // The hedge stake was solved at this exact price — one tick would break
+        // the balance, so cashout skips the favour checks entirely.
+        finalOdds = oddsNum;
+      } else if (isEdited) {
+        const manual = manualBetLiveCheck({ betType, editedOdds: oddsNum, liveOdds: finalOdds });
+        if (!manual.accept) {
+          setPlacing(false);
+          toast.error(manual.reason);
           return;
         }
-        const isLaySide = betType === "lay" || betType === "no";
-        const tiers = (liveRunner.odds || [])
-          .filter((o) => (String(o?.otype || "").toUpperCase() === (isLaySide ? "LAY" : "BACK")))
-          .map((o) => (o?.odds == null || o?.odds === "-" || o?.odds === "--" || o?.odds === "") ? NaN : Number(o.odds))
-          .filter((n) => Number.isFinite(n) && n > 0);
-        if (tiers.length > 0) {
-          const closest = tiers.reduce((b, c) => (Math.abs(c - oddsNum) < Math.abs(b - oddsNum) ? c : b));
-          if (Math.abs(closest - oddsNum) > 0.01) {
-            toast.error("Odds changed");
-            return;
-          }
+        finalOdds = manual.finalOdds; // Y, never E
+      } else {
+        const auto = autoBetCheck({ market, betType, selectedOdds: selOdds, currentOdds: finalOdds });
+        if (!auto.accept) {
+          setPlacing(false);
+          toast.error(auto.reason);
+          return;
         }
+        finalOdds = auto.finalOdds; // Y, never X
       }
-    }
 
-    const selectionName = runner?.nat || runner?.name || "";
-    const mnLower = (market.mname || "").toLowerCase();
-    const gtLower = (market.gtype || "").toLowerCase();
-    const isFancyCat = mnLower.includes("fancy") || gtLower === "fancy" || gtLower === "fancy1" || gtLower === "oddeven" || gtLower === "meter";
-    const sections = market.section || [];
-    const teamNames = sections.filter((s) => s.nat).map((s) => s.nat);
-    const placeDate = new Date().toISOString().slice(0, 19).replace("T", " ");
+      // ── Step 7: rate cap again — an auto BACK can cross 4.00 in the buffer ──
+      if (isRateCapped({ sid, market, eventName, odds: finalOdds })) {
+        setPlacing(false);
+        toast.error(TOASTS.RATE_OVER_LIMIT);
+        return;
+      }
 
-    // Determine game_type: Bookmaker/match1 = "MATCH", fancy = "FANCY", etc.
-    let gameType = "MATCH";
-    if (gtLower === "fancy" || gtLower === "fancy1" || gtLower === "oddeven" || gtLower === "meter") {
-      gameType = "FANCY";
-    } else if (gtLower === "cricketcasino") {
-      gameType = "FANCY";
-    }
+      // Show the price the bet is actually going in at.
+      setBetState((prev) => ({ ...prev, odds: String(Number(finalOdds.toFixed(2))) }));
 
-    // For fancy-style, selection_name = runner name; for structured, = team name
-    const selName = isFancyCat
-      ? (selectionName || (betType === "yes" ? "YES" : "NO"))
-      : selectionName;
+      // ── Payload ──
+      const sections = market.section || [];
+      const teamNames = sections.filter((s) => s.nat).map((s) => s.nat);
+      const placeDate = new Date().toISOString().slice(0, 19).replace("T", " ");
+      const fancyCat = isFancyCategory(market);
 
-    const payload = {
-      sports: "Cricket",
-      event_name: matchInfo.name || "",
-      market_name: market.mname || "",
-      market_type: market.mname || "",
-      category: String(isFancyCat ? "1" : "0"),
-      eventid: String(gmid),
-      event_id: String(gmid),
-      fancy_name: String(isFancyCat ? selectionName : ""),
-      fixed: 0,
-      game_type: String(gameType),
-      match_id: String(market.mid),
-      market_id: String(market.mid),
-      match_start_time: String(matchInfo.time || ""),
-      match_title: String(matchInfo.name || ""),
-      odds: Number(oddsNum.toFixed(2)),
-      original_amount: Number(stakeNum.toFixed(2)),
-      original_currency: "INR",
-      selection_name: String(selName),
-      // sid must be the SPORT id (route param, e.g. 4=cricket) — NOT runner.sid,
-      // which is the selection/runner id. Sending the runner id here was stored as
-      // SportsBet.sport_id and made AVRKHUB reject the result fetch (400) so bets
-      // never settled. Route `sid` is the authoritative sport id.
-      sid: String(sid || ""),
-      stake_amount: Number(stakeNum.toFixed(2)),
-      team_one: String(teamNames[0] || ""),
-      team_two: String(teamNames[1] || ""),
-      usd_amount: Number((stakeNum * 0.0118).toFixed(2)),
-      user_id: String(user.user_id || user.id || "0"),
-      count: sections.length || 2,
-      bet_type: betType,
-      settlened: "pending",
-      nation: String(selectionName),
-      nat: String(selectionName),
-      user_rate: Number(oddsNum.toFixed(2)),
-      amount: Number(stakeNum.toFixed(2)),
-      place_date: placeDate,
-      runners: teamNames,
-      // Real feed sizes + top-tier prices. These are what let the server price a
-      // fancy bet at all — hardcoding them to 0/[] made lay/no bets book zero
-      // liability. See deriveBetSizes().
-      ...deriveBetSizes(pricedRunner, betType, oddsNum),
-      unmatched: false,
-      mname: String(market.mname || ""),
-      gtype: String(market.gtype || "match"),
-      section: Array.isArray(sections) ? sections : [],
-    };
+      // Price the payload off the LIVE runner where possible — same source the
+      // buffer and drift check trust — falling back to the click-time snapshot.
+      const liveMarket = getMarkets().find((m) => String(m?.mid ?? "") === String(marketId ?? ""));
+      const liveRunner =
+        liveMarket?.section?.find(
+          (s) =>
+            (selectionId && String(s?.sid ?? "") === String(selectionId)) ||
+            String(s?.nat ?? "").trim().toLowerCase() === selectionName.trim().toLowerCase()
+        ) || runner;
+      const sizes = deriveBetSizes(liveRunner, betType, finalOdds);
+      if (finalSize > 0) {
+        sizes.size = finalSize;
+        const laySide = betType === "lay" || betType === "no";
+        if (laySide) sizes.lay_size = finalSize;
+        else sizes.back_size = finalSize;
+      }
 
-    setPlacing(true);
-    try {
+      const payload = {
+        // ⚠ Known gap carried over from the reference: football/tennis bets are
+        // still saved as Cricket. Fixing it needs the server's sport mapping.
+        sports: "Cricket",
+        event_name: eventName,
+        market_name: market.mname || "",
+        // GOLDEN RULE (spec §3.3): market_type is the feed's mname VERBATIM.
+        // Never an internal/UI label — exposure and settlement key on this, and
+        // "Bookmaker" vs "Bookmaker 2" are only distinguishable here.
+        market_type: market.mname || "",
+        category: getBetCategory(market),
+        eventid: String(gmid),
+        event_id: Number(gmid),
+        fancy_name: String(fancyCat ? selectionName : ""),
+        fixed: 0,
+        // match1 → BOOKMAKER (server maps to BM); Tied → FANCY so the server
+        // accepts sub-1 percent odds and routes to its Tied branch.
+        game_type: getGameType(market),
+        match_id: String(market.mid),      // NB: this is the MARKET id
+        market_id: Number(market.mid),
+        match_start_time: String(matchInfo.time || ""),
+        match_title: String(matchInfo.name || ""),
+        odds: Number(finalOdds.toFixed(2)),
+        // Resolves the ambiguity that `gtype` alone cannot: `match1` + dtype 2 is
+        // structurally identical for Bookmaker 2 and Tied Match, opposite scales.
+        odds_format: getOddsFormat(market),
+        original_amount: Number(stakeNum.toFixed(2)),
+        original_currency: "INR",
+        selection_name: String(selectionName),
+        // The runner's real feed id. Without it, settlement and exposure key on
+        // free-text names, which carry trailing dots/prefixes that drift.
+        selection_id: selectionId ?? null,
+        // `sid` keeps its legacy meaning (SPORT id, not runner id) for backward
+        // compatibility; sport_id is the same value under a name that says so.
+        sid: String(sid || ""),
+        sport_id: String(sid || ""),
+        stake_amount: Number(stakeNum.toFixed(2)),
+        team_one: String(teamNames[0] || ""),
+        team_two: String(teamNames[1] || ""),
+        usd_amount: Number((stakeNum * 0.0118).toFixed(2)),
+        user_id: String(user.user_id || user.id || "0"),
+        count: sections.length || 2,
+        bet_type: betType,
+        settlened: "pending",
+        nation: String(selectionName),
+        nat: String(selectionName),
+        user_rate: Number(finalOdds.toFixed(2)),
+        amount: Number(stakeNum.toFixed(2)),
+        place_date: placeDate,
+        runners: teamNames,
+        limited_overs: isLimitedOvers(sid, eventName),
+        // Real feed sizes + top-tier prices — the server prices fancy bets off
+        // these, and zeroes here book zero liability. See deriveBetSizes().
+        ...sizes,
+        // This frontend never places an unmatched bet: an accepted manual bet is
+        // a matched bet at the live price. The fields exist for the backend
+        // contract only.
+        unmatched: false,
+        unmatched_odds: isEdited ? Number(oddsNum.toFixed(2)) : null,
+        is_cashout: !!isCashout,
+        mname: String(market.mname || ""),
+        gtype: String(market.gtype || "match"),
+        section: Array.isArray(sections) ? sections : [],
+      };
+
       const res = await sportsPlaceBet(payload);
       if (res?.success === false) {
-        toast.error(res?.error || res?.message || "Bet failed.");
+        toast.error(res?.error || res?.message || TOASTS.GENERIC_ERROR);
       } else {
-        toast.success("Bet placed successfully!");
+        // Order is fixed (spec §5.2 step 12): close the panel, toast, then
+        // refresh balance/bets — exposure last so it reads post-commit.
         setBetState(INITIAL_BET_STATE);
-        // Refresh balance and matched bets
+        toast.success(TOASTS.BET_PLACED);
         dispatch(fetchBalanceThunk());
         if (user?.user_id) {
           dispatch(fetchMatchedBetsThunk({ eventId: gmid, userId: user.user_id }));
         }
       }
     } catch (err) {
-      toast.error(err?.response?.data?.error || err?.message || "Bet placement failed.");
+      const msg = err?.response?.data?.error || err?.message || "";
+      toast.error(/fetch|network/i.test(msg) ? TOASTS.NETWORK_ERROR : msg || TOASTS.GENERIC_ERROR);
     } finally {
       setPlacing(false);
     }

@@ -1,3 +1,5 @@
+import { getOddsFormat, isTiedMarket } from "./sportsBetRules.js";
+
 // ---------------------------------------------------------------------------
 // Helper utilities
 // ---------------------------------------------------------------------------
@@ -209,41 +211,61 @@ export function isFancyType(marketType) {
 // Profit calculation
 // ---------------------------------------------------------------------------
 
-// Core profit/loss for a single bet (mirrors the tested old-frontend model):
-//  - Decimal markets (Match Odds, Tied, OddEven, Fancy1, …): back/yes → win=(o-1)·s, lose=s;
-//    lay/no → win=s, lose=(o-1)·s
-//  - Bookmaker (percentage, o≥10): back/yes → win=(o/100)·s, lose=s; lay/no → win=s, lose=(o/100)·s
-//  - Percentage fancy/session (Normal, Meter, Over By Over, Khado): win=(s·o)/100, lose=s (both sides)
-export function calcProfitLoss(marketType, betType, odds, stake) {
+// Core profit/loss for a single bet. The scale is derived from the RAW MARKET
+// (gtype/mname) via getOddsFormat, never from the rendering label `marketType`
+// — `match1` covers Bookmaker, Bookmaker 2 AND Tied Match, and those all quote
+// percent while looking structurally identical to decimal markets (spec §2/§7.1).
+//
+//   percent (gtype match1): back/yes → win=(o/100)·s, lose=s
+//                           lay/no   → win=s,         lose=(o/100)·s
+//   line    (fancy/khado/meter/fancy2): `o` is a run line and the RATE lives in
+//                           `size` → win=s·rate/100, lose=s. Rate defaults to
+//                           100 (1.00) when the clicked size isn't known.
+//   decimal (match, oddeven, fancy1, cricketcasino): back/yes → win=(o-1)·s
+//
+// `market` is optional so old callers keep working, but every caller inside the
+// app passes it — without it a bookmaker bet is priced as decimal.
+export function calcProfitLoss(marketType, betType, odds, stake, market = null, rate = null) {
   const o = Number(odds) || 0;
   const s = Number(stake) || 0;
   if (!o || !s) return { profit: 0, loss: 0 };
   const r2 = (n) => Math.round(n * 100) / 100;
   const back = betType === "back" || betType === "yes";
 
-  const isBook = marketType === MARKET_TYPE.BOOKMAKER || marketType === MARKET_TYPE.BOOKMAKER2;
-  if (isBook && o >= 10) {
-    const v = r2((o / 100) * s);
+  const fmt = market
+    ? getOddsFormat(market)
+    : marketType === MARKET_TYPE.BOOKMAKER || marketType === MARKET_TYPE.BOOKMAKER2
+      ? "percent"
+      : LEGACY_LINE_TYPES.has(marketType)
+        ? "line"
+        : "decimal";
+
+  if (fmt === "percent") {
+    const v = r2((o / 100) * s); // unfloored — no `>= 10` cutoff (spec §7.1)
     return back ? { profit: v, loss: s } : { profit: s, loss: v };
   }
 
-  switch (marketType) {
-    case MARKET_TYPE.NORMAL:
-    case MARKET_TYPE.METER:
-    case MARKET_TYPE.OVERBYOVER:
-    case MARKET_TYPE.KHADO: {
-      const v = r2((s * o) / 100);
-      return { profit: v, loss: s };
-    }
-    default: {
-      const v = r2((o - 1) * s);
-      return back ? { profit: v, loss: s } : { profit: s, loss: v };
-    }
+  if (fmt === "line") {
+    const rateNum = Number(rate);
+    const usedRate = Number.isFinite(rateNum) && rateNum > 0 ? rateNum : 100;
+    const v = r2((s * usedRate) / 100);
+    return { profit: v, loss: s };
   }
+
+  const v = r2((o - 1) * s);
+  return back ? { profit: v, loss: s } : { profit: s, loss: v };
 }
 
-export function calcProfit(marketType, betType, odds, stake) {
-  return calcProfitLoss(marketType, betType, odds, stake).profit;
+const LEGACY_LINE_TYPES = new Set([
+  MARKET_TYPE.NORMAL,
+  MARKET_TYPE.METER,
+  MARKET_TYPE.OVERBYOVER,
+  MARKET_TYPE.KHADO,
+  MARKET_TYPE.FANCY2,
+]);
+
+export function calcProfit(marketType, betType, odds, stake, market = null, rate = null) {
+  return calcProfitLoss(marketType, betType, odds, stake, market, rate).profit;
 }
 
 // Projected book the user would hold AFTER this pending bet, per outcome.
@@ -252,13 +274,16 @@ export function calcProfit(marketType, betType, odds, stake) {
 // this bet's contribution (win on the backed runner, lose stake on the others; lay
 // is the mirror). Fancy/session single bets → the chosen side's Yes/No win/lose.
 // Returns [{ name, total }] or null when there is nothing to show.
-export function calcOutcomeProjection({ market, marketType, selectedRunner, betType, odds, stake, exposures }) {
+export function calcOutcomeProjection({ market, marketType, selectedRunner, betType, odds, stake, exposures, rate = null }) {
   const s = Number(stake) || 0;
   const o = Number(odds) || 0;
-  if (s <= 0 || o < 1.01) return null;
+  // Percent/line markets legitimately quote below 1.01 (Tied "Yes" @ 0.75), so
+  // the decimal floor only applies to decimal markets.
+  if (s <= 0 || o <= 0) return null;
+  if (getOddsFormat(market) === "decimal" && o < 1.01) return null;
 
   const r2 = (n) => Number(n.toFixed(2));
-  const { profit, loss } = calcProfitLoss(marketType, betType, odds, stake);
+  const { profit, loss } = calcProfitLoss(marketType, betType, odds, stake, market, rate);
   const back = betType === "back" || betType === "yes";
   const mid = market?.mid;
   const runners = market?.section || [];
@@ -309,7 +334,11 @@ export function buildMarketCashout(market, marketType, exposures) {
   if (!sections || sections.length < 2) return { ok: false, reason: "invalid_market" };
 
   const mname = (market.mname || "").toLowerCase();
-  const isTied = marketType === MARKET_TYPE.TIED_MATCH;
+  // Percent scale, not "is it Tied": Bookmaker / Bookmaker 2 / Tied all quote
+  // percent (gtype match1) and all need divisor = odds/100 + 1. Keying this off
+  // the rendering label used to send Bookmaker cashouts through the decimal
+  // divisor, which produced a hedge stake that did not balance the book.
+  const usePercent = getOddsFormat(market) === "percent" || isTiedMarket(market);
 
   // Get exposure per runner
   const exps = {};
@@ -342,10 +371,10 @@ export function buildMarketCashout(market, marketType, exposures) {
   // Strategy 1: LAY the higher-exposure runner
   const layOdds = pickBestPrice(sections[higherIdx], "lay");
   if (layOdds) {
-    const divisor = isTied ? (layOdds / 100 + 1) : layOdds;
+    const divisor = usePercent ? (layOdds / 100 + 1) : layOdds;
     const stake = Math.round(Math.max(0, diff / divisor) * 100) / 100;
     // Project new exposures
-    const newH = vals[higherIdx] - stake * (isTied ? layOdds / 100 : layOdds - 1);
+    const newH = vals[higherIdx] - stake * (usePercent ? layOdds / 100 : layOdds - 1);
     const newL = vals[lowerIdx] + stake;
     const worstAfter = Math.min(newH, newL);
     if (worstAfter >= worstBefore - 0.01) {
@@ -362,10 +391,10 @@ export function buildMarketCashout(market, marketType, exposures) {
   // Strategy 2: BACK the lower-exposure runner
   const backOdds = pickBestPrice(sections[lowerIdx], "back");
   if (backOdds) {
-    const divisor = isTied ? (backOdds / 100 + 1) : backOdds;
+    const divisor = usePercent ? (backOdds / 100 + 1) : backOdds;
     const stake = Math.round(Math.max(0, diff / divisor) * 100) / 100;
     const newH = vals[higherIdx] - stake;
-    const newL = vals[lowerIdx] + stake * (isTied ? backOdds / 100 : backOdds - 1);
+    const newL = vals[lowerIdx] + stake * (usePercent ? backOdds / 100 : backOdds - 1);
     const worstAfter = Math.min(newH, newL);
     if (worstAfter >= worstBefore - 0.01) {
       candidates.push({
@@ -443,4 +472,33 @@ export const INITIAL_BET_STATE = {
   odds: "",
   originalOdds: "",
   stake: "",
+  // True once the user types/steps the price — that is what routes the submit
+  // down the MANUAL (E vs X, then Y vs E) path instead of the AUTO one.
+  isUserModifiedOdds: false,
+  isCashout: false,
 };
+
+// ---------------------------------------------------------------------------
+// Odds stepper ladder (spec §6.3) — the tick size depends on the price band.
+// ---------------------------------------------------------------------------
+
+const ODDS_TICK_BANDS = [
+  [1, 2, 0.01], [2, 3, 0.02], [3, 4, 0.05], [4, 6, 0.1], [6, 10, 0.2],
+  [10, 20, 0.5], [20, 30, 1], [30, 50, 2], [50, 100, 5], [100, 1000, 10],
+];
+
+function oddsStepFor(value, dir) {
+  // At a band boundary a decrement uses the LOWER band's step (2.00 − → 1.99)
+  // while an increment uses the upper one (2.00 + → 2.02).
+  const x = dir > 0 ? value : value - 0.000001;
+  const band = ODDS_TICK_BANDS.find(([lo, hi]) => x >= lo && x < hi);
+  if (band) return band[2];
+  return x >= 1000 ? 10 : 0.01;
+}
+
+export function stepOdds(prevStr, dir) {
+  const n = parseFloat(prevStr) || 0;
+  const step = oddsStepFor(n, dir);
+  const next = Math.max(1.01, Math.min(1000, Math.round((n + dir * step) * 100) / 100));
+  return String(Number(next.toFixed(2)));
+}

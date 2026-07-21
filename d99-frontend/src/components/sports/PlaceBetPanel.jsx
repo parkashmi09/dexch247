@@ -1,18 +1,21 @@
-import { SPORTS_QUICK_STAKES, calcProfitLoss, calcOutcomeProjection, isFancyType } from "../../utils/gameDetailsUtils.js";
+import { SPORTS_QUICK_STAKES, calcProfitLoss, calcOutcomeProjection, stepOdds } from "../../utils/gameDetailsUtils.js";
+import { getStakeLimits, isOddsInRange, isOddsLocked } from "../../utils/sportsBetRules.js";
 
 export default function PlaceBetPanel({ betState, exposures, onOddsChange, onStakeChange, onQuickStake, onClear, onReset, onSubmit, placing }) {
-  const { open, market, marketType, runner, betType, odds, stake, originalOdds } = betState;
+  const { open, market, marketType, runner, betType, odds, stake, isCashout } = betState;
 
   if (!open || !market) return null;
 
   const stakeNum = Number(stake) || 0;
   const oddsNum = Number(odds) || 0;
-  const { profit } = calcProfitLoss(marketType, betType, oddsNum, stakeNum);
-  const spinnerEnabled = !isFancyType(marketType);
+  const clickedSize = Number(betState.runner?.odds?.find?.((o) => Number(o?.odds) === oddsNum)?.size) || 0;
+  const { profit } = calcProfitLoss(marketType, betType, oddsNum, stakeNum, market, clickedSize);
+  // Only `gtype: 'match'` markets let the user move the price — everything else
+  // is odds-locked, and a cashout price is solved, not chosen.
+  const oddsEditable = !isOddsLocked(market) && !isCashout;
 
   const selectionName = runner?.nat || runner?.name || "";
-  const min = runner?.min ?? market?.min ?? 0;
-  const max = runner?.max ?? market?.max ?? 0;
+  const { min, max } = getStakeLimits(market, runner, { isCashout });
 
   // Normal / Ball By Ball / Over By Over: no real-time profit number (matches old frontend)
   const mname = String(market?.mname || marketType || "").toLowerCase();
@@ -20,23 +23,21 @@ export default function PlaceBetPanel({ betState, exposures, onOddsChange, onSta
   const displayProfit = isNormalLike ? 0 : profit;
 
   // Projected book per outcome = existing exposure (by market mid) + this pending bet
-  const projection = stakeNum > 0 && oddsNum >= 1.01
-    ? calcOutcomeProjection({ market, marketType, selectedRunner: runner, betType, odds: oddsNum, stake: stakeNum, exposures })
+  const projection = stakeNum > 0 && isOddsInRange(market, oddsNum)
+    ? calcOutcomeProjection({ market, marketType, selectedRunner: runner, betType, odds: oddsNum, stake: stakeNum, exposures, rate: clickedSize })
     : null;
 
   function handleSpinUp() {
-    if (!spinnerEnabled) return;
-    const next = Math.min(1000, Math.round((oddsNum + 0.01) * 100) / 100);
-    onOddsChange(String(next));
+    if (!oddsEditable) return;
+    onOddsChange(stepOdds(odds, +1));
   }
 
   function handleSpinDown() {
-    if (!spinnerEnabled) return;
-    const next = Math.max(1.01, Math.round((oddsNum - 0.01) * 100) / 100);
-    onOddsChange(String(next));
+    if (!oddsEditable) return;
+    onOddsChange(stepOdds(odds, -1));
   }
 
-  const submitDisabled = placing || stakeNum <= 0 || oddsNum < 1.01;
+  const submitDisabled = placing || stakeNum <= 0 || !isOddsInRange(market, oddsNum);
 
   return (
     <div className="sidebar-box place-bet-container">
@@ -64,11 +65,16 @@ export default function PlaceBetPanel({ betState, exposures, onOddsChange, onSta
           <div className="place-bet-odds">
             <input
               type="text"
+              inputMode="decimal"
               className="form-control"
-              disabled
-              value={oddsNum}
+              disabled={!oddsEditable}
+              value={odds}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v === "" || /^\d*\.?\d{0,2}$/.test(v)) onOddsChange(v);
+              }}
             />
-            {spinnerEnabled && (
+            {oddsEditable && (
               <div className="spinner-buttons input-group-btn btn-group-vertical">
                 <button className="btn-default" onClick={handleSpinUp} type="button">
                   <i className="fa fa-angle-up" />
