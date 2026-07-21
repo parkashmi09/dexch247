@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Not Found</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans:400,400i,700,700i&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <style type="text/css">
+        body {
+            background-color: #23292E;
+        }
+
+        .error-page {
+            width: 100%;
+            display: flex;
+            display: -webkit-flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .error-page img {
+            width: auto;
+            max-width: 90%;
+            max-height: 80%;
+        }
+
+        .btn-primary {
+            background-color: #03B37F;
+            border-color: #03B37F;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- Main Content-->
+        <div class="main-container error-page-container">
+            <div class="error-page">
+                <img src="/pages/not-found/img/not-found.png" class="img-fluid">
+            </div>
+        </div>
+        <!-- /Main Content-->
+    </div>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>

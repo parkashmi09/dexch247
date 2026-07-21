@@ -33,7 +33,7 @@ import SportsEventSettlementJob from '../../model/user/SportsEventSettlementJobs
 import User from '../../model/user/User.js';
 import sequelize from '../../config/db.js';
 import MannualResult from '../../model/admin/manualresult.js';
-import { resolveH2HBookmakerFallback } from './customMarketResolvers.js';
+import { resolveH2HBookmakerFallback, matchMarketByRunners, splitRunnerString } from './customMarketResolvers.js';
 // cash_received is never touched during settlement
 
 console.log('[Settlement] Process started');
@@ -434,7 +434,7 @@ function normalizeMarketType(v) {
 //   - m.winnerId = numeric result (runs/score) for fancy, null for MO/BM
 //   - m.winnerName = team name for MO/BM, YES/NO for fancy1/tied, null for numeric fancy
 //   - m.status = SETTLE | VOID (VOID = refund)
-async function fetchResultForEvent(eventid, eventName, marketId, marketName, sport_id, market_type, gameType, team_one, team_two) {
+async function fetchResultForEvent(eventid, eventName, marketId, marketName, sport_id, market_type, gameType, team_one, team_two, runners) {
     log.debug('[SettlementV2] fetchResultForEvent start', { eventid, eventName, marketId, marketName, market_type, gameType });
     const maxAttempts = RESULTS_MAX_FETCH_RETRIES || 6;
     const url = `${AVRKHUB_BASE_URL}/get_result`;
@@ -486,6 +486,20 @@ async function fetchResultForEvent(eventid, eventName, marketId, marketName, spo
                             normalizeText(m?.marketName) === inputEventName &&
                             normalizeMarketType(m?.mname) === inputMname
                         );
+                    }
+
+                    // Racing: a race is a FIELD, not two teams — none of the
+                    // identifiers above exist. Match the bet's `runners` column
+                    // against upstream natName as an order-independent set.
+                    // Gated to 3+ runners inside the helper, so 2-way markets
+                    // (cricket / soccer / tennis / fancy) never reach it.
+                    if (!matchedMarket) {
+                        matchedMarket = matchMarketByRunners(markets, runners, eventName, market_type);
+                        if (matchedMarket) {
+                            log.info('[SettlementV2] matched market by runner field', {
+                                eventid, market_type, runners: splitRunnerString(runners).length,
+                            });
+                        }
                     }
 
                     // VOID = refund (treat like SUSPENDED)
@@ -819,7 +833,25 @@ function normalize(str) {
     return (str || '').toString().toLowerCase().replace(/\s+/g, ' ').replace(/[^\w\s]/g, '').trim();
 }
 
-function resolveMobmWinner({ result, team_one, team_two }) {
+// Some markets declare MORE THAN ONE winner in a single comma-separated field:
+//   { mname: "TOP 2 FINISH", winnerName: "Lasso,Nuedorf" }
+// The split MUST happen BEFORE norm() — norm() strips punctuation, so
+// "Lasso,Nuedorf" collapses to "lassonuedorf" and matches no runner at all.
+function splitWinnerNames(value) {
+    if (Array.isArray(value)) return value.map(v => String(v ?? '').trim()).filter(Boolean);
+    if (value == null || value === '') return [];
+    return String(value).split(',').map(s => s.trim()).filter(Boolean);
+}
+
+// A bet wins when its selection matches ANY declared winner.
+function isWinningSelection(bet, winners) {
+    const list = Array.isArray(winners) ? winners : splitWinnerNames(winners);
+    const sel = norm(bet?.selection_name);
+    if (!sel) return false;
+    return list.some(w => norm(w) === sel);
+}
+
+function resolveMobmWinner({ result, team_one, team_two, runners }) {
     console.log("inside resolveMobmWinner", result, team_one, team_two, result);
     let final_result = result.items[0].winnerName;
     console.log("final_result", final_result);
@@ -838,53 +870,103 @@ function resolveMobmWinner({ result, team_one, team_two }) {
     const teamOneNorm = normalize(team_one);
     const teamTwoNorm = normalize(team_two);
 
+    // The field of runners this market was offered on (racing). Empty for
+    // ordinary 2-way markets, which keeps every branch below unchanged.
+    const field = splitRunnerString(runners);
+
     // 1. Check for SUSPENDED or CANCELLED
     if (['suspended', 'cancelled'].includes(finalResult)) {
         log.debug('[Settlement] resolveMobmWinner: result is SUSPENDED or CANCELLED', { finalResult, resultStr });
-        return { winnerName: 'SUSPENDED', reason: `final_result is ${finalResult.toUpperCase()}` };
+        return { winnerName: 'SUSPENDED', winnerNames: ['SUSPENDED'], reason: `final_result is ${finalResult.toUpperCase()}` };
     }
 
     // 2. Check for draw/tie/abandoned/no result
     if (['draw', 'tie', 'abandoned', 'no result'].some(term => finalResult.includes(term))) {
         log.debug('[Settlement] resolveMobmWinner: draw or no result', { finalResult, team_one, team_two });
-        return { winnerName: 'The Draw', reason: 'final_result indicates draw/tie/abandoned/no result' };
+        return { winnerName: 'The Draw', winnerNames: ['The Draw'], reason: 'final_result indicates draw/tie/abandoned/no result' };
+    }
+
+    // 2.5 MULTI-WINNER markets ("TOP 2 FINISH" pays two runners, declared as
+    // "Lasso,Nuedorf" in ONE field). Split BEFORE normalising — norm() strips
+    // the comma and the joined string matches nothing. Every declared name
+    // must map to a real runner; a half-mapped result is treated as unresolved
+    // so the job requeues rather than paying some legs and losing the rest.
+    const declaredNames = splitWinnerNames(resultStr);
+    if (declaredNames.length > 1) {
+        const mapped = declaredNames.map(n => field.find(r => norm(r) === norm(n)) || null);
+        if (field.length && mapped.every(Boolean)) {
+            return {
+                winnerName: mapped.join(','),
+                winnerNames: mapped,
+                reason: `multi-winner: ${mapped.length} runners matched the field`,
+            };
+        }
+        log.error('[Settlement] resolveMobmWinner: multi-winner not fully mapped to runners', {
+            declaredNames, field, resultStr,
+        });
+        return { winnerName: '', winnerNames: [], reason: 'multi-winner names not all present in runner field' };
     }
 
     // 3. String matching for winner
     if (finalResult) {
         // Exact match
-        if (finalResult === teamOneNorm) {
-            return { winnerName: team_one, reason: 'exact match to team_one' };
+        if (teamOneNorm && finalResult === teamOneNorm) {
+            return { winnerName: team_one, winnerNames: [team_one], reason: 'exact match to team_one' };
         }
-        if (finalResult === teamTwoNorm) {
-            return { winnerName: team_two, reason: 'exact match to team_two' };
+        if (teamTwoNorm && finalResult === teamTwoNorm) {
+            return { winnerName: team_two, winnerNames: [team_two], reason: 'exact match to team_two' };
+        }
+
+        // Racing: team_one/team_two are merely the FIRST TWO runners on the
+        // card, so a winner anywhere else in the field fell through to
+        // "ambiguous → SUSPENDED" and the whole market was silently REFUNDED
+        // instead of paid. Match the whole field. Exact-match runs here,
+        // deliberately AHEAD of the legacy "first 3 letters" step below, which
+        // would otherwise mis-assign e.g. "Lassie" → "Lasso".
+        {
+            const exactRunner = field.find(r => norm(r) === finalResult);
+            if (exactRunner) {
+                return { winnerName: exactRunner, winnerNames: [exactRunner], reason: 'exact match to runner' };
+            }
         }
 
         // Starts with (e.g., "Australia won by...")
-        if (finalResult.startsWith(teamOneNorm)) {
-            return { winnerName: team_one, reason: 'startsWith team_one' };
+        if (teamOneNorm && finalResult.startsWith(teamOneNorm)) {
+            return { winnerName: team_one, winnerNames: [team_one], reason: 'startsWith team_one' };
         }
-        if (finalResult.startsWith(teamTwoNorm)) {
-            return { winnerName: team_two, reason: 'startsWith team_two' };
+        if (teamTwoNorm && finalResult.startsWith(teamTwoNorm)) {
+            return { winnerName: team_two, winnerNames: [team_two], reason: 'startsWith team_two' };
         }
 
         // Contains (e.g., "defeated Australia")
-        if (finalResult.includes(teamOneNorm)) {
-            return { winnerName: team_one, reason: 'contains team_one' };
+        if (teamOneNorm && finalResult.includes(teamOneNorm)) {
+            return { winnerName: team_one, winnerNames: [team_one], reason: 'contains team_one' };
         }
-        if (finalResult.includes(teamTwoNorm)) {
-            return { winnerName: team_two, reason: 'contains team_two' };
+        if (teamTwoNorm && finalResult.includes(teamTwoNorm)) {
+            return { winnerName: team_two, winnerNames: [team_two], reason: 'contains team_two' };
         }
 
         // First 3 characters (legacy fallback)
-        if (finalResult.substring(0, 3) === teamOneNorm.substring(0, 3)) {
-            return { winnerName: team_one, reason: 'first 3 letters match team_one' };
+        if (teamOneNorm && finalResult.substring(0, 3) === teamOneNorm.substring(0, 3)) {
+            return { winnerName: team_one, winnerNames: [team_one], reason: 'first 3 letters match team_one' };
         }
-        if (finalResult.substring(0, 3) === teamTwoNorm.substring(0, 3)) {
-            return { winnerName: team_two, reason: 'first 3 letters match team_two' };
+        if (teamTwoNorm && finalResult.substring(0, 3) === teamTwoNorm.substring(0, 3)) {
+            return { winnerName: team_two, winnerNames: [team_two], reason: 'first 3 letters match team_two' };
         }
 
-        log.debug('[Settlement] resolveMobmWinner: no string match', { finalResult, team_one, team_two, resultStr });
+        // Last resort for racing: a fuzzy pass over the field (the declared
+        // name carries extra wording, e.g. "Nuedorf (4)").
+        {
+            const fuzzyRunner = field.find(r => {
+                const rn = norm(r);
+                return rn && (finalResult.startsWith(rn) || finalResult.includes(rn) || rn.includes(finalResult));
+            });
+            if (fuzzyRunner) {
+                return { winnerName: fuzzyRunner, winnerNames: [fuzzyRunner], reason: 'fuzzy match to runner' };
+            }
+        }
+
+        log.debug('[Settlement] resolveMobmWinner: no string match', { finalResult, team_one, team_two, field, resultStr });
     }
 
     // 4. WinnerId fallback
@@ -897,7 +979,7 @@ function resolveMobmWinner({ result, team_one, team_two }) {
 
     // 5. Fallback to team_one
     log.debug('[Settlement] resolveMobmWinner: ambiguous result', { finalResult, team_one, team_two });
-    return { winnerName: "SUSPENDED" || '', reason: 'ambiguous; fallback SUSPENDED' };
+    return { winnerName: "SUSPENDED", winnerNames: ['SUSPENDED'], reason: 'ambiguous; fallback SUSPENDED' };
 }
 
 
@@ -1414,9 +1496,10 @@ function getStake(b) { return num(b.stake_amount ?? b.stake ?? b.amount ?? b.sta
 function isBack(b) { return lower(b.bet_type) === 'back'; }
 function isLay(b) { return lower(b.bet_type) === 'lay'; }
 
-function moBmBetWinCredit(bet, winnerName) {
-    const sel = bet.selection_name || '';
-    const selIsWinner = norm(sel) === norm(winnerName);
+// `winners` may be a single name or an array (multi-winner markets like
+// "TOP 2 FINISH", where a bet on EITHER declared runner wins).
+function moBmBetWinCredit(bet, winners) {
+    const selIsWinner = isWinningSelection(bet, winners);
     const stake = getStake(bet);
     // backProfit reads the RAW odds and picks the right rate (bookmaker odds/100
     // vs decimal odds-1), so this matches placement exposure/liability and the
@@ -1426,6 +1509,25 @@ function moBmBetWinCredit(bet, winnerName) {
     if (isLay(bet)) return selIsWinner ? 0 : Math.max(0, stake);
     return 0;
 }
+// Signed profit/loss of ONE leg:
+//   back, won  → +stake × (odds − 1)      back, lost → −stake
+//   lay , won  → +stake (backer's stake)  lay , lost → −liability
+// Used to value MULTI-WINNER markets, where the per-runner exposure map has no
+// entry describing "both A and B paid" (it is keyed under a single-winner
+// assumption), so the market P&L must be summed from the legs themselves.
+function moBmBetPnl(bet, winners) {
+    const selIsWinner = isWinningSelection(bet, winners);
+    const stake = getStake(bet);
+    if (isBack(bet)) {
+        return selIsWinner ? Math.max(0, backProfit(stake, bet)) : -stake;
+    }
+    if (isLay(bet)) {
+        const liability = num(bet.liability) || Math.max(0, backProfit(stake, bet));
+        return selIsWinner ? -liability : stake;
+    }
+    return 0;
+}
+
 function normalizeExposure(value) {
     return Math.abs(value);
 }
@@ -1478,10 +1580,15 @@ async function processMobmGroup({ job_id, user_id, eventid, match_id, bets, even
     let result;
     const any = bets[0] || {};
 
+    // The FIELD this market was offered on. For racing it is the only usable
+    // identifier upstream (see matchMarketByRunners) and the only way to know
+    // which names a declared winner may legitimately be.
+    const runners = any.runners;
+
     if (any.status === 'manual') {
         result = await fetchManualResult(eventid, match_id, game_type, market_type);
     } else {
-        result = await fetchResultForEvent(eventid, eventName, marketId, marketName, sport_id, market_type, game_type, team_one, team_two);
+        result = await fetchResultForEvent(eventid, eventName, marketId, marketName, sport_id, market_type, game_type, team_one, team_two, runners);
     }
 
     // Custom h2h bookmaker fallback — see customMarketResolvers.js.
@@ -1514,11 +1621,20 @@ async function processMobmGroup({ job_id, user_id, eventid, match_id, bets, even
 
 
 
-    const { winnerName, reason } = resolveMobmWinner({ result, team_one, team_two, result: result });
+    const { winnerName, winnerNames, reason } = resolveMobmWinner({ result, team_one, team_two, runners });
+    const winners = (winnerNames && winnerNames.length) ? winnerNames : splitWinnerNames(winnerName);
 
     log.info(`[Settlement] MO/BM WINNER NAME or STATUS="${winnerName}" (${reason})`, { match_id, eventid, bets: bets.length });
 
     console.log("step donw 22");
+
+    // A declared winner we could not map to a real runner means the result is
+    // only half-understood. Requeue rather than settle — paying some legs and
+    // losing the rest would be unrecoverable.
+    if (!winners.length) {
+        log.error('[Settlement] MO/BM winner unresolved, requeue', { user_id, match_id, eventid, reason });
+        return { settled: false, requeue: true };
+    }
 
     // Check if winner is SUSPENDED
     if (winnerName.toUpperCase() === 'SUSPENDED') {
@@ -1562,7 +1678,27 @@ async function processMobmGroup({ job_id, user_id, eventid, match_id, bets, even
     // Determine winner's exposure value (trim winner name too)
     const winTrimmed = (winnerName || '').trim();
     let winnerExposure = 0;
-    if (t1 === winTrimmed) winnerExposure = mTeam1;
+    if (winners.length > 1) {
+        // MULTI-WINNER: the exposure map is keyed PER RUNNER under a
+        // single-winner assumption — no entry describes "Lasso *and* Nuedorf
+        // both paid" — so value the market from the sum of actual per-leg P&L.
+        //
+        // ⚠️ Settlement jobs are queued PER BET but settlement runs PER MARKET:
+        // this handler usually receives a SINGLE leg while the wallet maths is
+        // market-wide, and it closes the whole market. Summing only `bets`
+        // over-credited by exactly the losing leg's stake. Re-query EVERY open
+        // leg of (user_id, match_id, market_type) before summing.
+        const marketLegs = await SportsBet.findAll({
+            where: { user_id, match_id, market_type, status: { [Op.in]: ['open', 'manual'] } },
+        });
+        const legs = marketLegs.length ? marketLegs : bets;
+        winnerExposure = legs.reduce((sum, leg) => sum + moBmBetPnl(leg, winners), 0);
+        winnerExposure = Math.round(winnerExposure * 100) / 100;
+        log.info('[Settlement] multi-winner market valued from per-leg P&L', {
+            user_id, match_id, market_type, winners, legs: legs.length, winnerExposure,
+        });
+    }
+    else if (t1 === winTrimmed) winnerExposure = mTeam1;
     else if (t2 === winTrimmed) winnerExposure = mTeam2;
     else if (winTrimmed === 'The Draw' || winTrimmed === 'Draw') winnerExposure = mDraw;
     else {
@@ -1589,9 +1725,9 @@ async function processMobmGroup({ job_id, user_id, eventid, match_id, bets, even
 
     for (const bet of bets) {
 
-        let credit = moBmBetWinCredit(bet, winnerName);
+        let credit = moBmBetWinCredit(bet, winners);
         const stake = getStake(bet);
-        const selIsWinner = norm(bet.selection_name) === norm(winnerName);
+        const selIsWinner = isWinningSelection(bet, winners);
 
         totalCredit += credit;
 
@@ -1724,7 +1860,7 @@ async function processnonfancy({ job_id, user_id, eventid, match_id, bet, eventN
 
 
 
-    const { winnerName, reason } = resolveMobmWinner({ result, team_one, team_two, final_result: result.final_result });
+    const { winnerName, reason } = resolveMobmWinner({ result, team_one, team_two, runners: bet?.runners, final_result: result.final_result });
 
     log.info(`[Settlement] FAN/non-FAN WINNER NAME or STATUS="${winnerName}" (${reason})`, { match_id, eventid, marketId, marketName });
 

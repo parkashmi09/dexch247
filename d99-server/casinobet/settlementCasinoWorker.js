@@ -33,6 +33,11 @@ axios.defaults.timeout = Number(process.env.SETTLE_HTTP_TIMEOUT_MS || 10000);
 
 const toKey = (v) => (v == null ? "" : String(v));
 
+const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+
+// 1 Card Meter charges 2% on winnings only (game rules). Losses are charged in full.
+const CASINO_WIN_COMMISSION = 0.02;
+
 async function clearExposuresForMatch(user_id, match_id, transaction) {
   try {
     await UserExposure.destroy({
@@ -195,7 +200,13 @@ async function updateStaffParentBalUp(staffId, amount, transaction) {
   );
 }
 
-async function settleBetCommon(bet, winner) {
+/**
+ * @param {object} bet
+ * @param {boolean|"void"} winner
+ * @param {number|null} payoutRate  multiplier games (1 Card Meter) settle at
+ *        stake × rate instead of stake × odds; null for every other game.
+ */
+async function settleBetCommon(bet, winner, payoutRate = null) {
   const transaction = await sequelize.transaction();
 
   try {
@@ -266,26 +277,37 @@ async function settleBetCommon(bet, winner) {
        ✅ WIN CASE
     ======================= */
     else if (winner) {
-      // Cash credit on win: liability return + winnings.
-      if (type === "lay") {
-        amt = mtype === "fancy" ? stakeNum * 2 : stakeNum * oddsNum;
+      let netProfit;
+
+      if (payoutRate) {
+        // MULTIPLIER GAME (1 Card Meter): the win is stake × point difference,
+        // not stake × odds, and commission is charged on the winnings only.
+        // Placement locked the worst case (max rate × stake), so the cash credit
+        // is that whole lock back plus the actual winnings.
+        netProfit = round2(stakeNum * payoutRate * (1 - CASINO_WIN_COMMISSION));
+        amt = round2(Math.abs(Number(lockedBet.exposer || 0)) + netProfit);
       } else {
-        // BACK: always pay the locked decimal odds. Back placement locks
-        // exposer = −stake regardless of mtype, so the old `fancy → stake*2`
-        // path mis-paid any casino back bet whose odds ≠ 2.0 (lowercase-etype
-        // "fancy" games — teen20, poker20, …). Casino `b` is always the decimal
-        // multiplier, so stake×odds is universally correct for back.
-        amt = stakeNum * oddsNum;
+        // Cash credit on win: liability return + winnings.
+        if (type === "lay") {
+          amt = mtype === "fancy" ? stakeNum * 2 : stakeNum * oddsNum;
+        } else {
+          // BACK: always pay the locked decimal odds. Back placement locks
+          // exposer = −stake regardless of mtype, so the old `fancy → stake*2`
+          // path mis-paid any casino back bet whose odds ≠ 2.0 (lowercase-etype
+          // "fancy" games — teen20, poker20, …). Casino `b` is always the decimal
+          // multiplier, so stake×odds is universally correct for back.
+          amt = stakeNum * oddsNum;
+        }
+
+        // Liability that was locked at placement (mirrors loss-amt formula).
+        // netProfit = cash credit minus locked liability => actual P/L for inr_balance.
+        const exp = (type === "lay")
+          ? (mtype === "fancy" ? stakeNum : stakeNum * (oddsNum - 1))
+          : stakeNum;
+        netProfit = amt - exp;
       }
 
       resultStatus = "won";
-
-      // Liability that was locked at placement (mirrors loss-amt formula).
-      // netProfit = cash credit minus locked liability => actual P/L for inr_balance.
-      const exp = (type === "lay")
-        ? (mtype === "fancy" ? stakeNum : stakeNum * (oddsNum - 1))
-        : stakeNum;
-      const netProfit = amt - exp;
 
       await wallet.update(
         {
@@ -336,7 +358,15 @@ async function settleBetCommon(bet, winner) {
        ❌ LOSS CASE
     ======================= */
     else {
-      if (type === "lay") {
+      let cashAdjust = 0;
+
+      if (payoutRate) {
+        // MULTIPLIER GAME (1 Card Meter): the loss is stake × point difference.
+        // Placement locked the worst case (max rate × stake), so whatever the
+        // actual loss did not consume must go back to cash.
+        amt = round2(stakeNum * payoutRate);
+        cashAdjust = round2(Math.abs(Number(lockedBet.exposer || 0)) - amt);
+      } else if (type === "lay") {
         amt = mtype === "fancy" ? stakeNum : stakeNum * (oddsNum - 1);
       } else {
         amt = stakeNum;
@@ -346,7 +376,10 @@ async function settleBetCommon(bet, winner) {
 
       // Deduct inr_balance on loss (cash already deducted at placement)
       await wallet.update(
-        { inr_balance: Number(wallet.inr_balance || 0) - amt },
+        {
+          inr_balance: Number(wallet.inr_balance || 0) - amt,
+          ...(cashAdjust ? { cash: Number(wallet.cash || 0) + cashAdjust } : {}),
+        },
         { transaction }
       );
 
@@ -1043,6 +1076,24 @@ async function resolveCmeter1(bet) {
     return false;
   }
 
+  // 1 Card Meter pays a MULTIPLE of the stake — the point difference between the
+  // two cards (A=1 … K=13), capped at 12. Equal ranks are split by suit rank and
+  // pay 1x; identical rank AND suit is a tie -> stake pushed back.
+  // The feed carries it in rdesc as "Fighter A#3"; the cards are the fallback.
+  const rate = parseCmeter1Rate(t1);
+
+  if (rate === "void" || !winNat) {
+    console.log("[Settlement] cmeter1 tie -> void", { bet_id: bet.id, rdesc: t1.rdesc, card: t1.card });
+    return "void";
+  }
+
+  if (!rate) {
+    console.warn("[Settlement] cmeter1 unreadable rate, retrying", {
+      bet_id: bet.id, rdesc: t1.rdesc, card: t1.card,
+    });
+    return null; // leaves the bet OPEN for the next pass rather than mis-paying
+  }
+
   const outcome = sel === winNat;
   const betType = String(type || "back").toLowerCase();
   const userWon = betType === "lay" ? !outcome : outcome;
@@ -1052,11 +1103,47 @@ async function resolveCmeter1(bet) {
     selection,
     type: betType,
     winnat: t1.winnat,
+    rdesc: t1.rdesc,
+    card: t1.card,
+    rate,
     outcome,
     userWon,
   });
 
-  return userWon;
+  return { won: userWon, rate };
+}
+
+// helper cmeter1 — point difference that scales the payout (1x … 12x)
+const CMETER1_MAX_RATE = 12;
+
+function cmeter1CardValue(card) {
+  // feed card format: "QSS" / "10DD" / "9CC" -> rank chars then a doubled suit
+  const rank = String(card || "").trim().toUpperCase().replace(/[SHCD]+$/, "");
+  if (!rank) return null;
+  const map = { A: 1, J: 11, Q: 12, K: 13 };
+  if (map[rank]) return map[rank];
+  const n = parseInt(rank, 10);
+  return n >= 2 && n <= 10 ? n : null;
+}
+
+function parseCmeter1Rate(t1) {
+  // Preferred: the "#n" tail of rdesc ("Fighter A#3")
+  const fromRdesc = parseInt(String(t1?.rdesc || "").split("#")[1], 10);
+  if (Number.isFinite(fromRdesc) && fromRdesc > 0) {
+    return Math.min(fromRdesc, CMETER1_MAX_RATE);
+  }
+
+  // Fallback: derive from the two cards
+  const [a, b] = String(t1?.card || "").split(",").map((c) => cmeter1CardValue(c));
+  if (a == null || b == null) return null;
+
+  const diff = Math.abs(a - b);
+  if (diff === 0) {
+    // Same rank: suit ranking decides and pays 1x. Identical card = tie (push).
+    const [ca, cb] = String(t1.card).split(",").map((c) => String(c || "").trim().toUpperCase());
+    return ca === cb ? "void" : 1;
+  }
+  return Math.min(diff, CMETER1_MAX_RATE);
 }
 
 //poker
@@ -7068,7 +7155,16 @@ async function processPendingCasinoBets() {
           continue;
         }
 
-        const winner = await resolver(bet);
+        let winner = await resolver(bet);
+
+        // Multiplier games (1 Card Meter) return { won, rate } instead of a bare
+        // boolean: the payout is stake × rate, not stake × odds. Everything else
+        // keeps returning true / false / "void" / null.
+        let payoutRate = null;
+        if (winner && typeof winner === "object") {
+          payoutRate = Number(winner.rate) || null;
+          winner = winner.won;
+        }
 
         // No result yet → revert back to OPEN
         if (winner === null) {
@@ -7079,7 +7175,7 @@ async function processPendingCasinoBets() {
           continue;
         }
 
-        await settleBetCommon(bet, winner);
+        await settleBetCommon(bet, winner, payoutRate);
       } catch (err) {
         console.error("[Settlement] Bet failed:", bet.id, err.message);
 

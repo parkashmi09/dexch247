@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import BlinkBox, { ExposureValue } from "./BlinkBox.jsx";
+import CombinedBetSlip from "./CombinedBetSlip.jsx";
 import {
   MARKET_TYPE,
   formatSize,
   formatLimit,
   getOddByTier,
   getExposureForSelection,
+  calcCombinedOdds,
 } from "../../../utils/gameDetailsUtils.js";
 
 const SILK_BASE = "https://sitethemedata.com/race_icons/";
@@ -79,7 +81,7 @@ function GreyhoundRunnerRow({ runner, market, onBetClick, exposures }) {
 }
 
 // --- Horse runner row (checkbox + silk + jockey details + odds) ---
-function HorseRunnerRow({ runner, market, onBetClick, exposures }) {
+function HorseRunnerRow({ runner, market, onBetClick, exposures, selectable, checked, onToggle }) {
   const [expanded, setExpanded] = useState(false);
   const gs = (runner.gstatus || "").toUpperCase();
   const susp = gs === "SUSPENDED" || gs === "BALL RUNNING";
@@ -108,7 +110,16 @@ function HorseRunnerRow({ runner, market, onBetClick, exposures }) {
       <div className={`market-row${susp ? " suspended-row" : ""}`} data-title={susp ? "SUSPENDED" : gs || "ACTIVE"}>
         <div className="market-nation-detail">
           <div className="form-check">
-            <input className="form-check-input" type="checkbox" id={`checkbox-runner-${runner.sid}`} readOnly />
+            {selectable && (
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id={`checkbox-runner-${runner.sid}`}
+                checked={checked}
+                disabled={susp}
+                onChange={() => onToggle(runner)}
+              />
+            )}
             <label className="form-check-label" htmlFor={`checkbox-runner-${runner.sid}`}>
               <div>{gateNo}<br />({gateNo})</div>
               <div>
@@ -119,6 +130,11 @@ function HorseRunnerRow({ runner, market, onBetClick, exposures }) {
                   <span>{runnerName}</span>
                   <span className="d-md-none horse-detail-arrow ms-1" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExpanded((v) => !v); }} style={{ cursor: "pointer" }}>
                     <i className={`fas fa-angle-${expanded ? "up" : "down"}`}></i>
+                  </span>
+                  {/* The horse row computed the book but never rendered it —
+                      only the greyhound row did. */}
+                  <span className="horse-nation-book ms-auto">
+                    <ExposureValue value={exposure} />
                   </span>
                 </span>
                 <div className="jockey-detail d-none d-md-flex">
@@ -147,11 +163,107 @@ function HorseRunnerRow({ runner, market, onBetClick, exposures }) {
   );
 }
 
-export default function RacingMarket({ market, onBetClick, exposures, isGreyhound = false }) {
+// --- COMBINED row: one price for all ticked runners ---
+// Shown above the market as soon as 2+ runners are ticked. Back and lay are
+// each offered ONLY when EVERY ticked runner has a price on that side —
+// a dutch with a missing leg is not a dutch.
+function CombinedRow({ market, selected, onCombinedBetClick }) {
+  const backOdds = selected.map((s) => Number(getOddByTier(s.runner.odds, "back", 0).odds));
+  const layOdds = selected.map((s) => Number(getOddByTier(s.runner.odds, "lay", 0).odds));
+
+  const combinedBack = backOdds.every((o) => Number.isFinite(o) && o > 1)
+    ? calcCombinedOdds(backOdds) : null;
+  const combinedLay = layOdds.every((o) => Number.isFinite(o) && o > 1)
+    ? calcCombinedOdds(layOdds) : null;
+
+  // "4 + 5" is each runner's 1-based board POSITION, not its cloth number.
+  const label = selected.map((s) => s.position).join(" + ");
+
+  function fire(betType, odds, prices) {
+    if (!odds) return;
+    onCombinedBetClick({
+      market,
+      marketType: MARKET_TYPE.MATCH_ODDS,
+      betType,
+      odds,
+      legs: selected.map((s, i) => ({ runner: s.runner, odds: prices[i], position: s.position })),
+    });
+  }
+
+  return (
+    <div className="market-row combined-row">
+      <div className="market-nation-detail">
+        <span className="market-nation-name"><b>COMBINED</b> {label}</span>
+      </div>
+      <div className="market-odd-box no-border d-none d-md-flex" />
+      <div className="market-odd-box no-border d-none d-md-flex" />
+      <BlinkBox
+        value={combinedBack ?? "-"}
+        className="market-odd-box back"
+        onClick={combinedBack ? () => fire("back", combinedBack, backOdds) : undefined}
+      >
+        <span className="market-odd">{combinedBack ?? "-"}</span>
+      </BlinkBox>
+      <BlinkBox
+        value={combinedLay ?? "-"}
+        className="market-odd-box lay"
+        onClick={combinedLay ? () => fire("lay", combinedLay, layOdds) : undefined}
+      >
+        <span className="market-odd">{combinedLay ?? "-"}</span>
+      </BlinkBox>
+      <div className="market-odd-box d-none d-md-flex" />
+      <div className="market-odd-box no-border d-none d-md-flex" />
+    </div>
+  );
+}
+
+export default function RacingMarket({
+  market, onBetClick, exposures, isGreyhound = false,
+  onCombinedBetClick, combinedSlip, sportId,
+}) {
   const isSuspended = market.status === "SUSPENDED";
   const marketClass = getMarketClass(market, isGreyhound);
   const label = market.mname || "MATCH_ODDS";
   const minMax = `Max: ${formatLimit(market.maxb || market.max)}`;
+
+  // Ticks are tracked by runner `sid` so they survive the 2s market refresh
+  // (the runner OBJECTS are replaced on every poll).
+  const [selectedSids, setSelectedSids] = useState([]);
+
+  // Combined betting is gated on the SPORT id, not the market shape: sid 65
+  // events can carry horse-shaped dtype 12 markets, and greyhound racecards
+  // have no combined betting at all.
+  const combinedEnabled = !isGreyhound && String(sportId) === "10" && !!onCombinedBetClick;
+
+  const runners = market.section || [];
+
+  const toggle = (runner) => {
+    const key = String(runner.sid);
+    setSelectedSids((prev) =>
+      prev.includes(key) ? prev.filter((s) => s !== key) : [...prev, key]
+    );
+  };
+
+  // Resolve ticks against the CURRENT runner objects, keeping board order so
+  // the "4 + 5" position label is stable.
+  const selected = useMemo(() => {
+    if (!combinedEnabled) return [];
+    return runners
+      .map((runner, idx) => ({ runner, position: idx + 1 }))
+      .filter((x) => selectedSids.includes(String(x.runner.sid)))
+      .filter((x) => {
+        const gs = (x.runner.gstatus || "").toUpperCase();
+        return gs !== "SUSPENDED" && gs !== "BALL RUNNING";
+      });
+  }, [runners, selectedSids, combinedEnabled]);
+
+  const showCombined = combinedEnabled && selected.length >= 2;
+
+  // The inline slip is MOBILE ONLY (web uses the right-sidebar panel) and is
+  // anchored under the first ticked row.
+  const inlineSlipAfterSid = combinedSlip && selected.length
+    ? String(selected[0].runner.sid)
+    : null;
 
   // Greyhound header uses d-none d-md-block for outer columns, horse uses d-none d-md-flex
   const hiddenClass = isGreyhound ? "d-none d-md-flex" : "d-none d-md-flex";
@@ -173,7 +285,14 @@ export default function RacingMarket({ market, onBetClick, exposures, isGreyhoun
         <div className={`market-odd-box no-border ${hiddenClass}`} />
       </div>
       <div className={`market-body${isSuspended ? " suspended-table" : ""}`} data-title={isSuspended ? "SUSPENDED" : market.status || "OPEN"}>
-        {market.section?.map((runner) =>
+        {showCombined && (
+          <CombinedRow
+            market={market}
+            selected={selected}
+            onCombinedBetClick={onCombinedBetClick}
+          />
+        )}
+        {runners.map((runner) =>
           isGreyhound ? (
             <GreyhoundRunnerRow
               key={runner.sid || runner.nat}
@@ -183,13 +302,18 @@ export default function RacingMarket({ market, onBetClick, exposures, isGreyhoun
               exposures={exposures}
             />
           ) : (
-            <HorseRunnerRow
-              key={runner.sid || runner.nat}
-              runner={runner}
-              market={market}
-              onBetClick={onBetClick}
-              exposures={exposures}
-            />
+            <div key={runner.sid || runner.nat}>
+              <HorseRunnerRow
+                runner={runner}
+                market={market}
+                onBetClick={onBetClick}
+                exposures={exposures}
+                selectable={combinedEnabled}
+                checked={selectedSids.includes(String(runner.sid))}
+                onToggle={toggle}
+              />
+              {inlineSlipAfterSid === String(runner.sid) && combinedSlip}
+            </div>
           )
         )}
       </div>

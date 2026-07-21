@@ -27,6 +27,68 @@ const ax = axios.create({
 });
 
 // ---------------------------------------------------------------------
+// splitRunnerString / runnersKey / matchMarketByRunners
+//
+// Racing (sid 10 horse, 65 greyhound) has no team_one/team_two — a race is
+// a FIELD of runners — so every identifier the standard MO/BM matcher uses
+// misses:
+//
+//   our match_title      "Chriss Revenge vs Lasso vs Talented Man vs …"
+//   upstream ename       "Philadelphia - Jul 21 2026 11:31PM"  (venue + off)
+//   upstream marketName  "CHRISS REVENGE VS LASSO"             (first TWO only)
+//   upstream natName     "CHRISS REVENGE VS LASSO VS TALENTED MAN VS …"  ← field
+//
+// So we match the bet's stored `runners` column against upstream `natName`
+// as an ORDER-INDEPENDENT SET, plus mname (which is what separates
+// MATCH_ODDS from TOP 2 FINISH inside one gmid).
+//
+// Gated to 3+ runners so ordinary 2-way markets (cricket / soccer / tennis /
+// fancy) never reach this path and are completely unaffected.
+// ---------------------------------------------------------------------
+export function splitRunnerString(value) {
+    if (Array.isArray(value)) {
+        return value.map(v => String(v ?? '').trim()).filter(Boolean);
+    }
+    if (value == null || value === '') return [];
+    const str = String(value).trim();
+    if (str.startsWith('[')) {
+        // SportsBet.runners is a JSON column but can arrive as raw text.
+        try {
+            const parsed = JSON.parse(str);
+            if (Array.isArray(parsed)) {
+                return parsed.map(v => String(v ?? '').trim()).filter(Boolean);
+            }
+        } catch { /* fall through to the delimiter split */ }
+    }
+    return str.split(/\s+VS\s+|\s+V\s+/i).map(s => s.trim()).filter(Boolean);
+}
+
+export function runnersKey(value) {
+    const parts = splitRunnerString(value)
+        .map(s => s.toUpperCase().replace(/\s+/g, ' ').trim())
+        .filter(Boolean);
+    if (!parts.length) return '';
+    return [...parts].sort().join('|');
+}
+
+export function matchMarketByRunners(markets, runners, eventName, mname) {
+    const field = splitRunnerString(runners);
+    // 2-way markets are handled by the standard matchers; never come here.
+    if (field.length < 3) return null;
+
+    const key = runnersKey(field);
+    if (!key) return null;
+
+    const wantMname = String(mname || '').trim().toUpperCase();
+    if (!wantMname) return null;
+
+    return (markets || []).find(m =>
+        String(m?.mname || '').trim().toUpperCase() === wantMname &&
+        runnersKey(m?.natName) === key
+    ) || null;
+}
+
+// ---------------------------------------------------------------------
 // resolveH2HBookmakerFallback
 //
 // Handles custom "head-to-head over runs" bookmakers like

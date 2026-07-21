@@ -45,6 +45,13 @@ export const getTreeData = getSportsTree;
 export const sportsPlaceBet = (payload) =>
   api.post("/user/place", payload).then((r) => r.data);
 
+/**
+ * Place a COMBINED (dutched) slip — one bet PER RUNNER of a single market,
+ * all-or-nothing. `bets` is an array of the same payload shape /place takes.
+ */
+export const sportsPlaceCombinedBet = (bets) =>
+  api.post("/user/place-combined", { bets }).then((r) => r.data);
+
 /** Open bets for a user on a given event. */
 export const getUserMatchedBets = (eventid, userid) =>
   api

@@ -5,7 +5,11 @@ import { SPORTS_QUICK_STAKES, calcProfitLoss, calcOutcomeProjection, isFancyType
 export default function PlaceBetMobile({
   betState, exposures, onOddsChange, onStakeChange, onQuickStake, onClear, onReset, onClose, onSubmit, placing
 }) {
-  const { open, market, marketType, runner, betType, odds, stake } = betState;
+  const { open, market, marketType, runner, betType, odds, stake, legs } = betState;
+
+  // A COMBINED slip is rendered INLINE under the first ticked racecard row on
+  // mobile, so this modal must stay shut — never both at once.
+  const isCombined = (legs?.length ?? 0) >= 2;
 
   const stakeNum = Number(stake) || 0;
   const oddsNum = Number(odds) || 0;
@@ -36,7 +40,7 @@ export default function PlaceBetMobile({
   const submitDisabled = placing || stakeNum <= 0 || oddsNum < 1.01;
 
   return (
-    <Modal show={open} onHide={onClose}>
+    <Modal show={open && !isCombined} onHide={onClose}>
       <Modal.Header closeButton>
         <Modal.Title>Place Bet</Modal.Title>
       </Modal.Header>

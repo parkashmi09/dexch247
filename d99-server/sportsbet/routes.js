@@ -21,6 +21,9 @@ router.get('/test', (req, res) => {
 });
 
 router.post('/place', authMiddleware, controller.placeBet);
+// COMBINED (dutched) slip: one stake split across 2+ runners of ONE market,
+// stored as one bet PER RUNNER inside a single all-or-nothing transaction.
+router.post('/place-combined', authMiddleware, controller.placeCombinedBet);
 router.get('/buffer-time', controller.getBufferTime);
 router.get('/exposures/:user_id', controller.getUserExposures);
 

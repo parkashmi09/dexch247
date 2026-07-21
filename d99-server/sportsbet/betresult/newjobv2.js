@@ -22,7 +22,7 @@ import SportsBetResultCache from '../../model/user/SportsBetResultCache.js';
 import Tokens from '../../model/user/Tokens.js';
 import SportsBet from '../../model/user/SportsBet.js'
 import { Op } from 'sequelize';
-import { resolveH2HBookmakerFallback } from './customMarketResolvers.js';
+import { resolveH2HBookmakerFallback, matchMarketByRunners, splitRunnerString } from './customMarketResolvers.js';
 
 console.log('[ResultCron] Process started');
 
@@ -79,9 +79,13 @@ const RESULTS_RATE_LIMIT_MS = +(process.env.RESULTS_RATE_LIMIT_MS || 250); // ac
 // and the bet never settles. When a bet's sid is garbage we fall back across the
 // known sport ids (cricket first — this platform is cricket-dominant) until one
 // returns data for the gmid. Override via RESULTS_SID_FALLBACKS="4,1,2".
-const RESULTS_SID_FALLBACKS = (process.env.RESULTS_SID_FALLBACKS || '4,1,2')
+// Racing (10 horse, 65 greyhound) MUST be listed here: a bet carrying the
+// CORRECT sid=10 was otherwise judged garbage and re-probed as 4/1/2, all of
+// which 404 for a racing gmid — so racing results were never declared and
+// racing bets sat `open` forever.
+const RESULTS_SID_FALLBACKS = (process.env.RESULTS_SID_FALLBACKS || '4,1,2,10,65')
     .split(',').map(s => Number(String(s).trim())).filter(n => Number.isInteger(n) && n > 0);
-const KNOWN_VALID_SIDS = new Set([1, 2, 4, ...RESULTS_SID_FALLBACKS]);
+const KNOWN_VALID_SIDS = new Set([1, 2, 4, 10, 65, ...RESULTS_SID_FALLBACKS]);
 function isValidSid(sid) {
     const n = Number(sid);
     return Number.isInteger(n) && n > 0 && KNOWN_VALID_SIDS.has(n);
@@ -179,7 +183,7 @@ function normalizeMarketType(v) {
 
 
 // Fetch result — AVRKHUB GET API (v2) or old Diamond POST API (v1)
-async function fetchResultForEvent(eventid, eventName, marketId, marketName, sport_id, market_type, gameType, team_one, team_two) {
+async function fetchResultForEvent(eventid, eventName, marketId, marketName, sport_id, market_type, gameType, team_one, team_two, runners) {
     log.debug('[ResultCronV2] fetchResultForEvent start', { eventid, eventName, market_type, version: SETTLEMENT_VERSION });
 
     const maxAttempts = RESULTS_MAX_FETCH_RETRIES || 6;
@@ -291,6 +295,18 @@ async function fetchResultForEvent(eventid, eventName, marketId, marketName, spo
                                     normalizeText(m?.marketName) === inputEventName &&
                                     normalizeMarketType(m?.mname) === inputMname
                                 );
+                            }
+                            // Racing: no team_one/team_two and no usable ename —
+                            // match the FIELD (bet.runners) against upstream natName.
+                            // Gated to 3+ runners inside the helper, so 2-way markets
+                            // never reach it. See customMarketResolvers.js.
+                            if (!matchedMarket) {
+                                matchedMarket = matchMarketByRunners(markets, runners, eventName, market_type);
+                                if (matchedMarket) {
+                                    log.info('[ResultCronV2] matched market by runner field', {
+                                        eventid, market_type, runners: splitRunnerString(runners).length,
+                                    });
+                                }
                             }
                         } else {
                             matchedMarket = markets.find(m =>
@@ -436,7 +452,7 @@ async function runOnce() {
                 eventid: { [Op.ne]: null },
                 job_id: null   // jinke paas already job hai unhe dobara queue mat karo (double-settle rok)
             },
-            attributes: ['id', 'user_id', 'game_type', 'bet_type', 'selection_name', 'odds', 'stake_amount', 'match_title', 'match_id', 'fancy_name', 'eventid', 'created_at', 'sport_id', 'market_type', 'status', 'team_one', 'team_two'],
+            attributes: ['id', 'user_id', 'game_type', 'bet_type', 'selection_name', 'odds', 'stake_amount', 'match_title', 'match_id', 'fancy_name', 'eventid', 'created_at', 'sport_id', 'market_type', 'status', 'team_one', 'team_two', 'runners'],
             order: [['created_at', 'ASC']]
         });
 
@@ -491,7 +507,7 @@ async function runOnce() {
                 if (b.status === 'manual') {
                     declared = true;
                 } else {
-                    const res = await fetchResultForEvent(eid, eventName, marketId, marketName, sport_id, market_type, gameType, b.team_one, b.team_two);
+                    const res = await fetchResultForEvent(eid, eventName, marketId, marketName, sport_id, market_type, gameType, b.team_one, b.team_two, b.runners);
                     log.debug(`[ResultCron] fetchResultForEvent result`, { betId: b.id, res });
                     declared = res?.declared;
                     result_meta = res?.meta || null;

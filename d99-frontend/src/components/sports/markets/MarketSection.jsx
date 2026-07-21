@@ -8,7 +8,7 @@ import OddEvenMarket from "./OddEvenMarket.jsx";
 import HtftMarket from "./HtftMarket.jsx";
 import RacingMarket from "./RacingMarket.jsx";
 
-export default function MarketSection({ market, exposures, onBetClick, widthClass, onCashout }) {
+export default function MarketSection({ market, exposures, onBetClick, widthClass, onCashout, onCombinedBetClick, combinedSlip, sportId }) {
   const type = detectMarketType(market);
 
   switch (type) {
@@ -113,6 +113,9 @@ export default function MarketSection({ market, exposures, onBetClick, widthClas
           market={market}
           exposures={exposures}
           onBetClick={onBetClick}
+          onCombinedBetClick={onCombinedBetClick}
+          combinedSlip={combinedSlip}
+          sportId={sportId}
         />
       );
     case MARKET_TYPE.GREYHOUND:
@@ -121,6 +124,7 @@ export default function MarketSection({ market, exposures, onBetClick, widthClas
           market={market}
           exposures={exposures}
           onBetClick={onBetClick}
+          sportId={sportId}
           isGreyhound
         />
       );

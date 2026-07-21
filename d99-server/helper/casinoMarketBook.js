@@ -25,20 +25,21 @@ const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
 
 // Runner sets mirror how settlementCasinoWorker resolves each game: every group
 // below settles independently, so every group is its own book.
+// aaa and aaa2 are the same table (same 22 runners, same back/lay layout — only
+// the main players take a lay), so they share one definition.
+//
+// ONLY the main market books across its runners. The live site shows the side
+// markets (Even/Odd, Red/Black, Under 7/Over 7, Card A–K) as a plain worst-case
+// figure under the selected runner alone, with nothing under its opposite — so
+// those selections deliberately stay OUT of this registry and fall through to
+// the legacy single-row path in CasinoService.placeBet.
+const AAA_MARKETS = [
+  { key: "main", runners: ["Amar", "Akbar", "Anthony"] },
+];
+
 const MARKETS = {
-  aaa2: [
-    { key: "main", runners: ["Amar", "Akbar", "Anthony"] },
-    { key: "evenodd", runners: ["Even", "Odd"] },
-    { key: "color", runners: ["Red", "Black"] },
-    { key: "underover", runners: ["Under 7", "Over 7"] },
-    {
-      key: "card",
-      runners: [
-        "Card A", "Card 2", "Card 3", "Card 4", "Card 5", "Card 6", "Card 7",
-        "Card 8", "Card 9", "Card 10", "Card J", "Card Q", "Card K",
-      ],
-    },
-  ],
+  aaa: AAA_MARKETS,
+  aaa2: AAA_MARKETS,
 };
 
 const norm = (s) => String(s ?? "").trim().toLowerCase();

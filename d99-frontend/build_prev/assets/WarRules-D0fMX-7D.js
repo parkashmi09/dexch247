@@ -1,0 +1,1 @@
+import{j as s}from"./index-C8r1daSj.js";function e(){return s.jsx("div",{className:"rules-section",children:s.jsx("div",{children:s.jsx("img",{src:"/assets/casino-rules/war.jpg",alt:"Casino War Rules",className:"img-fluid"})})})}export{e as default};

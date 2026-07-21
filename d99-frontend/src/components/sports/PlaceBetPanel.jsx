@@ -1,16 +1,27 @@
-import { SPORTS_QUICK_STAKES, calcProfitLoss, calcOutcomeProjection, isFancyType } from "../../utils/gameDetailsUtils.js";
+import { SPORTS_QUICK_STAKES, calcProfitLoss, calcOutcomeProjection, isFancyType, splitCombinedStake } from "../../utils/gameDetailsUtils.js";
 
 export default function PlaceBetPanel({ betState, exposures, onOddsChange, onStakeChange, onQuickStake, onClear, onReset, onSubmit, placing }) {
-  const { open, market, marketType, runner, betType, odds, stake, originalOdds } = betState;
+  const { open, market, marketType, runner, betType, odds, stake, originalOdds, legs } = betState;
 
   if (!open || !market) return null;
+
+  // COMBINED (dutched) slip: one price across 2+ runners. The price is DERIVED
+  // from the individual runner prices, so it is locked — no spinner.
+  const isCombined = (legs?.length ?? 0) >= 2;
 
   const stakeNum = Number(stake) || 0;
   const oddsNum = Number(odds) || 0;
   const { profit } = calcProfitLoss(marketType, betType, oddsNum, stakeNum);
-  const spinnerEnabled = !isFancyType(marketType);
+  const spinnerEnabled = !isCombined && !isFancyType(marketType);
 
-  const selectionName = runner?.nat || runner?.name || "";
+  // Per-leg split preview, so the user can see where the stake goes.
+  const legParts = isCombined && stakeNum > 0
+    ? splitCombinedStake(stakeNum, legs.map((l) => Number(l.odds)))
+    : [];
+
+  const selectionName = isCombined
+    ? `COMBINED ${legs.map((l) => l.position).join(" + ")}`
+    : (runner?.nat || runner?.name || "");
   const min = runner?.min ?? market?.min ?? 0;
   const max = runner?.max ?? market?.max ?? 0;
 
@@ -20,7 +31,10 @@ export default function PlaceBetPanel({ betState, exposures, onOddsChange, onSta
   const displayProfit = isNormalLike ? 0 : profit;
 
   // Projected book per outcome = existing exposure (by market mid) + this pending bet
-  const projection = stakeNum > 0 && oddsNum >= 1.01
+  // A dutched slip pays the same on every winning leg, so a per-outcome
+  // projection built from ONE selected runner would be wrong — the per-leg
+  // split below is shown instead.
+  const projection = !isCombined && stakeNum > 0 && oddsNum >= 1.01
     ? calcOutcomeProjection({ market, marketType, selectedRunner: runner, betType, odds: oddsNum, stake: stakeNum, exposures })
     : null;
 
@@ -128,6 +142,17 @@ export default function PlaceBetPanel({ betState, exposures, onOddsChange, onSta
             </button>
           </div>
         </div>
+        {isCombined && legParts.length > 0 && (
+          <div className="combined-slip-legs mt-1">
+            {legs.map((leg, i) => (
+              <div key={leg.runner?.sid ?? i} className="combined-slip-leg d-flex justify-content-between px-2">
+                <span>{leg.runner?.nat || leg.runner?.name}</span>
+                <span>{leg.odds}</span>
+                <span>{legParts[i]}</span>
+              </div>
+            ))}
+          </div>
+        )}
         {projection && projection.length > 0 && (
           <div className="place-bet-book mt-1">
             {projection.map((p) => (

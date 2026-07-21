@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { parseFeedIstTime, formatFeedIstTime } from "../../../utils/gameDetailsUtils.js";
 
 // Banner image base URL
 const BANNER_IMG_BASE = "https://versionobj.ecoassetsservice.com/v104/static/front/img/";
@@ -10,23 +11,9 @@ function getBannerImg(sid) {
   return "10.png"; // default for sid=10 and unknown
 }
 
-function formatRaceTime(timeStr) {
-  if (!timeStr) return "";
-  try {
-    const d = new Date(timeStr);
-    if (isNaN(d)) return timeStr;
-    const dd = String(d.getDate()).padStart(2, "0");
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const yyyy = d.getFullYear();
-    const hh = String(d.getHours()).padStart(2, "0");
-    const mi = String(d.getMinutes()).padStart(2, "0");
-    const ss = String(d.getSeconds()).padStart(2, "0");
-    return `${dd}/${mm}/${yyyy} ${hh}:${mi}:${ss}`;
-  } catch {
-    return timeStr;
-  }
-}
-
+// The feed time is IST wall-clock with no zone marker, so the countdown has to
+// parse it explicitly — `new Date(stime)` resolves it in the VIEWER's timezone
+// and was only correct for users in India.
 function useCountdown(targetTimeStr) {
   const [remaining, setRemaining] = useState(null);
   const timerRef = useRef(null);
@@ -38,8 +25,8 @@ function useCountdown(targetTimeStr) {
     }
 
     const update = () => {
-      const target = new Date(targetTimeStr);
-      if (isNaN(target)) {
+      const target = parseFeedIstTime(targetTimeStr);
+      if (target == null) {
         setRemaining(null);
         return;
       }
@@ -70,12 +57,16 @@ export default function HorseBanner({ matchInfo, sid, markets }) {
   // Get status from first market
   const status = markets?.[0]?.status || "OPEN";
 
-  // Parse location and race details from matchInfo.name
-  // matchInfo.name might be "Wagga R3 1740m Pace M" or just a gmid
+  // Racing boards nest country → venue → race, so the banner title is built
+  // from those (e.g. "US > Louisiana Downs"). The RACE title itself
+  // ("R4 1m Mdn Claim") is not published by this provider — it appears only if
+  // a feed ever supplies one.
+  const country = matchInfo?.country || "";
+  const venue = matchInfo?.venue || "";
+  const location = [country, venue].filter(Boolean).join(" > ");
   const matchName = matchInfo?.name || "";
-  // Try to detect if it looks like a race name (not just a number)
   const isNumericName = /^\d+$/.test(matchName.trim());
-  const raceName = isNumericName ? "" : matchName;
+  const raceName = location || (isNumericName ? "" : matchName);
 
   return (
     <div className="horse-banner">
@@ -110,7 +101,9 @@ export default function HorseBanner({ matchInfo, sid, markets }) {
             {raceName && <p>{raceName}</p>}
             {matchInfo?.time && (
               <h5>
-                <span>{formatRaceTime(matchInfo.time)}</span>
+                {/* Racecard time — the IST parts reformatted, NOT converted, so
+                    every viewer sees what the racecard says. */}
+                <span>{formatFeedIstTime(matchInfo.time)}</span>
               </h5>
             )}
           </div>

@@ -1,0 +1,8 @@
+import{j as e}from"./index-C8r1daSj.js";function i(){return e.jsxs("div",{children:[e.jsx("style",{children:`
+        .rules-section { text-align: left; margin-bottom: 10px; }
+        .rules-section ul li, .rules-section p { margin-bottom: 5px; }
+        .rules-section .rules-highlight { color: #FDCF13; font-size: 16px; }
+        .rules-section .rules-sub-highlight { color: #FDCF13; font-size: 14px; }
+        .rules-section .list-style, .rules-section .list-style li { list-style: disc; }
+        .rules-section img { max-width: 100%; }
+      `}),e.jsxs("div",{className:"rules-section",children:[e.jsxs("p",{children:["Welcome to ",e.jsx("b",{children:"Teenpatti Poison 20-20"}),", a new variation of Teenpatti."]}),e.jsxs("p",{children:["As Teenpatti games are becoming more and more famous and popular on our platforms, we are excited to introduce you to ",e.jsx("b",{children:"Teenpatti Poison 20-20"}),". The game follows the same standard rules of Teenpatti but at the beginning of the round the dealer draws a ",e.jsx("b",{children:"Poison"})," card before dealing to the players. ",e.jsx("b",{children:"The Poison"})," card is toxic and makes the player lose as soon as any player gets it. If no ",e.jsx("b",{children:"Poison"})," card is dealt then the game continues as per Teenpatti standard rules."]}),e.jsx("p",{children:"For Example:"}),e.jsx("img",{src:"/assets/img/casino-rules/joker3.jpg",className:"img-fluid",alt:""}),e.jsxs("p",{children:["Player A wins because Player B is dealt with ",e.jsx("b",{children:"THE POISON"})," card."]}),e.jsx("h4",{children:"Standard Rules."}),e.jsx("div",{children:e.jsx("img",{src:"/assets/img/casino-rules/teen6.jpg",className:"img-fluid",alt:""})})]})]})}export{i as default};

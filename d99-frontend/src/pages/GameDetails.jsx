@@ -8,6 +8,7 @@ import {
   getMatchPrivateData,
   getMatchExposures,
   sportsPlaceBet,
+  sportsPlaceCombinedBet,
   getSportsScoreCard,
 } from "../apiservices/SportsApi.js";
 import { SPORTS_STREAM_URL, SCORECARD_URL } from "../config.js";
@@ -21,11 +22,17 @@ import {
   buildMarketCashout,
   INITIAL_BET_STATE,
   deriveBetSizes,
+  calcCombinedOdds,
+  splitCombinedStake,
+  findRaceInBoard,
+  isRaceBettingOpen,
+  RACE_BET_WINDOW_MINUTES,
 } from "../utils/gameDetailsUtils.js";
 import MarketSection from "../components/sports/markets/MarketSection.jsx";
 import RightSidebar from "../components/sports/RightSidebar.jsx";
 import PlaceBetMobile from "../components/sports/PlaceBetMobile.jsx";
 import HorseBanner from "../components/sports/markets/HorseBanner.jsx";
+import CombinedBetSlip from "../components/sports/markets/CombinedBetSlip.jsx";
 
 // ---------------------------------------------------------------------------
 // Main GameDetails page
@@ -64,9 +71,20 @@ export default function GameDetails() {
   const pollRef = useRef(null);
   const latestMarketsRef = useRef([]); // always-fresh markets for submit-time odds/suspended checks
 
+  // --- Race betting window (horse racing only) ---
+  // The server is authoritative (placeBet STEP 4.55); this only tells the user
+  // why the slip won't open. Odds stay visible — no overlay.
+  const raceWindowAllows = useCallback(() => {
+    if (isRaceBettingOpen(matchInfo.time, sid)) return true;
+    toast.error(`Betting opens ${RACE_BET_WINDOW_MINUTES} minutes before the race starts.`);
+    return false;
+  }, [matchInfo.time, sid]);
+
   // --- Bet click handler (passed down to market components) ---
   const handleBetClick = useCallback(({ market, marketType, runner, betType, odds }) => {
+    if (!raceWindowAllows()) return;
     setBetState({
+      ...INITIAL_BET_STATE,
       open: true,
       market,
       marketType,
@@ -76,7 +94,27 @@ export default function GameDetails() {
       originalOdds: String(odds),
       stake: "",
     });
-  }, []);
+  }, [raceWindowAllows]);
+
+  // --- COMBINED (dutched) bet click: 2+ runners ticked on one racecard ---
+  // `legs` = [{ runner, odds, position }] — one per ticked runner, each at its
+  // own price. The slip carries a single COMBINED price; the stake is split at
+  // submit time so every winning runner returns the same amount.
+  const handleCombinedBetClick = useCallback(({ market, marketType, betType, legs, odds }) => {
+    if (!raceWindowAllows()) return;
+    setBetState({
+      ...INITIAL_BET_STATE,
+      open: true,
+      market,
+      marketType,
+      runner: null,
+      legs,
+      betType,
+      odds: String(odds),
+      originalOdds: String(odds),
+      stake: "",
+    });
+  }, [raceWindowAllows]);
 
   // --- Cashout handler ---
   const handleCashout = useCallback((market, marketType) => {
@@ -100,6 +138,7 @@ export default function GameDetails() {
     }
     // Open place bet panel pre-filled with cashout bet
     setBetState({
+      ...INITIAL_BET_STATE,
       open: true,
       market,
       marketType,
@@ -145,6 +184,205 @@ export default function GameDetails() {
     setBetState(INITIAL_BET_STATE);
   }, []);
 
+  // --- Place-bet payload for ONE runner ---
+  // Shared by the single-bet submit and by every leg of a combined slip, so a
+  // combined leg is stored exactly like a normal bet (which is what makes the
+  // existing exposure and settlement maths work on it unchanged).
+  const buildBetPayload = useCallback(({ market, runner, pricedRunner, betType, oddsNum, stakeNum }) => {
+    const selectionName = runner?.nat || runner?.name || "";
+    const mnLower = (market.mname || "").toLowerCase();
+    const gtLower = (market.gtype || "").toLowerCase();
+    const isFancyCat = mnLower.includes("fancy") || gtLower === "fancy" || gtLower === "fancy1" || gtLower === "oddeven" || gtLower === "meter";
+    const sections = market.section || [];
+    const teamNames = sections.filter((s) => s.nat).map((s) => s.nat);
+    const placeDate = new Date().toISOString().slice(0, 19).replace("T", " ");
+
+    // Determine game_type: Bookmaker/match1 = "MATCH", fancy = "FANCY", etc.
+    let gameType = "MATCH";
+    if (gtLower === "fancy" || gtLower === "fancy1" || gtLower === "oddeven" || gtLower === "meter") {
+      gameType = "FANCY";
+    } else if (gtLower === "cricketcasino") {
+      gameType = "FANCY";
+    }
+
+    // For fancy-style, selection_name = runner name; for structured, = team name
+    const selName = isFancyCat
+      ? (selectionName || (betType === "yes" ? "YES" : "NO"))
+      : selectionName;
+
+    return {
+      sports: "Cricket",
+      event_name: matchInfo.name || "",
+      market_name: market.mname || "",
+      market_type: market.mname || "",
+      category: String(isFancyCat ? "1" : "0"),
+      eventid: String(gmid),
+      event_id: String(gmid),
+      fancy_name: String(isFancyCat ? selectionName : ""),
+      fixed: 0,
+      game_type: String(gameType),
+      match_id: String(market.mid),
+      market_id: String(market.mid),
+      match_start_time: String(matchInfo.time || ""),
+      match_title: String(matchInfo.name || ""),
+      odds: Number(oddsNum.toFixed(2)),
+      original_amount: Number(stakeNum.toFixed(2)),
+      original_currency: "INR",
+      selection_name: String(selName),
+      // sid must be the SPORT id (route param, e.g. 4=cricket) — NOT runner.sid,
+      // which is the selection/runner id. Sending the runner id here was stored as
+      // SportsBet.sport_id and made AVRKHUB reject the result fetch (400) so bets
+      // never settled. Route `sid` is the authoritative sport id.
+      sid: String(sid || ""),
+      stake_amount: Number(stakeNum.toFixed(2)),
+      team_one: String(teamNames[0] || ""),
+      team_two: String(teamNames[1] || ""),
+      usd_amount: Number((stakeNum * 0.0118).toFixed(2)),
+      user_id: String(user?.user_id || user?.id || "0"),
+      count: sections.length || 2,
+      bet_type: betType,
+      settlened: "pending",
+      nation: String(selectionName),
+      nat: String(selectionName),
+      user_rate: Number(oddsNum.toFixed(2)),
+      amount: Number(stakeNum.toFixed(2)),
+      place_date: placeDate,
+      // The FIELD. For racing this is the only identifier that can match the
+      // upstream result (a race has no team_one/team_two) — see
+      // matchMarketByRunners on the server.
+      runners: teamNames,
+      // Real feed sizes + top-tier prices. These are what let the server price a
+      // fancy bet at all — hardcoding them to 0/[] made lay/no bets book zero
+      // liability. See deriveBetSizes().
+      ...deriveBetSizes(pricedRunner || runner, betType, oddsNum),
+      unmatched: false,
+      mname: String(market.mname || ""),
+      gtype: String(market.gtype || "match"),
+      section: Array.isArray(sections) ? sections : [],
+    };
+  }, [matchInfo, gmid, sid, user]);
+
+  // --- Submit a COMBINED (dutched) slip ---
+  const handleCombinedSubmit = useCallback(async () => {
+    if (!user) {
+      toast.error("Please log in to place a bet.");
+      return;
+    }
+
+    const { market, marketType, betType, legs, stake } = betState;
+    const stakeNum = Number(stake);
+
+    if (!legs || legs.length < 2) {
+      toast.error("Select at least 2 runners for a combined bet.");
+      return;
+    }
+    if (!stakeNum || stakeNum <= 0) {
+      toast.error("Please enter a valid stake amount.");
+      return;
+    }
+    if (!raceWindowAllows()) return;
+
+    // Re-read every leg from the FRESHEST polled market before sending. A
+    // suspended runner kills the slip; live prices are what we actually bet at.
+    const liveMarket = (latestMarketsRef.current || []).find(
+      (m) => String(m?.mid ?? "") === String(market?.mid ?? "")
+    );
+    const isLaySide = betType === "lay" || betType === "no";
+    const priced = [];
+    for (const leg of legs) {
+      const wantSid = String(leg.runner?.sid ?? "");
+      const wantNat = String(leg.runner?.nat ?? leg.runner?.name ?? "").trim().toLowerCase();
+      const liveRunner = liveMarket?.section?.find(
+        (s) => (wantSid && String(s?.sid ?? "") === wantSid) ||
+               String(s?.nat ?? "").trim().toLowerCase() === wantNat
+      );
+      const runner = liveRunner || leg.runner;
+
+      if (liveRunner) {
+        const gs = String(liveRunner.gstatus || liveRunner.status || "").toUpperCase();
+        if (gs === "SUSPENDED" || gs === "BALL RUNNING" || gs === "BALLRUNNING" || gs === "REMOVED") {
+          toast.error("Market is not available");
+          return;
+        }
+      }
+
+      // Best live price on the user's side for this runner.
+      const tiers = (runner?.odds || [])
+        .filter((o) => String(o?.otype || "").toUpperCase() === (isLaySide ? "LAY" : "BACK"))
+        .map((o) => Number(o?.odds))
+        .filter((n) => Number.isFinite(n) && n > 1);
+      const livePrice = tiers.length
+        ? (isLaySide ? Math.min(...tiers) : Math.max(...tiers))
+        : Number(leg.odds);
+
+      if (!Number.isFinite(livePrice) || livePrice <= 1) {
+        toast.error("Market is not available");
+        return;
+      }
+      priced.push({ runner, odds: livePrice });
+    }
+
+    // If the live combined price moved AGAINST the user (back lower / lay
+    // higher) refuse the slip and refresh it to the new price so they can
+    // re-submit. A move in the user's FAVOUR is accepted.
+    const liveCombined = calcCombinedOdds(priced.map((p) => p.odds));
+    const slipCombined = Number(betState.odds);
+    if (!liveCombined) {
+      toast.error("Market is not available");
+      return;
+    }
+    const movedAgainst = isLaySide
+      ? liveCombined > slipCombined + 0.001
+      : liveCombined < slipCombined - 0.001;
+    if (movedAgainst) {
+      toast.error("Odds changed");
+      setBetState((prev) => ({
+        ...prev,
+        odds: String(liveCombined),
+        originalOdds: String(liveCombined),
+        legs: priced.map((p, i) => ({ ...prev.legs[i], runner: p.runner, odds: p.odds })),
+      }));
+      return;
+    }
+
+    // Dutch the stake across the legs at their live prices.
+    const parts = splitCombinedStake(stakeNum, priced.map((p) => p.odds));
+    if (parts.some((p) => !(p > 0))) {
+      toast.error("Stake is too small to split across the selected runners.");
+      return;
+    }
+
+    const payloads = priced.map((p, i) =>
+      buildBetPayload({
+        market,
+        runner: p.runner,
+        pricedRunner: p.runner,
+        betType,
+        oddsNum: p.odds,
+        stakeNum: parts[i],
+      })
+    );
+
+    setPlacing(true);
+    try {
+      const res = await sportsPlaceCombinedBet(payloads);
+      if (res?.success === false) {
+        toast.error(res?.error || res?.message || "Bet failed.");
+      } else {
+        toast.success("Combined bet placed successfully!");
+        setBetState(INITIAL_BET_STATE);
+        dispatch(fetchBalanceThunk());
+        if (user?.user_id) {
+          dispatch(fetchMatchedBetsThunk({ eventId: gmid, userId: user.user_id }));
+        }
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.error || err?.message || "Bet placement failed.");
+    } finally {
+      setPlacing(false);
+    }
+  }, [betState, user, gmid, dispatch, buildBetPayload, raceWindowAllows]);
+
   // --- Submit bet ---
   const handleSubmit = useCallback(async () => {
     if (!user) {
@@ -152,9 +390,16 @@ export default function GameDetails() {
       return;
     }
 
+    // A combined slip is a different request entirely (N legs, one transaction).
+    if (betState.legs?.length >= 2) {
+      return handleCombinedSubmit();
+    }
+
     const { market, marketType, runner, betType, odds, stake } = betState;
     const oddsNum = Number(odds);
     const stakeNum = Number(stake);
+
+    if (!raceWindowAllows()) return;
 
     if (!stakeNum || stakeNum <= 0) {
       toast.error("Please enter a valid stake amount.");
@@ -232,74 +477,7 @@ export default function GameDetails() {
       }
     }
 
-    const selectionName = runner?.nat || runner?.name || "";
-    const mnLower = (market.mname || "").toLowerCase();
-    const gtLower = (market.gtype || "").toLowerCase();
-    const isFancyCat = mnLower.includes("fancy") || gtLower === "fancy" || gtLower === "fancy1" || gtLower === "oddeven" || gtLower === "meter";
-    const sections = market.section || [];
-    const teamNames = sections.filter((s) => s.nat).map((s) => s.nat);
-    const placeDate = new Date().toISOString().slice(0, 19).replace("T", " ");
-
-    // Determine game_type: Bookmaker/match1 = "MATCH", fancy = "FANCY", etc.
-    let gameType = "MATCH";
-    if (gtLower === "fancy" || gtLower === "fancy1" || gtLower === "oddeven" || gtLower === "meter") {
-      gameType = "FANCY";
-    } else if (gtLower === "cricketcasino") {
-      gameType = "FANCY";
-    }
-
-    // For fancy-style, selection_name = runner name; for structured, = team name
-    const selName = isFancyCat
-      ? (selectionName || (betType === "yes" ? "YES" : "NO"))
-      : selectionName;
-
-    const payload = {
-      sports: "Cricket",
-      event_name: matchInfo.name || "",
-      market_name: market.mname || "",
-      market_type: market.mname || "",
-      category: String(isFancyCat ? "1" : "0"),
-      eventid: String(gmid),
-      event_id: String(gmid),
-      fancy_name: String(isFancyCat ? selectionName : ""),
-      fixed: 0,
-      game_type: String(gameType),
-      match_id: String(market.mid),
-      market_id: String(market.mid),
-      match_start_time: String(matchInfo.time || ""),
-      match_title: String(matchInfo.name || ""),
-      odds: Number(oddsNum.toFixed(2)),
-      original_amount: Number(stakeNum.toFixed(2)),
-      original_currency: "INR",
-      selection_name: String(selName),
-      // sid must be the SPORT id (route param, e.g. 4=cricket) — NOT runner.sid,
-      // which is the selection/runner id. Sending the runner id here was stored as
-      // SportsBet.sport_id and made AVRKHUB reject the result fetch (400) so bets
-      // never settled. Route `sid` is the authoritative sport id.
-      sid: String(sid || ""),
-      stake_amount: Number(stakeNum.toFixed(2)),
-      team_one: String(teamNames[0] || ""),
-      team_two: String(teamNames[1] || ""),
-      usd_amount: Number((stakeNum * 0.0118).toFixed(2)),
-      user_id: String(user.user_id || user.id || "0"),
-      count: sections.length || 2,
-      bet_type: betType,
-      settlened: "pending",
-      nation: String(selectionName),
-      nat: String(selectionName),
-      user_rate: Number(oddsNum.toFixed(2)),
-      amount: Number(stakeNum.toFixed(2)),
-      place_date: placeDate,
-      runners: teamNames,
-      // Real feed sizes + top-tier prices. These are what let the server price a
-      // fancy bet at all — hardcoding them to 0/[] made lay/no bets book zero
-      // liability. See deriveBetSizes().
-      ...deriveBetSizes(pricedRunner, betType, oddsNum),
-      unmatched: false,
-      mname: String(market.mname || ""),
-      gtype: String(market.gtype || "match"),
-      section: Array.isArray(sections) ? sections : [],
-    };
+    const payload = buildBetPayload({ market, runner, pricedRunner, betType, oddsNum, stakeNum });
 
     setPlacing(true);
     try {
@@ -320,7 +498,7 @@ export default function GameDetails() {
     } finally {
       setPlacing(false);
     }
-  }, [betState, user, gmid, sid, dispatch, matchInfo]);
+  }, [betState, user, gmid, sid, dispatch, matchInfo, buildBetPayload, handleCombinedSubmit, raceWindowAllows]);
 
   // --- Fetch match info once on mount (for name / time / iplay) ---
   useEffect(() => {
@@ -329,6 +507,23 @@ export default function GameDetails() {
     getTopBarEvents(sid)
       .then((res) => {
         const inner = res?.data;
+
+        // Racing boards nest country → venue → race, so the flat lookup below
+        // finds nothing and the banner ends up with no data at all.
+        if (isRacing) {
+          const hit = findRaceInBoard(inner?.data, gmid);
+          if (hit) {
+            setMatchInfo({
+              name: [hit.country, hit.venue].filter(Boolean).join(" > ") || gmid,
+              time: hit.race.stime || "",
+              country: hit.country || "",
+              venue: hit.venue || "",
+            });
+            setIsLive(hit.race.iplay === true || hit.race.iplay === 1 || hit.race.iplay === "true");
+          }
+          return;
+        }
+
         const t1 = inner?.data?.t1 || [];
         const t2 = inner?.data?.t2 || [];
         const all = [...t1, ...t2];
@@ -355,7 +550,7 @@ export default function GameDetails() {
       .catch(() => {
         // Match info is optional — markets will still render
       });
-  }, [gmid, sid]);
+  }, [gmid, sid, isRacing]);
 
   // --- Poll getMatchPrivateData every 2s for live market data ---
   useEffect(() => {
@@ -601,6 +796,26 @@ export default function GameDetails() {
                 onBetClick={handleBetClick}
                 onCashout={user ? handleCashout : null}
                 widthClass={wc}
+                sportId={sid}
+                onCombinedBetClick={handleCombinedBetClick}
+                // Inline slip is MOBILE ONLY — on web the combined slip lives
+                // in the right-sidebar Place Bet panel. Never both.
+                combinedSlip={
+                  isMobile && betState.open && betState.legs?.length >= 2 &&
+                  String(betState.market?.mid ?? "") === String(market.mid ?? "")
+                    ? (
+                      <CombinedBetSlip
+                        betState={betState}
+                        onStakeChange={handleStakeChange}
+                        onQuickStake={handleQuickStake}
+                        onClear={handleClear}
+                        onReset={handleReset}
+                        onSubmit={handleCombinedSubmit}
+                        placing={placing}
+                      />
+                    )
+                    : null
+                }
               />
             );
             });

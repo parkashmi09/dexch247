@@ -11,6 +11,14 @@ import User from "../../model/user/User.js";
 import Staff from "../../model/admin/Staff.js";
 import { Op } from "sequelize";
 
+// Games whose payout is a MULTIPLE of the stake rather than decimal odds.
+// Value = the highest multiple the punter can lose, which is what placement must
+// lock. 1 Card Meter pays the point difference between the two cards, max 12x.
+// Keep in sync with the settlement worker's payoutRate handling.
+const CASINO_MULTIPLIER_GAMES = {
+    cmeter1: 12,
+};
+
 const CasinoController = {
     fetchAllData: async (req, res) => {
         const { type} = req.body;
@@ -162,6 +170,17 @@ const CasinoController = {
 
     exposer = -1 * amount;
     libality = -amount;
+    }
+
+    // 1 Card Meter settles at a MULTIPLE of the stake — the point difference
+    // between the two cards, up to 12x — so a 100 bet can lose 1200. Locking the
+    // flat stake let a punter take on 12x more risk than their balance covered;
+    // the worst case must be held, and settlement returns whatever the actual
+    // point difference does not consume.
+    if (CASINO_MULTIPLIER_GAMES[gameName]) {
+        const maxRate = CASINO_MULTIPLIER_GAMES[gameName];
+        exposer = -maxRate * amount;
+        libality = -maxRate * amount;
     }
     let eventId = gameId;
    

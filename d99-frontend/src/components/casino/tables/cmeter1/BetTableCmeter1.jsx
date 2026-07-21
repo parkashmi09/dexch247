@@ -6,9 +6,14 @@ function getExp(exposures, nat) {
 function BookValue({ value }) {
   const n = value !== null && value !== undefined ? parseFloat(value) : NaN;
   const show = !isNaN(n) && n !== 0;
+  // Sign-coloured and 2dp, like every other casino table. The figure here is the
+  // worst case: 1 Card Meter can lose up to 12x the stake, so it is large.
   return (
-    <div className="text-center book-green">
-      <b>{show ? n : ""}</b>
+    <div
+      className="casino-nation-book text-center"
+      style={show ? { color: n >= 0 ? "var(--text-success, #00aa00)" : "var(--text-danger, #ff0000)", fontWeight: "bold" } : undefined}
+    >
+      <b>{show ? (n >= 0 ? `+${n.toFixed(2)}` : n.toFixed(2)) : ""}</b>
     </div>
   );
 }

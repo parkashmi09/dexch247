@@ -41,11 +41,85 @@ async function resolveMarketLimits({ eventid, sid, match_id, mname, market_type,
   const selNorm = (selection_name || '').toString().trim().toLowerCase();
   const sec = (mkt.section || []).find(s => (s.nat || '').trim().toLowerCase() === selNorm) || null;
 
-  const maxLimit = Number(mkt.maxb) > 0 ? Number(mkt.maxb)
-    : (Number(mkt.max) > 0 ? Number(mkt.max) : (Number(sec?.max) || 0));
+  // NOTE: `maxb` is NOT a stake cap on this deployment — the feed sends
+  // maxb:1 on every market (cricket MATCH_ODDS and racing alike) as a boolean
+  // flag. Reading it as a limit would reject every bet above 1. The real cap
+  // is mkt.max (per-market) or sec.max (per-runner).
+  const maxLimit = Number(mkt.max) > 0 ? Number(mkt.max) : (Number(sec?.max) || 0);
   const minLimit = Number(sec?.min) > 0 ? Number(sec.min) : (Number(mkt.min) || 0);
 
   return { minLimit, maxLimit, marketName: mkt.mname };
+}
+
+// ---------------------------------------------------------------------------
+// HORSE RACING BETTING WINDOW (sid=10 only)
+// ---------------------------------------------------------------------------
+// A horse race accepts bets only in the final N minutes before the off.
+// Greyhound (65) is NOT affected.
+const RACE_BET_WINDOW_MINUTES = Number(process.env.RACE_BET_WINDOW_MINUTES) || 5;
+
+// ⚠️ THE TIMEZONE TRAP. The feed sends `stime` as an IST wall-clock string
+// with NO zone marker: "7/22/2026 1:44:00 AM". This server runs in UTC, where
+// `new Date(stime)` reads it as UTC and lands 5h30m LATE — every race would
+// look hours away and EVERY bet would be refused. Parse the parts explicitly
+// and subtract the +05:30 offset to get true UTC.
+const IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1000;
+function parseFeedIstTime(stime) {
+  if (!stime) return null;
+  const m = String(stime).trim().match(
+    /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/i
+  );
+  if (!m) {
+    const d = new Date(stime);
+    return isNaN(d) ? null : d.getTime();
+  }
+  const [, mo, day, yr, hhRaw, mi, ss, ampm] = m;
+  let hh = Number(hhRaw);
+  if (ampm) {
+    const up = ampm.toUpperCase();
+    if (up === 'PM' && hh !== 12) hh += 12;
+    if (up === 'AM' && hh === 12) hh = 0;
+  }
+  const asUtc = Date.UTC(Number(yr), Number(mo) - 1, Number(day), hh, Number(mi), Number(ss || 0));
+  return asUtc - IST_OFFSET_MS;
+}
+
+// Race start read from the LIVE board feed — never from the client-sent
+// match_start_time, which is forgeable. Racing boards nest
+// country → venue → race, so the tree has to be walked.
+// Returns null when the race can't be found, so callers FAIL OPEN (matching
+// how the limit and rate-cap checks behave when the feed is unreadable).
+// The board is one upstream call, and every bet on the same race would repeat
+// it. Memoise briefly — race times don't move second to second.
+const raceBoardCache = new Map();
+const RACE_BOARD_TTL_MS = 5000;
+async function fetchRaceBoard(sid) {
+  const key = String(sid);
+  const hit = raceBoardCache.get(key);
+  if (hit && Date.now() - hit.at < RACE_BOARD_TTL_MS) return hit.board;
+  const board = await CricketService.fetchCricketData(sid);
+  raceBoardCache.set(key, { at: Date.now(), board });
+  return board;
+}
+
+async function resolveRaceStartMs(eventid, sid) {
+  try {
+    const board = await fetchRaceBoard(sid);
+    const t1 = board?.data?.t1 || [];
+    const t2 = board?.data?.t2 || [];
+    const stack = [...t1, ...t2];
+    while (stack.length) {
+      const node = stack.pop();
+      if (!node || typeof node !== 'object') continue;
+      if (String(node.gmid ?? '') === String(eventid)) {
+        return parseFeedIstTime(node.stime);
+      }
+      if (Array.isArray(node.children)) stack.push(...node.children);
+    }
+  } catch (e) {
+    console.warn('[placeBet] Race start lookup failed (non-blocking):', e.message);
+  }
+  return null;
 }
 
 let cachedUsdRate = 0;
@@ -557,10 +631,22 @@ const walletUpdate = async (wallet, balanceChange, transaction, context = {}) =>
 //-------------------------   SPORTS PLACE BET FUNCTION  -----------------------------------------------
 //======================================================================================================
 
-export const placeBet = async (req, res) => {
+// `options` is the optional 3rd argument used by placeCombinedBet:
+//   options.transaction   — the CALLER owns the transaction: placeBet does not
+//                           commit, does not roll back, and does not emit the
+//                           balance socket push (the caller does all three
+//                           once, after every leg has been priced).
+//   options.skipMinStake  — waive the per-leg market MINIMUM. A dutched slip
+//                           splits one stake across runners, so an 8.37 leg of
+//                           a 100 slip must not trip a 100 minimum; the caller
+//                           enforces the minimum against the slip TOTAL.
+// As a plain Express handler the 3rd argument is `next` (a function) and is
+// ignored — only a plain object is treated as options.
+export const placeBet = async (req, res, options) => {
 
-
-  const transaction = await sequelize.transaction();
+  const opts = (options && typeof options === 'object' && !Array.isArray(options)) ? options : {};
+  const ownsTransaction = !opts.transaction;
+  const transaction = opts.transaction || await sequelize.transaction();
 
   try {
 
@@ -794,7 +880,9 @@ export const placeBet = async (req, res) => {
       const stakeNum = Number(stake_amount);
       // Cashout hedge stakes are COMPUTED (not user-chosen) — a min-stake
       // reject would leave the position unbalanceable. Max still applies.
-      const skipMin = is_cashout === true;
+      // Combined (dutched) legs skip it for the same reason: the caller checks
+      // the market minimum against the slip TOTAL instead.
+      const skipMin = is_cashout === true || opts.skipMinStake === true;
       if (limits) {
         console.log(`[placeBet] Limits for ${limits.marketName}: min=${limits.minLimit} max=${limits.maxLimit} stake=${stakeNum}${skipMin ? ' (cashout — min skipped)' : ''}`);
         if (!skipMin && limits.minLimit > 0 && stakeNum < limits.minLimit) {
@@ -814,6 +902,29 @@ export const placeBet = async (req, res) => {
         if (stakeNum > hardCap) {
           throw new Error(`Maximum bet amount is ${hardCap}`);
         }
+      }
+    }
+
+    //=============================================================================================
+    // ✅ STEP 4.55:              HORSE RACING BETTING WINDOW (server-side)
+    //=============================================================================================
+    // A horse race (sid=10) accepts bets ONLY in the final
+    // RACE_BET_WINDOW_MINUTES before the off. Greyhound (65) is unaffected.
+    // The start time comes from the LIVE board feed — never from the
+    // client-sent match_start_time, which is forgeable. Combined slips inherit
+    // this automatically because every leg goes through placeBet.
+    // Feed unreadable / race not listed → fails open (check skipped), matching
+    // the limit and rate-cap checks above.
+    if (String(sid) === '10') {
+      const raceStartMs = await resolveRaceStartMs(eventid, sid);
+      if (raceStartMs != null) {
+        const minutesToOff = (raceStartMs - Date.now()) / 60000;
+        console.log(`[placeBet] Race window: gmid=${eventid} minutesToOff=${minutesToOff.toFixed(1)} window=${RACE_BET_WINDOW_MINUTES}`);
+        if (minutesToOff > RACE_BET_WINDOW_MINUTES) {
+          throw new Error(`Betting opens ${RACE_BET_WINDOW_MINUTES} minutes before the race starts`);
+        }
+      } else {
+        console.warn(`[placeBet] Race start unresolved for gmid=${eventid} — window check skipped`);
       }
     }
 
@@ -2471,7 +2582,9 @@ export const placeBet = async (req, res) => {
     const totalUserExposure = await syncTotalExposure(user_id, transaction);
     console.log(`✅ TotalExposure synced for user ${user_id}: ${totalUserExposure}`);
 
-    await transaction.commit();
+    // A combined slip is ALL-OR-NOTHING: the caller owns the transaction and
+    // commits once, after every leg has priced successfully.
+    if (ownsTransaction) await transaction.commit();
 
     const newBalance = balanceChange !== 0 ? currentInr - balanceChange : currentInr;
 
@@ -2490,21 +2603,25 @@ export const placeBet = async (req, res) => {
     //   rises. So we emit the UNCHANGED inr_balance (placeBet only mutates wallet.cash) and the
     //   fresh net exposure: the header keeps its Balance and only Exp moves.
     // ========================================================================================
-    try {
-      // Net exposure computed the same way the header reads it (clamped,
-      // worst-case liability) so the pushed value equals a page refresh.
-      const netExposure = await calculateUserNetExposure(user_id);
+    // Skipped for combined legs — nothing is committed yet, so an emit here
+    // would push a balance the database does not hold. The caller emits once.
+    if (ownsTransaction) {
+      try {
+        // Net exposure computed the same way the header reads it (clamped,
+        // worst-case liability) so the pushed value equals a page refresh.
+        const netExposure = await calculateUserNetExposure(user_id);
 
-      // Keep user_net_exposure immediately consistent (the bg worker also syncs
-      // every ~1s) so a refresh right after the bet shows the same value.
-      await UserNetExposure.upsert({ user_id, net_exposure: netExposure });
+        // Keep user_net_exposure immediately consistent (the bg worker also syncs
+        // every ~1s) so a refresh right after the bet shows the same value.
+        await UserNetExposure.upsert({ user_id, net_exposure: netExposure });
 
-      await emitBalanceUpdate(user_id, {
-        inr_balance: Number(wallet.inr_balance),
-        exposure: netExposure,
-      });
-    } catch (emitErr) {
-      console.error('placeBet: real-time balanceUpdate emit failed:', emitErr.message);
+        await emitBalanceUpdate(user_id, {
+          inr_balance: Number(wallet.inr_balance),
+          exposure: netExposure,
+        });
+      } catch (emitErr) {
+        console.error('placeBet: real-time balanceUpdate emit failed:', emitErr.message);
+      }
     }
 
     return res.json({
@@ -2517,8 +2634,169 @@ export const placeBet = async (req, res) => {
     });
 
   } catch (err) {
-    await transaction.rollback();
+    // Only roll back a transaction we opened. For a combined leg the caller
+    // rolls the whole slip back, so the other legs unwind too.
+    if (ownsTransaction) await transaction.rollback();
     console.error("PLACE BET ERROR:", err.message);
+    return res.status(400).json({ success: false, error: err.message });
+  }
+};
+
+//=============================================================================================
+//-------------------   SPORTS COMBINED (DUTCHED) PLACE BET FUNCTION  -------------------------
+//=============================================================================================
+// A COMBINED slip is NOT one wager: it is one bet PER RUNNER, each at its own
+// price, with the typed stake split so that whichever selected runner wins,
+// the return is the same (dutching). The frontend does the split; this
+// endpoint stores each leg through the SAME placeBet — all the usual locks,
+// limits, exposure, wallet and ledger logic — inside ONE transaction, so the
+// slip is ALL-OR-NOTHING. If any leg is rejected (suspended runner, over max,
+// insufficient balance), nothing is stored and the wallet is untouched.
+//
+// Exposure needs no special handling: each leg is a normal bet, so the
+// existing per-runner maths produces the correct dutched book on its own.
+//
+//   POST /api/user/place-combined   { "bets": [ <same shape as /place>, … ] }
+//=============================================================================================
+
+const MAX_COMBINED_LEGS = Number(process.env.MAX_COMBINED_LEGS) || 10;
+
+export const placeCombinedBet = async (req, res) => {
+  const user_id = req.user?.account?.id;
+  if (!user_id) return res.status(400).json({ success: false, error: "User ID is required" });
+
+  const legs = req.body?.bets;
+
+  //---------------------------------------------------------------------------
+  // VALIDATION — every rule here exists because breaking it makes the slip
+  // either meaningless or a way around a per-bet limit.
+  //---------------------------------------------------------------------------
+  if (!Array.isArray(legs) || legs.length < 2) {
+    // A combined PRICE needs at least two runners.
+    return res.status(400).json({ success: false, error: "A combined bet needs at least 2 selections" });
+  }
+  if (legs.length > MAX_COMBINED_LEGS) {
+    return res.status(400).json({ success: false, error: `A combined bet allows at most ${MAX_COMBINED_LEGS} selections` });
+  }
+
+  const first = legs[0] || {};
+  // A combined price is only meaningful inside ONE market.
+  const sameMarket = legs.every(b =>
+    String(b?.eventid ?? '') === String(first.eventid ?? '') &&
+    String(b?.match_id ?? '') === String(first.match_id ?? '')
+  );
+  if (!sameMarket) {
+    return res.status(400).json({ success: false, error: "All selections must belong to the same market" });
+  }
+
+  // Mixing back and lay is not a dutch.
+  const side = String(first.bet_type || '').toLowerCase();
+  if (!legs.every(b => String(b?.bet_type || '').toLowerCase() === side)) {
+    return res.status(400).json({ success: false, error: "All selections must be on the same side (all back or all lay)" });
+  }
+
+  // Duplicate selections would double-count exposure on one outcome.
+  const names = legs.map(b => String(b?.selection_name || '').trim().toLowerCase());
+  if (names.some(n => !n)) {
+    return res.status(400).json({ success: false, error: "Every selection must have a name" });
+  }
+  if (new Set(names).size !== names.length) {
+    return res.status(400).json({ success: false, error: "Duplicate selections in a combined bet" });
+  }
+
+  let total = 0;
+  for (const b of legs) {
+    const s = Number(b?.stake_amount);
+    if (!Number.isFinite(s) || s <= 0) {
+      return res.status(400).json({ success: false, error: "Every selection needs a valid stake" });
+    }
+    total += s;
+  }
+  total = round2(total);
+
+  //---------------------------------------------------------------------------
+  // Market MIN / MAX are checked against the SLIP TOTAL, not per leg:
+  //   • an 8.37 leg of a 100 slip must not trip a 100 minimum;
+  //   • splitting must not become a way around the per-bet cap.
+  // The per-leg minimum is waived via opts.skipMinStake below.
+  //---------------------------------------------------------------------------
+  try {
+    const limits = await resolveMarketLimits({
+      eventid: first.eventid,
+      sid: first.sid,
+      match_id: first.match_id,
+      mname: first.mname,
+      market_type: first.market_type,
+      selection_name: first.selection_name,
+    });
+    if (limits) {
+      if (limits.minLimit > 0 && total < limits.minLimit) {
+        return res.status(400).json({ success: false, error: `Minimum bet amount is ${limits.minLimit}` });
+      }
+      if (limits.maxLimit > 0 && total > limits.maxLimit) {
+        return res.status(400).json({ success: false, error: `Maximum bet amount is ${limits.maxLimit}` });
+      }
+    }
+  } catch (limitErr) {
+    console.warn('[placeCombinedBet] Market limits lookup failed (non-blocking):', limitErr.message);
+  }
+
+  //---------------------------------------------------------------------------
+  // ALL-OR-NOTHING placement. Each leg runs through the real placeBet with the
+  // shared transaction; a fake `res` captures its verdict, because placeBet
+  // reports some rejections (bet locks) by RETURNING an error response rather
+  // than throwing — those must abort the slip too.
+  //---------------------------------------------------------------------------
+  const transaction = await sequelize.transaction();
+  try {
+    const placed = [];
+    for (const leg of legs) {
+      // Object.create keeps the real request's prototype (headers, ip, …)
+      // while overriding only the body for this leg.
+      const legReq = Object.create(req);
+      legReq.body = leg;
+
+      const captured = { status: 200, body: null };
+      const legRes = {
+        status(code) { captured.status = code; return this; },
+        json(body) { captured.body = body; return this; },
+      };
+
+      await placeBet(legReq, legRes, { transaction, skipMinStake: true });
+
+      if (captured.body?.success !== true) {
+        throw new Error(captured.body?.error || captured.body?.message || 'Selection rejected');
+      }
+      placed.push(captured.body);
+    }
+
+    await transaction.commit();
+
+    // ONE balance push for the whole slip, after the commit.
+    let totalExposure = null;
+    try {
+      const netExposure = await calculateUserNetExposure(user_id);
+      await UserNetExposure.upsert({ user_id, net_exposure: netExposure });
+      totalExposure = netExposure;
+      const wallet = await Wallet.findOne({ where: { user_id: String(user_id) } });
+      await emitBalanceUpdate(user_id, {
+        inr_balance: Number(wallet?.inr_balance ?? 0),
+        exposure: netExposure,
+      });
+    } catch (emitErr) {
+      console.error('placeCombinedBet: real-time balanceUpdate emit failed:', emitErr.message);
+    }
+
+    return res.json({
+      success: true,
+      legs: placed.length,
+      total_stake: total,
+      totalExposure,
+      results: placed,
+    });
+  } catch (err) {
+    await transaction.rollback();
+    console.error("PLACE COMBINED BET ERROR:", err.message);
     return res.status(400).json({ success: false, error: err.message });
   }
 };
@@ -2650,6 +2928,7 @@ export const settleBets = async () => {
 // ------------------------ EXPORT ------------------------
 const controller = {
   placeBet,
+  placeCombinedBet,
   getUserExposures,
   getOpenBets,
   getWalletBalance,
