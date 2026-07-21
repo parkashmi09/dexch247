@@ -1,5 +1,5 @@
 import BlinkBox, { ExposureValue } from "./BlinkBox.jsx";
-import { MARKET_TYPE, formatSize, formatLimit, getOddByTier, getExposureForSelection } from "../../../utils/gameDetailsUtils.js";
+import { MARKET_TYPE, formatSize, formatLimit, getOddByTier, getExposureForSelection, hasCashoutPosition } from "../../../utils/gameDetailsUtils.js";
 
 export default function SixColumnMarket({ market, exposures, marketType, onBetClick, widthClass, onCashout }) {
   // Suspension follows per-runner gstatus, NOT the top-level market.status:
@@ -20,6 +20,10 @@ export default function SixColumnMarket({ market, exposures, marketType, onBetCl
     ? `Min: ${formatLimit(market.min)}\u00a0 Max: ${formatLimit(market.max)}`
     : `Max: ${formatLimit(market.maxb || market.max)}`;
 
+  // Enable Cashout only when the user actually holds a book on this 2-runner
+  // market \u2014 otherwise the click just toasts "no position" (spec \u00a78.1).
+  const canCashout = !!onCashout && hasCashoutPosition(market, exposures);
+
   function handleOddClick(runner, betType, oddObj) {
     if (!oddObj || oddObj.odds === "-" || !oddObj.odds) return;
     const gs = (runner.gstatus || "").toUpperCase();
@@ -39,8 +43,8 @@ export default function SixColumnMarket({ market, exposures, marketType, onBetCl
         <span>{label}</span>
         <button
           className="btn btn-success btn-sm"
-          disabled={!onCashout}
-          onClick={() => onCashout && onCashout(market, marketType)}
+          disabled={!canCashout}
+          onClick={() => canCashout && onCashout(market, marketType)}
         >
           Cashout
         </button>

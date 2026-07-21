@@ -319,104 +319,179 @@ export function calcOutcomeProjection({ market, marketType, selectedRunner, betT
 // Cashout calculation
 // ---------------------------------------------------------------------------
 
-export function pickBestPrice(runner, otype) {
-  const odds = runner?.odds?.filter((o) => o.otype?.toLowerCase() === otype) || [];
-  if (!odds.length) return null;
-  const best = otype === "back"
-    ? odds.reduce((a, b) => ((Number(b.odds) || 0) > (Number(a.odds) || 0) ? b : a))
-    : odds.reduce((a, b) => ((Number(b.odds) || 0) < (Number(a.odds) || 0) && Number(b.odds) > 0 ? b : a));
-  const v = Number(best?.odds);
-  return v && v > 1 && isFinite(v) ? v : null;
+const CASHOUT_EPS = 0.01;
+
+// Best executable price object for one runner on the given side. Prefers the
+// named best tier (back1/lay1); otherwise max-odds back / min-odds lay across
+// tiers whose odds > 1 (a 0/`-` rung is not a price). Returns the full rung so
+// the caller can read `size`, or null.
+export function pickBestPriceObj(runner, otype) {
+  const side = (runner?.odds || []).filter(
+    (o) => String(o?.otype || "").toLowerCase() === otype && Number(o?.odds) > 1
+  );
+  if (!side.length) return null;
+  const named = side.find((o) => String(o?.oname || "").toLowerCase() === `${otype}1`);
+  if (named) return named;
+  return otype === "back"
+    ? side.reduce((a, b) => (Number(b.odds) > Number(a.odds) ? b : a))
+    : side.reduce((a, b) => (Number(b.odds) < Number(a.odds) ? b : a));
 }
 
+/** Backward-compatible: just the best price as a number, or null. */
+export function pickBestPrice(runner, otype) {
+  const o = pickBestPriceObj(runner, otype);
+  const v = Number(o?.odds);
+  return v > 1 && isFinite(v) ? v : null;
+}
+
+// Exposure walk mirroring the backend placeBet math (spec §8.2):
+//   mult = percent ? odds/100 : odds-1
+//   BACK sel: sel += stake·mult ; other -= stake
+//   LAY  sel: sel -= stake·mult ; other += stake
+function projectCashout(vals, higherIdx, lowerIdx, betType, selIsHigher, odds, stake, usePercent) {
+  const mult = usePercent ? odds / 100 : odds - 1;
+  const next = [...vals];
+  const sel = selIsHigher ? higherIdx : lowerIdx;
+  const other = selIsHigher ? lowerIdx : higherIdx;
+  if (betType === "back") {
+    next[sel] = vals[sel] + stake * mult;
+    next[other] = vals[other] - stake;
+  } else {
+    next[sel] = vals[sel] - stake * mult;
+    next[other] = vals[other] + stake;
+  }
+  return Math.min(next[0], next[1]);
+}
+
+/**
+ * Compute ONE hedge bet that balances a 2-runner book (spec §8).
+ *
+ * `exposures` may be the raw API rows OR a page-level exposure map — either way
+ * per-runner exposure is read through getExposureForSelection, which scopes to
+ * the market mid and prefers selection_id over free-text names.
+ *
+ * Candidates (LAY higher / BACK lower) are projected, sorted safest-first, and
+ * the FIRST that neither worsens the book nor breaks the max is returned.
+ * There is deliberately NO min-stake gate — a computed hedge of 99.02 on a
+ * min-100 market is valid (spec §8.5). Returns {ok:false, reason} otherwise.
+ */
 export function buildMarketCashout(market, marketType, exposures) {
   const sections = market?.section;
-  if (!sections || sections.length < 2) return { ok: false, reason: "invalid_market" };
+  if (!sections || sections.length !== 2 || !market?.mname) {
+    return { ok: false, reason: "invalid_market" };
+  }
 
-  const mname = (market.mname || "").toLowerCase();
   // Percent scale, not "is it Tied": Bookmaker / Bookmaker 2 / Tied all quote
   // percent (gtype match1) and all need divisor = odds/100 + 1. Keying this off
-  // the rendering label used to send Bookmaker cashouts through the decimal
-  // divisor, which produced a hedge stake that did not balance the book.
+  // the rendering label sent Bookmaker cashouts through the decimal divisor,
+  // producing a hedge stake that did not balance the book.
   const usePercent = getOddsFormat(market) === "percent" || isTiedMarket(market);
 
-  // Get exposure per runner
-  const exps = {};
-  sections.forEach((s) => {
-    const name = s.nat || "";
-    const found = exposures.find(
-      (e) =>
-        (e.team_name === name || e.nation === name || e.nat === name) &&
-        (String(e.match_id) === String(market.mid) || e.game_type === mname)
-    );
-    exps[name] = Number(found?.exposure_amount ?? found?.exposure ?? found?.pl ?? 0);
-  });
+  const vals = sections.map((s) => Number(getExposureForSelection(exposures, s, market.mid) || 0));
 
-  const names = Object.keys(exps);
-  const vals = names.map((n) => exps[n]);
+  if (vals.every((v) => Math.abs(v) < CASHOUT_EPS)) return { ok: false, reason: "no_position" };
+  if (Math.abs(vals[0] - vals[1]) < CASHOUT_EPS) return { ok: false, reason: "already_balanced" };
 
-  if (vals.every((v) => Math.abs(v) < 0.01)) return { ok: false, reason: "no_position" };
-  if (Math.abs(vals[0] - vals[1]) < 0.01) return { ok: false, reason: "already_balanced" };
-
-  // Determine higher/lower exposure runner
-  const higherIdx = vals[0] >= vals[1] ? 0 : 1;
+  const higherIdx = vals[0] >= vals[1] ? 0 : 1; // drain the higher-exposure runner
   const lowerIdx = 1 - higherIdx;
   const diff = vals[higherIdx] - vals[lowerIdx];
   const worstBefore = Math.min(...vals);
 
   const candidates = [];
-  const minStake = market.min || 0;
-  const maxStake = market.maxb || market.max || Infinity;
 
-  // Strategy 1: LAY the higher-exposure runner
-  const layOdds = pickBestPrice(sections[higherIdx], "lay");
-  if (layOdds) {
-    const divisor = usePercent ? (layOdds / 100 + 1) : layOdds;
+  // PRIMARY — LAY the higher-exposure runner
+  const layObj = pickBestPriceObj(sections[higherIdx], "lay");
+  if (layObj) {
+    const odds = Number(layObj.odds);
+    const divisor = usePercent ? odds / 100 + 1 : odds;
     const stake = Math.round(Math.max(0, diff / divisor) * 100) / 100;
-    // Project new exposures
-    const newH = vals[higherIdx] - stake * (usePercent ? layOdds / 100 : layOdds - 1);
-    const newL = vals[lowerIdx] + stake;
-    const worstAfter = Math.min(newH, newL);
-    if (worstAfter >= worstBefore - 0.01) {
+    if (stake > 0) {
       candidates.push({
         betType: "lay",
         runner: sections[higherIdx],
-        odds: layOdds,
+        odds,
+        size: Number(layObj.size) || 0,
         stake,
-        worstAfter,
+        worstAfter: projectCashout(vals, higherIdx, lowerIdx, "lay", true, odds, stake, usePercent),
       });
     }
   }
 
-  // Strategy 2: BACK the lower-exposure runner
-  const backOdds = pickBestPrice(sections[lowerIdx], "back");
-  if (backOdds) {
-    const divisor = usePercent ? (backOdds / 100 + 1) : backOdds;
+  // FALLBACK — BACK the lower-exposure runner
+  const backObj = pickBestPriceObj(sections[lowerIdx], "back");
+  if (backObj) {
+    const odds = Number(backObj.odds);
+    const divisor = usePercent ? odds / 100 + 1 : odds;
     const stake = Math.round(Math.max(0, diff / divisor) * 100) / 100;
-    const newH = vals[higherIdx] - stake;
-    const newL = vals[lowerIdx] + stake * (usePercent ? backOdds / 100 : backOdds - 1);
-    const worstAfter = Math.min(newH, newL);
-    if (worstAfter >= worstBefore - 0.01) {
+    if (stake > 0) {
       candidates.push({
         betType: "back",
         runner: sections[lowerIdx],
-        odds: backOdds,
+        odds,
+        size: Number(backObj.size) || 0,
         stake,
-        worstAfter,
+        worstAfter: projectCashout(vals, higherIdx, lowerIdx, "back", false, odds, stake, usePercent),
       });
     }
   }
 
   if (!candidates.length) return { ok: false, reason: "no_odds" };
 
-  // Pick best candidate (highest worst-case)
+  // Safest-first (highest resulting floor), then take the first that passes.
   candidates.sort((a, b) => b.worstAfter - a.worstAfter);
-  const best = candidates[0];
+  const maxStake = Number(market.maxb) > 0 ? Number(market.maxb) : Number(market.max) || 0;
 
-  if (best.stake < minStake) return { ok: false, reason: "below_min", min: minStake };
-  if (best.stake > maxStake) return { ok: false, reason: "above_max", max: maxStake };
+  let lastReject = { ok: false, reason: "no_odds" };
+  for (const c of candidates) {
+    if (c.worstAfter + CASHOUT_EPS < worstBefore) {
+      lastReject = { ok: false, reason: "worsens" };
+      continue;
+    }
+    if (maxStake > 0 && c.stake > maxStake) {
+      lastReject = { ok: false, reason: "above_max", max: maxStake };
+      continue;
+    }
+    return { ok: true, ...c };
+  }
+  return lastReject;
+}
 
-  return { ok: true, ...best };
+/**
+ * Whether the Cashout button should be enabled (spec §8.1): the market is a
+ * 2-runner match/match1 hedge target AND the user holds a non-zero book on at
+ * least one runner. 3-way and fancy markets are excluded — the 2-runner hedge
+ * engine cannot balance them.
+ */
+export function hasCashoutPosition(market, exposures) {
+  const sections = market?.section || [];
+  if (sections.length !== 2) return false;
+  const gt = String(market?.gtype || "").toLowerCase();
+  const mn = String(market?.mname || "").toLowerCase();
+  const eligible =
+    gt === "match" || gt === "match1" || /match[\s_]*odds|tied|bookmaker/.test(mn);
+  if (!eligible) return false;
+  return sections.some(
+    (s) => Math.abs(Number(getExposureForSelection(exposures, s, market.mid) || 0)) > 0.01
+  );
+}
+
+/** Cashout reject reason → user-facing toast (reference wording, spec §8.6). */
+export function cashoutToastMessage(reason) {
+  switch (reason) {
+    case "no_position":
+      return "No active bets to cashout";
+    case "already_balanced":
+      return "You are not eligible for cashout!";
+    case "no_odds":
+    case "worsens":
+      return "You are not eligible for cashout";
+    case "above_max":
+      return "Cashout stake above the market limit";
+    case "invalid_market":
+      return "Cashout not available for this market";
+    default:
+      return "Cashout not available";
+  }
 }
 
 // ---------------------------------------------------------------------------

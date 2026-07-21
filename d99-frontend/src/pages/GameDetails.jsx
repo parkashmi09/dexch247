@@ -21,6 +21,7 @@ import {
   buildMarketCashout,
   INITIAL_BET_STATE,
   deriveBetSizes,
+  cashoutToastMessage,
 } from "../utils/gameDetailsUtils.js";
 import {
   TOASTS,
@@ -112,19 +113,13 @@ export default function GameDetails() {
     }
     const result = buildMarketCashout(market, marketType, exposures);
     if (!result.ok) {
-      const msgs = {
-        invalid_market: "Invalid market for cashout.",
-        no_position: "No open position to cashout.",
-        already_balanced: "Position is already balanced.",
-        no_odds: "No odds available for cashout.",
-        worsens: "Cashout would worsen your position.",
-        below_min: `Cashout stake below minimum (${result.min}).`,
-        above_max: `Cashout stake above maximum (${result.max}).`,
-      };
-      toast.error(msgs[result.reason] || "Cashout not available.");
+      toast.error(cashoutToastMessage(result.reason));
       return;
     }
-    // Open place bet panel pre-filled with cashout bet
+    // Open the place-bet panel pre-filled with the computed hedge. The user
+    // still confirms with Submit; the pipeline routes it through is_cashout,
+    // which skips the min-stake and bookie-favour checks (spec §8.5) but keeps
+    // the max, suspension, balance and buffer checks.
     setBetState({
       open: true,
       market,
