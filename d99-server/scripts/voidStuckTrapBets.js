@@ -64,14 +64,14 @@ const w = async () =>
     const [exp] = await s.query(
       `SELECT SUM(market_exposure) AS total_exposure FROM (
          SELECT MIN(exposure_amount) AS market_exposure FROM user_exposures
-         WHERE user_id = :u AND category <> 'casino' AND game_type IS NOT NULL
+         WHERE user_id = :u AND game_type IS NOT NULL
            AND game_type NOT IN ('Normal','Ball By Ball','Over By Over','khado','meter','fancy1')
            AND game_type NOT LIKE '%Overs Line%'
            AND NOT (team_name ILIKE '%back%' OR team_name ILIKE '%lay%')
          GROUP BY match_id, game_type, event_id
          UNION ALL
          SELECT exposure_amount AS market_exposure FROM user_exposures
-         WHERE user_id = :u AND (category='casino' OR game_type IS NULL
+         WHERE user_id = :u AND (game_type IS NULL
            OR game_type IN ('Normal','Ball By Ball','Over By Over','khado','meter','fancy1')
            OR game_type LIKE '%Overs Line%')
            AND NOT (team_name ILIKE '%back%' OR team_name ILIKE '%lay%')

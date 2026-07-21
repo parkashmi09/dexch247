@@ -137,12 +137,13 @@ export const calculateUserNetExposure = async (user_id, transaction = null) => {
     SELECT SUM(market_exposure) AS total_exposure
     FROM (
 
-      /* 1️⃣ GROUPED SPORTS MARKETS (Worst-case per market, clamped to ≤ 0) */
+      /* 1️⃣ GROUPED TEAM MARKETS (Worst-case per market, clamped to ≤ 0)
+         Tagged rows only — sports markets and casino book markets (see the
+         longer note in calculateNetExposure above). */
       SELECT LEAST(MIN(exposure_amount), 0) AS market_exposure
       FROM user_exposures
       WHERE
         user_id = :user_id
-        AND category <> 'casino'
         AND game_type IS NOT NULL
         AND game_type NOT IN ('Normal', 'Ball By Ball', 'Over By Over', 'khado', 'meter', 'fancy1')
         AND game_type NOT LIKE '%Overs Line%'
@@ -157,8 +158,7 @@ export const calculateUserNetExposure = async (user_id, transaction = null) => {
       WHERE
         user_id = :user_id
         AND (
-          category = 'casino'
-          OR game_type IS NULL
+          game_type IS NULL
           OR game_type IN ('Normal', 'Ball By Ball', 'Over By Over', 'khado', 'meter', 'fancy1')
           OR game_type LIKE '%Overs Line%'
         )

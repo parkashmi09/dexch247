@@ -70,13 +70,13 @@ export const CHECKS = [
         SELECT user_id, SUM(grp) AS exp FROM (
           SELECT CAST(user_id AS TEXT) AS user_id, LEAST(0, MIN(exposure_amount)) AS grp
             FROM user_exposures
-           WHERE category <> 'casino' AND game_type IS NOT NULL
+           WHERE game_type IS NOT NULL
              AND game_type NOT IN ${FANCY_GT} AND game_type NOT LIKE '%Overs Line%' AND ${NOT_BACKLAY}
            GROUP BY CAST(user_id AS TEXT), match_id, game_type, event_id
           UNION ALL
           SELECT CAST(user_id AS TEXT) AS user_id, LEAST(exposure_amount, 0) AS grp
             FROM user_exposures
-           WHERE ( category = 'casino' OR game_type IS NULL OR game_type IN ${FANCY_GT}
+           WHERE ( game_type IS NULL OR game_type IN ${FANCY_GT}
                    OR game_type LIKE '%Overs Line%' ) AND ${NOT_BACKLAY}
         ) x GROUP BY user_id
       ) d ON d.user_id = CAST(u.user_id AS TEXT)

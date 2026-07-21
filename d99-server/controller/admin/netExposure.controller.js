@@ -304,6 +304,7 @@ export const getNetExposureCasino = async (req, res) => {
                 eventDate: exp.created_at,
                 category: 'casino',
                 selections: {},
+                marketWorst: {},   // game_type -> worst runner in that book market
                 totalStake: 0,
                 totalPL: 0
             });
@@ -316,16 +317,31 @@ export const getNetExposureCasino = async (req, res) => {
             round.selections[teamName] = 0;
           }
           round.selections[teamName] += amount;
-    
-          // Calculate stake (absolute sum of negative exposures)
-          if (amount < 0) {
+
+          // Liability. Rows tagged with a game_type are a per-runner BOOK of one
+          // market (see helper/casinoMarketBook.js) — the market can only lose the
+          // WORST runner, so summing its negative rows would double-count. Legacy
+          // untagged rows are one-liability-per-bet and stay additive.
+          if (exp.game_type) {
+            round.marketWorst[exp.game_type] = Math.min(
+              round.marketWorst[exp.game_type] ?? 0,
+              amount
+            );
+          } else if (amount < 0) {
             round.totalStake += Math.abs(amount);
           }
-    
+
           // Calculate P/L (sum of positive exposures)
           if (amount > 0) {
             round.totalPL += amount;
           }
+    }
+
+    // Fold each book market's worst case into the round's liability.
+    for (const round of roundsMap.values()) {
+        for (const worst of Object.values(round.marketWorst)) {
+            round.totalStake += Math.abs(worst);
+        }
     }
 
     const data = [];

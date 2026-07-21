@@ -161,12 +161,12 @@ async function buildBettorReport(sequelize, u) {
   const derived = num(((await q(sequelize,
     `SELECT COALESCE(SUM(grp),0) AS exp FROM (
         SELECT LEAST(0, MIN(exposure_amount)) AS grp FROM user_exposures
-         WHERE user_id=:uid AND category<>'casino' AND game_type IS NOT NULL
+         WHERE user_id=:uid AND game_type IS NOT NULL
            AND game_type NOT IN ${FANCY_GT} AND game_type NOT LIKE '%Overs Line%' AND ${NOT_BACKLAY}
          GROUP BY match_id, game_type, event_id
         UNION ALL
         SELECT LEAST(exposure_amount,0) FROM user_exposures
-         WHERE user_id=:uid AND (category='casino' OR game_type IS NULL OR game_type IN ${FANCY_GT} OR game_type LIKE '%Overs Line%') AND ${NOT_BACKLAY}
+         WHERE user_id=:uid AND (game_type IS NULL OR game_type IN ${FANCY_GT} OR game_type LIKE '%Overs Line%') AND ${NOT_BACKLAY}
      ) s`, { uid }))[0] || {}).exp);
   const perMarket = await q(sequelize,
     `SELECT COALESCE(match_title, match_id) AS market, game_type, ROUND(LEAST(0,MIN(exposure_amount))::numeric,2) AS worst
