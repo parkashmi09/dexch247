@@ -9,6 +9,7 @@ import User from "../model/user/User.js";
 import Wallet from "../model/admin/Wallet.js";
 import TotalExposure from "../model/user/TotalExposure.js";
 import { emitBalanceUpdate } from "../utils/socketUtils.js";
+import { findCasinoMarket, calculateCasinoBook, casinoMarketGameType } from "../helper/casinoMarketBook.js";
 import { QueryTypes } from "sequelize";
 
 const BASE_URL = process.env.DIAMOND_BASE_URL;
@@ -254,41 +255,51 @@ const CasinoService = {
         { transaction }
       );
       // 2️⃣ UPSERT user exposure (find -> update OR create)
-      const exposureTeamName = gameName === 'abj' ? (player_name || selection) : selection;
-      const existingExposure = await UserExposure.findOne({
-        where: {
-          user_id: userId,
-          match_id: String(roundId),
-          team_name: exposureTeamName,
-          event_id: String(roundId),
-        },
-        transaction,
-      });
+      //
+      // Book-managed games (see helper/casinoMarketBook.js) write ONE ROW PER
+      // RUNNER of the bet's market — the backed runner holds the profit, the
+      // others the loss — exactly like the sports side does. Everything else
+      // keeps the legacy single-row behaviour (the wallet liability only).
+      const market = findCasinoMarket(gameName, selection);
+      const bookRows = market
+        ? calculateCasinoBook({ market, selection, stake: amount, odds, type })
+        : [{ team_name: gameName === 'abj' ? (player_name || selection) : selection, delta: Number(exposer ?? 0) }];
+      const gameType = market ? casinoMarketGameType(gameName, market.key) : null;
 
-      if (existingExposure) {
-        // ✅ UPDATE: add new exposure to existing amount
-        const newExposure =
-          Number(existingExposure.exposure_amount || 0) +
-          Number(exposer ?? 0);
-
-        await existingExposure.update(
-          { exposure_amount: newExposure },
-          { transaction }
-        );
-      } else {
-        // ✅ CREATE: first exposure row
-        await UserExposure.create(
-          {
+      for (const row of bookRows) {
+        const existingExposure = await UserExposure.findOne({
+          where: {
             user_id: userId,
             match_id: String(roundId),
-            exposure_amount: exposer ?? 0,
-            team_name: exposureTeamName,
-            match_title: gameName,
+            team_name: row.team_name,
             event_id: String(roundId),
-            category: "casino"
+            game_type: gameType,
           },
-          { transaction }
-        );
+          transaction,
+        });
+
+        if (existingExposure) {
+          // ✅ UPDATE: add this bet's contribution to the running book
+          await existingExposure.update(
+            { exposure_amount: Number(existingExposure.exposure_amount || 0) + row.delta },
+            { transaction }
+          );
+        } else {
+          // ✅ CREATE: first exposure row
+          await UserExposure.create(
+            {
+              user_id: userId,
+              match_id: String(roundId),
+              exposure_amount: row.delta,
+              team_name: row.team_name,
+              match_title: gameName,
+              event_id: String(roundId),
+              game_type: gameType,
+              category: "casino"
+            },
+            { transaction }
+          );
+        }
       }
 
 
@@ -305,7 +316,7 @@ const CasinoService = {
             `SELECT COALESCE(SUM(market_exposure),0) AS net FROM (
                SELECT LEAST(MIN(exposure_amount),0) AS market_exposure
                FROM user_exposures
-               WHERE user_id = :uid AND category <> 'casino' AND game_type IS NOT NULL
+               WHERE user_id = :uid AND game_type IS NOT NULL
                  AND game_type NOT IN ('Normal','Ball By Ball','Over By Over','khado','meter','fancy1')
                  AND game_type NOT LIKE '%Overs Line%'
                  AND NOT (team_name ILIKE '%back' OR team_name ILIKE '%lay')
@@ -313,7 +324,7 @@ const CasinoService = {
                UNION ALL
                SELECT LEAST(exposure_amount,0) AS market_exposure
                FROM user_exposures
-               WHERE user_id = :uid AND (category='casino' OR game_type IS NULL
+               WHERE user_id = :uid AND (game_type IS NULL
                  OR game_type IN ('Normal','Ball By Ball','Over By Over','khado','meter','fancy1')
                  OR game_type LIKE '%Overs Line%')
                  AND NOT (team_name ILIKE '%back' OR team_name ILIKE '%lay')

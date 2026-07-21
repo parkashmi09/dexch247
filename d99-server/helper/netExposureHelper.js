@@ -43,7 +43,12 @@ export const calculateNetExposure = async () => {
     SELECT user_id, SUM(market_exposure) AS total_exposure
 FROM (
 
-  /* 1️⃣ GROUPED SPORTS MARKETS (Worst-case per market, clamped to ≤ 0) */
+  /* 1️⃣ GROUPED TEAM MARKETS (Worst-case per market, clamped to ≤ 0)
+     A row belongs here when it carries a market tag in game_type — sports
+     markets, and casino book markets tagged game:market by
+     helper/casinoMarketBook.js. Their rows are a per-runner book, so the
+     market's liability is the WORST runner, never the sum of the rows.
+     Legacy casino rows (game_type NULL) stay additive in branch 2. */
   SELECT
     user_id,
     match_id,
@@ -52,8 +57,7 @@ FROM (
     LEAST(MIN(exposure_amount), 0) AS market_exposure
   FROM user_exposures
   WHERE
-    category <> 'casino'
-    AND game_type IS NOT NULL
+    game_type IS NOT NULL
     AND game_type NOT IN ('Normal', 'Ball By Ball', 'Over By Over', 'khado', 'meter' , 'fancy1')
     AND game_type NOT LIKE '%Overs Line%'
     AND NOT (team_name ILIKE '%back' OR team_name ILIKE '%lay' OR team_name ILIKE '%totalstake')
@@ -71,8 +75,7 @@ FROM (
   FROM user_exposures
   WHERE
     (
-      category = 'casino'
-      OR game_type IS NULL
+      game_type IS NULL
       OR game_type IN ('Normal', 'Ball By Ball', 'Over By Over', 'khado', 'meter', 'fancy1')
       OR game_type LIKE '%Overs Line%'
     )
