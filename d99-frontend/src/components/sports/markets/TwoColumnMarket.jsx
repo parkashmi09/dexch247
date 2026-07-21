@@ -1,7 +1,11 @@
 import BlinkBox, { ExposureValue } from "./BlinkBox.jsx";
-import { MARKET_TYPE, formatSize, formatLimit, getOddByTier, getExposureForSelection } from "../../../utils/gameDetailsUtils.js";
+import { formatSize, formatLimit, getOddByTier, getExposureForSelection, hasCashoutPosition, detectMarketType } from "../../../utils/gameDetailsUtils.js";
 
 export default function TwoColumnMarket({ market, exposures, onBetClick, onCashout, widthClass, showCashout = true, marketClass }) {
+  // Real type (Bookmaker 2 / Tied / Score More Runs all render here) — the raw
+  // `market` still drives payload/scale, but a correct label keeps display and
+  // exposure re-mapping honest instead of tagging everything BOOKMAKER2.
+  const resolvedType = detectMarketType(market);
   // Whole-market overlay is driven by per-runner gstatus, NOT the top-level
   // market.status. A match1 "Tied Match" bookmaker can report status:"SUSPENDED"
   // while one runner is still ACTIVE with live odds — that runner must stay
@@ -13,10 +17,11 @@ export default function TwoColumnMarket({ market, exposures, onBetClick, onCasho
     : market.status === "SUSPENDED";
   const label = market.mname;
   const minMax = `Min: ${formatLimit(market.min)}\u00a0 Max: ${formatLimit(market.max)}`;
+  const canCashout = !!onCashout && hasCashoutPosition(market, exposures);
 
   function handleOddClick(runner, betType, odd) {
     if (!onBetClick || odd.odds === "-") return;
-    onBetClick({ market, marketType: MARKET_TYPE.BOOKMAKER2, runner, betType, odds: odd.odds });
+    onBetClick({ market, marketType: resolvedType, runner, betType, odds: odd.odds });
   }
 
   return (
@@ -26,8 +31,8 @@ export default function TwoColumnMarket({ market, exposures, onBetClick, onCasho
         {showCashout && (
           <button
             className="btn btn-success btn-sm"
-            disabled={!onCashout}
-            onClick={() => onCashout && onCashout(market, MARKET_TYPE.BOOKMAKER2)}
+            disabled={!canCashout}
+            onClick={() => canCashout && onCashout(market, resolvedType)}
           >Cashout</button>
         )}
       </div>

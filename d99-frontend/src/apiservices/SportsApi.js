@@ -41,6 +41,10 @@ export const getSportsTree = () =>
 /** Legacy alias for getSportsTree — old code calls this `getTreeData`. */
 export const getTreeData = getSportsTree;
 
+/** Platform-configured bet buffer, in seconds. */
+export const getPlatformBufferTime = () =>
+  api.get("/user/buffer-time").then((r) => r.data);
+
 /** Place a bet. */
 export const sportsPlaceBet = (payload) =>
   api.post("/user/place", payload).then((r) => r.data);
