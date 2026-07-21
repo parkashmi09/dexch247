@@ -20,7 +20,9 @@
       "Bash(curl -s -o /dev/null -w \"buffer-time: %{http_code}\\\\n\" \"https://api.dexch247.com/api/user/buffer-time\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo5LCJyb2xlIjoiVVNFUiIsInVzZXJuYW1lIjoidXNlcnRlc3QwMDIiLCJsZXZlbCI6Ikw0IiwicGFyZW50X3N0YWZmX2lkIjpudWxsLCJvd25lcl9pZCI6bnVsbCwic2lkIjoiZmE1ODE2OTgtZDUyYy00NGFhLWFhOGItMjNmMWUzZjUwMjNlIiwiaWF0IjoxNzg0NjU3NDU2LCJleHAiOjE3ODQ3NDM4NTZ9.cjAv3_dUk6UuTgtCnUTff-LsagIiQ3__RH5WGDbyKPc\")",
       "Bash(curl -s \"https://api.dexch247.com/api/user/buffer-time\")",
       "Bash(node \"C:/Users/LOQ/AppData/Local/Temp/claude/D--Developer-dexch247/3cd3e556-3cee-4284-a5d4-97f4e8db6034/scratchpad/spec-check.mjs\")",
-      "Bash(npx vite *)"
+      "Bash(npx vite *)",
+      "Bash(grep -rn *)",
+      "Bash(echo \"exit=$?\")"
     ]
   }
 }
