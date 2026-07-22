@@ -33,8 +33,8 @@ export default function BetTableRace2({ tableData = [], onBetClick, exposures = 
         {ROWS.map(({ nat, sid }) => {
           const item = tableData.find((d) => d.nat === nat || d.sid === sid);
           const sus = isSus(item);
-          const backOdds = sus ? 0 : item?.b || 0;
-          const layOdds = sus ? 0 : item?.l || 0;
+          const backOdds = item?.b || 0;
+          const layOdds = item?.l || 0;
 
           return (
             <div key={nat} className="casino-odd-box-container">

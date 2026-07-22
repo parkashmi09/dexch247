@@ -34,7 +34,7 @@ export default function BetTableLucky5({ tableData = [], onBetClick, exposures =
     const sus = isSus(item);
     return (
       <div className="lucky7odds">
-        <div className="casino-odds text-center">{sus ? 0 : item?.b || 0}</div>
+        <div className="casino-odds text-center">{item?.b || 0}</div>
         <div
           className={`casino-odds-box back casino-odds-box-theme${sus ? " suspended-box" : ""}`}
           onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}
@@ -61,7 +61,7 @@ export default function BetTableLucky5({ tableData = [], onBetClick, exposures =
       {/* Top: Low Card | Center Card (6) | High Card */}
       <div className="casino-table-full-box">
         <div className="lucky7low">
-          <div className="casino-odds text-center">{isSus(lowCard) ? 0 : lowCard?.b || 0}</div>
+          <div className="casino-odds text-center">{lowCard?.b || 0}</div>
           <div
             className={`casino-odds-box back casino-odds-box-theme${isSus(lowCard) ? " suspended-box" : ""}`}
             onClick={() => !isSus(lowCard) && lowCard.b > 0 && onBetClick?.(lowCard.b, lowCard.nat, lowCard, "back")}
@@ -76,7 +76,7 @@ export default function BetTableLucky5({ tableData = [], onBetClick, exposures =
         </div>
 
         <div className="lucky7high">
-          <div className="casino-odds text-center">{isSus(highCard) ? 0 : highCard?.b || 0}</div>
+          <div className="casino-odds text-center">{highCard?.b || 0}</div>
           <div
             className={`casino-odds-box back casino-odds-box-theme${isSus(highCard) ? " suspended-box" : ""}`}
             onClick={() => !isSus(highCard) && highCard.b > 0 && onBetClick?.(highCard.b, highCard.nat, highCard, "back")}
@@ -96,7 +96,7 @@ export default function BetTableLucky5({ tableData = [], onBetClick, exposures =
         <div className="casino-table-right-box">
           {/* Red (hearts + diamonds) */}
           <div className="lucky7odds">
-            <div className="casino-odds text-center">{isSus(red) ? 0 : red?.b || 0}</div>
+            <div className="casino-odds text-center">{red?.b || 0}</div>
             <div
               className={`casino-odds-box back casino-odds-box-theme${isSus(red) ? " suspended-box" : ""}`}
               onClick={() => !isSus(red) && red.b > 0 && onBetClick?.(red.b, red.nat, red, "back")}
@@ -110,7 +110,7 @@ export default function BetTableLucky5({ tableData = [], onBetClick, exposures =
           </div>
           {/* Black (spades + clubs) */}
           <div className="lucky7odds">
-            <div className="casino-odds text-center">{isSus(black) ? 0 : black?.b || 0}</div>
+            <div className="casino-odds text-center">{black?.b || 0}</div>
             <div
               className={`casino-odds-box back casino-odds-box-theme${isSus(black) ? " suspended-box" : ""}`}
               onClick={() => !isSus(black) && black.b > 0 && onBetClick?.(black.b, black.nat, black, "back")}

@@ -31,7 +31,10 @@ export function betLost(b) { return ['lost', 'loss'].includes(lc(b.result_status
 export function winPayout(stake, odds) { return num(stake) * num(odds); }        // total returned on win
 export function winProfit(stake, odds) { return num(stake) * (num(odds) - 1); }  // net profit on win
 export function lossAmount(stake) { return num(stake); }                          // forfeited on loss
-export function exposureOf(b) { return Math.abs(num(b.exposer != null ? b.exposer : -num(b.stake))); }
+// Cash this bet locked (exposer is stored negative). SIGNED, not absolute: book-managed
+// markets (aaa, dum10) lock the marginal worst case, so a hedge stores a positive exposer
+// meaning it RELEASED cash — abs() would count that release as a second lock.
+export function exposureOf(b) { return -num(b.exposer != null ? b.exposer : -num(b.stake)); }
 // net casino exposure = −Σ(open stake); independent bets, no hedging
 export function computeExposure(openBets) { return -(openBets || []).reduce((s, b) => s + exposureOf(b), 0); }
 
@@ -69,7 +72,11 @@ export function checkBet(bet, ledgerRows = []) {
     // `profit` field is game-specific (some games book net differently) and reconciles
     // with users.profit, so it is NOT cross-checked here — only the money the player
     // actually received matters, and that is the payout amount.
-    const okAmount = within(amt, payout) || within(amt, profit);
+    // Cash credited on a win = the lock that was taken + the profit. For independent
+    // bets the lock is the stake, so that collapses to stake×odds; on a book-managed
+    // market (aaa, dum10) the lock is marginal and the credit is smaller by the hedge.
+    const lockedCredit = exposureOf(bet) + profit;
+    const okAmount = within(amt, payout) || within(amt, profit) || within(amt, lockedCredit);
     if (!okAmount) flag('winPayout', `paid ${r2(amt)}; expected payout ${r2(payout)} (profit ${r2(profit)}) for stake ${r2(stake)} @ ${odds}`);
   } else if (betLost(bet)) {
     if (loss.length === 0) { flag('settleRecord', 'lost but no BET_LOSS record'); return out; }

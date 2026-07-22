@@ -37,7 +37,7 @@ export default function BetTableTeen20c({ tableData = [], onBetClick, exposures 
         className={`casino-odds-box back${sus ? " suspended-box" : ""}`}
         onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}
       >
-        <span className="casino-odds">{label || (sus ? 0 : item?.b || 0)}</span>
+        <span className="casino-odds">{label || (item?.b || 0)}</span>
         <ExpBook value={getExp(exposures, item?.nat)} />
       </div>
     );
@@ -50,7 +50,7 @@ export default function BetTableTeen20c({ tableData = [], onBetClick, exposures 
         className={`casino-odds-box back${sus ? " suspended-box" : ""}`}
         onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}
       >
-        <div><span className="casino-odds">{sus ? 0 : item?.b || 0}</span></div>
+        <div><span className="casino-odds">{item?.b || 0}</span></div>
         <ExpBook value={getExp(exposures, item?.nat)} />
       </div>
     );
@@ -86,12 +86,12 @@ export default function BetTableTeen20c({ tableData = [], onBetClick, exposures 
             <div className={`casino-odds-box back${isSus(blackA) ? " suspended-box" : ""}`}
               onClick={() => !isSus(blackA) && blackA?.b > 0 && onBetClick?.(blackA.b, blackA.nat, blackA, "back")}>
               <div>{SPADE_CLUB}</div>
-              <div><span className="casino-odds">{isSus(blackA) ? 0 : blackA?.b || 0}</span></div>
+              <div><span className="casino-odds">{blackA?.b || 0}</span></div>
             </div>
             <div className={`casino-odds-box back${isSus(redA) ? " suspended-box" : ""}`}
               onClick={() => !isSus(redA) && redA?.b > 0 && onBetClick?.(redA.b, redA.nat, redA, "back")}>
               <div>{HEART_DIAMOND}</div>
-              <div><span className="casino-odds">{isSus(redA) ? 0 : redA?.b || 0}</span></div>
+              <div><span className="casino-odds">{redA?.b || 0}</span></div>
             </div>
           </div>
         </div>
@@ -123,12 +123,12 @@ export default function BetTableTeen20c({ tableData = [], onBetClick, exposures 
             <div className={`casino-odds-box back${isSus(blackB) ? " suspended-box" : ""}`}
               onClick={() => !isSus(blackB) && blackB?.b > 0 && onBetClick?.(blackB.b, blackB.nat, blackB, "back")}>
               <div>{SPADE_CLUB}</div>
-              <div><span className="casino-odds">{isSus(blackB) ? 0 : blackB?.b || 0}</span></div>
+              <div><span className="casino-odds">{blackB?.b || 0}</span></div>
             </div>
             <div className={`casino-odds-box back${isSus(redB) ? " suspended-box" : ""}`}
               onClick={() => !isSus(redB) && redB?.b > 0 && onBetClick?.(redB.b, redB.nat, redB, "back")}>
               <div>{HEART_DIAMOND}</div>
-              <div><span className="casino-odds">{isSus(redB) ? 0 : redB?.b || 0}</span></div>
+              <div><span className="casino-odds">{redB?.b || 0}</span></div>
             </div>
           </div>
         </div>
@@ -140,24 +140,24 @@ export default function BetTableTeen20c({ tableData = [], onBetClick, exposures 
           <div className={`casino-odds-box back${isSus(blackA) ? " suspended-box" : ""}`}
             onClick={() => !isSus(blackA) && blackA?.b > 0 && onBetClick?.(blackA.b, blackA.nat, blackA, "back")}>
             <div>{SPADE_CLUB}</div>
-            <div><span className="casino-odds">{isSus(blackA) ? 0 : blackA?.b || 0}</span></div>
+            <div><span className="casino-odds">{blackA?.b || 0}</span></div>
           </div>
           <div className={`casino-odds-box back${isSus(redA) ? " suspended-box" : ""}`}
             onClick={() => !isSus(redA) && redA?.b > 0 && onBetClick?.(redA.b, redA.nat, redA, "back")}>
             <div>{HEART_DIAMOND}</div>
-            <div><span className="casino-odds">{isSus(redA) ? 0 : redA?.b || 0}</span></div>
+            <div><span className="casino-odds">{redA?.b || 0}</span></div>
           </div>
         </div>
         <div className="casino-table-right-box">
           <div className={`casino-odds-box back${isSus(blackB) ? " suspended-box" : ""}`}
             onClick={() => !isSus(blackB) && blackB?.b > 0 && onBetClick?.(blackB.b, blackB.nat, blackB, "back")}>
             <div>{SPADE_CLUB}</div>
-            <div><span className="casino-odds">{isSus(blackB) ? 0 : blackB?.b || 0}</span></div>
+            <div><span className="casino-odds">{blackB?.b || 0}</span></div>
           </div>
           <div className={`casino-odds-box back${isSus(redB) ? " suspended-box" : ""}`}
             onClick={() => !isSus(redB) && redB?.b > 0 && onBetClick?.(redB.b, redB.nat, redB, "back")}>
             <div>{HEART_DIAMOND}</div>
-            <div><span className="casino-odds">{isSus(redB) ? 0 : redB?.b || 0}</span></div>
+            <div><span className="casino-odds">{redB?.b || 0}</span></div>
           </div>
         </div>
       </div>

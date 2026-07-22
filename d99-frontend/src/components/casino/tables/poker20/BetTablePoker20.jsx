@@ -31,7 +31,7 @@ export default function BetTablePoker20({ tableData = [], onBetClick, exposures 
               <div className="casino-nation-name text-center">{betType}</div>
               <div className={`casino-odds-box back${sus ? " suspended-box" : ""}`}
                 onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}>
-                <span className="casino-odds">{sus ? 0 : item?.b || 0}</span>
+                <span className="casino-odds">{item?.b || 0}</span>
                 <ExpBook value={getExp(exposures, item?.nat)} />
               </div>
             </div>

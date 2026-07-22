@@ -53,7 +53,7 @@ export default function BetTableTeen20b({ tableData = [], onBetClick, exposures 
         className={`casino-odds-box back${sus ? " suspended-box" : ""}`}
         onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}
       >
-        <span className="casino-odds">{displayLabel !== undefined ? displayLabel : sus ? 0 : item?.b || 0}</span>
+        <span className="casino-odds">{displayLabel !== undefined ? displayLabel : item?.b || 0}</span>
         <ExpBook value={getExp(exposures, item?.nat)} />
       </div>
     );
@@ -67,7 +67,7 @@ export default function BetTableTeen20b({ tableData = [], onBetClick, exposures 
         onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}
       >
         <div>{icons}</div>
-        <div><span className="casino-odds">{sus ? 0 : item?.b || 0}</span></div>
+        <div><span className="casino-odds">{item?.b || 0}</span></div>
         <ExpBook value={getExp(exposures, item?.nat)} />
       </div>
     );

@@ -27,7 +27,11 @@ export default function BetTableTeen120({ tableData = [], onBetClick, exposures 
     const sus = isSus(item);
     return (
       <div className={`onecard20oddbox ${colorClass}`}>
-        <div className="casino-odds text-center">{sus ? 0 : item?.b || 0}</div>
+        {/* Odds stay on screen while the round is locked — the live site keeps
+            the price visible and only greys the clickable box. A teen120 round
+            is open ~15s and suspended ~30s, so blanking to 0 hid the price for
+            most of the cycle. */}
+        <div className="casino-odds text-center">{item?.b || 0}</div>
         <div
           className={`casino-odds-box back casino-odds-box-theme${sus ? " suspended-box" : ""}`}
           onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}

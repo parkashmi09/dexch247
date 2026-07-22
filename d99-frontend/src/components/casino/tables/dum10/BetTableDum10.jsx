@@ -25,55 +25,20 @@ function ExposureBook({ nat, exposures }) {
 }
 
 /**
- * Both sides of the main market's book, from the round's own bets.
+ * Both sides of a two-outcome market that occupies one table row.
  *
- * "Next Total N or More" is a two-outcome market on ONE row, so the table only
- * ever printed the stored exposure row — the risk — and never the reward. Both
- * figures are derived here instead, because the stored row cannot express this:
- * it is a running sum of per-bet liabilities, which for a lay bet is the "it
- * happens" side, and for a mixed back+lay book is neither side.
+ * "Next Total N or More" has no clickable runner for the losing outcome, so the
+ * server books the two sides under suffixed names — the same convention the
+ * sports fancy lines use. Must match, byte for byte (no separator),
+ * d99-server/helper/casinoMarketBook.js → backRunner / layRunner.
  *
- * Mirrors settlement: back wins stake*(odds−1) / loses stake; lay is the inverse.
- *
- * @returns {{ hit: number, miss: number }} P/L if the outcome lands / does not
+ * The bare `nat` row also exists, but it holds the worst case for net exposure
+ * and the wallet — not something this table prints.
  */
-function calcOutcomeBook(bets, nat) {
-  if (!nat || !bets?.length) return { hit: 0, miss: 0 };
-  const target = nat.trim().toLowerCase();
-  let hit = 0;
-  let miss = 0;
-  bets.forEach((bet) => {
-    const sel = String(bet?.selection || bet?.nat || bet?.matchedBet || "").trim().toLowerCase();
-    if (sel !== target) return;
-    const stake = parseFloat(bet?.stake) || 0;
-    const odds = parseFloat(bet?.odds) || 0;
-    if (stake <= 0 || odds <= 0) return;
-    const win = stake * (odds - 1);
-    if (String(bet?.type || "back").toLowerCase() === "lay") {
-      hit -= win;
-      miss += stake;
-    } else {
-      hit += win;
-      miss -= stake;
-    }
-  });
-  const r2 = (n) => Math.round(n * 100) / 100;
-  return { hit: r2(hit), miss: r2(miss) };
-}
+const BACK_RUNNER = (nat) => `${nat.trim()}back`;
+const LAY_RUNNER = (nat) => `${nat.trim()}lay`;
 
-function BookValue({ value }) {
-  if (!value) return null;
-  return (
-    <div
-      className="casino-nation-book text-center"
-      style={{ color: value >= 0 ? "var(--text-success, #00aa00)" : "var(--text-danger, #ff0000)", fontSize: "10px", fontWeight: "bold" }}
-    >
-      {value >= 0 ? `+${value.toFixed(2)}` : value.toFixed(2)}
-    </div>
-  );
-}
-
-const BetTableDum10 = memo(function BetTableDum10({ gameData, onBet, exposures = {}, bets = [] }) {
+const BetTableDum10 = memo(function BetTableDum10({ gameData, onBet, exposures = {} }) {
   const raw = gameData?.data?.data || gameData?.data || gameData || {};
   const sub = raw.sub || [];
   const handleBet = onBet || (() => {});
@@ -88,8 +53,6 @@ const BetTableDum10 = memo(function BetTableDum10({ gameData, onBet, exposures =
   const odd = findFancy("Odd");
   const red = findFancy("Red");
   const black = findFancy("Black");
-
-  const mainBook = calcOutcomeBook(bets, mainBet?.nat);
 
   const suspMain = isSusp(mainBet);
   const suspMainLay = !mainBet || mainBet.gstatus !== "OPEN" || !parseFloat(mainBet.l);
@@ -111,11 +74,12 @@ const BetTableDum10 = memo(function BetTableDum10({ gameData, onBet, exposures =
                   `.duskadum .casino-nation-detail` sets flex-direction: revert
                   (row) + space-between, which would otherwise spread the name and
                   both values across the cell side by side.
-                  First position is the side the punter took: the gain on a back,
-                  the liability on a lay. The opposite outcome sits beneath it. */}
+                  First position is the P/L if the outcome lands, the one beneath
+                  it the P/L if it does not. Both come straight from the two
+                  exposure rows the server books for this market. */}
               <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.2 }}>
-                <BookValue value={mainBook.hit} />
-                <BookValue value={mainBook.miss} />
+                <ExposureBook nat={mainBet?.nat && BACK_RUNNER(mainBet.nat)} exposures={exposures} />
+                <ExposureBook nat={mainBet?.nat && LAY_RUNNER(mainBet.nat)} exposures={exposures} />
               </div>
             </div>
             <div

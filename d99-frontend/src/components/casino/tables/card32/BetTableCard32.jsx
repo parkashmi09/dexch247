@@ -22,8 +22,8 @@ function isSus(item) {
 function BackLayRow({ item, label, onBetClick, exposures }) {
   const sus = isSus(item);
   const nat = item?.nat || label;
-  const backOdds = sus ? 0 : (item?.b || 0);
-  const layOdds = sus ? 0 : (item?.l || 0);
+  const backOdds = (item?.b || 0);
+  const layOdds = (item?.l || 0);
 
   return (
     <div className="casino-table-row">

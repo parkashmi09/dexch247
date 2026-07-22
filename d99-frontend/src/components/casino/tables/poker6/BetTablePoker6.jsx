@@ -78,7 +78,7 @@ export default function BetTablePoker6({ tableData = [], onBetClick, exposures =
                           </div>
                         )}
                       </div>
-                      <div><span className="casino-odds">{sus ? 0 : item?.b || 0}</span></div>
+                      <div><span className="casino-odds">{item?.b || 0}</span></div>
                       <ExpBook value={getExp(exposures, item?.nat)} />
                     </div>
                   </div>
@@ -96,7 +96,7 @@ export default function BetTablePoker6({ tableData = [], onBetClick, exposures =
                     <div className={`casino-odds-box back${sus ? " suspended-box" : ""}`}
                       onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}>
                       <div className="casino-nation-name">{name}</div>
-                      <div><span className="casino-odds">{sus ? 0 : item?.b || 0}</span></div>
+                      <div><span className="casino-odds">{item?.b || 0}</span></div>
                       <ExpBook value={getExp(exposures, item?.nat)} />
                     </div>
                   </div>

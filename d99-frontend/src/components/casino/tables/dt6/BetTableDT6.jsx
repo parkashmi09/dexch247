@@ -50,8 +50,8 @@ export default function BetTableDT6({ tableData = [], onBetClick, exposures = {}
     const susBk = isSus(item);
     const susLay = isSus(item);
     const nat = item?.nat || label;
-    const backOdds = susBk ? 0 : (item?.b || 0);
-    const layOdds = susLay ? 0 : (item?.l || 0);
+    const backOdds = (item?.b || 0);
+    const layOdds = (item?.l || 0);
 
     return (
       <div className="casino-table-row">
@@ -78,7 +78,7 @@ export default function BetTableDT6({ tableData = [], onBetClick, exposures = {}
   function renderBackRow(item, label) {
     const sus = isSus(item);
     const nat = item?.nat || label;
-    const odds = sus ? 0 : (item?.b || 0);
+    const odds = (item?.b || 0);
 
     return (
       <div className="casino-table-row">
@@ -101,8 +101,8 @@ export default function BetTableDT6({ tableData = [], onBetClick, exposures = {}
     const susOdd = isSus(oddItem);
     const evenNat = evenItem?.nat || `${label} Even`;
     const oddNat = oddItem?.nat || `${label} Odd`;
-    const evenOdds = susEven ? 0 : (evenItem?.b || 0);
-    const oddOdds = susOdd ? 0 : (oddItem?.b || 0);
+    const evenOdds = (evenItem?.b || 0);
+    const oddOdds = (oddItem?.b || 0);
 
     return (
       <div className="casino-table-row">
@@ -132,8 +132,8 @@ export default function BetTableDT6({ tableData = [], onBetClick, exposures = {}
     const susBlack = isSus(blackItem);
     const redNat = redItem?.nat || `${label} Red`;
     const blackNat = blackItem?.nat || `${label} Black`;
-    const redOdds = susRed ? 0 : (redItem?.b || 0);
-    const blackOdds = susBlack ? 0 : (blackItem?.b || 0);
+    const redOdds = (redItem?.b || 0);
+    const blackOdds = (blackItem?.b || 0);
 
     return (
       <div className="casino-table-row">
@@ -173,7 +173,7 @@ export default function BetTableDT6({ tableData = [], onBetClick, exposures = {}
         </div>
         {items.map(({ item, nat }) => {
           const sus = isSus(item);
-          const odds = sus ? 0 : (item?.b || 0);
+          const odds = (item?.b || 0);
           return (
             <div
               key={nat}
@@ -190,7 +190,7 @@ export default function BetTableDT6({ tableData = [], onBetClick, exposures = {}
   }
 
   const pairSus = isSus(pair);
-  const pairOdds = pairSus ? 0 : (pair?.b || 0);
+  const pairOdds = (pair?.b || 0);
 
   return (
     <div className="casino-table dt1day">

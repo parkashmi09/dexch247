@@ -25,13 +25,13 @@ export default function BetTableTeen3({ tableData = [], onBetClick, exposures = 
           className="casino-odds-box back"
           onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}
         >
-          <span className="casino-odds">{sus ? 0 : item?.b || 0}</span>
+          <span className="casino-odds">{item?.b || 0}</span>
         </div>
         <div
           className="casino-odds-box lay"
           onClick={() => !sus && item?.l > 0 && onBetClick?.(item.l, item.nat, item, "lay")}
         >
-          <span className="casino-odds">{sus ? 0 : item?.l || 0}</span>
+          <span className="casino-odds">{item?.l || 0}</span>
         </div>
       </div>
     );

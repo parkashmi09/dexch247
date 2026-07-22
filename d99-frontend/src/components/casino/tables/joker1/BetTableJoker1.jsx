@@ -50,13 +50,13 @@ export default function BetTableJoker1({ tableData = [], onBetClick, exposures =
             className={`casino-odds-box back${sus ? " suspended-box" : ""}`}
             onClick={() => !sus && item.b > 0 && handleBetClick(item.b, item.nat, item, "back")}
           >
-            <span className="casino-odds">{sus ? 0 : item.b || 0}</span>
+            <span className="casino-odds">{item.b || 0}</span>
           </div>
           <div
             className={`casino-odds-box lay${sus ? " suspended-box" : ""}`}
             onClick={() => !sus && item.l > 0 && handleBetClick(item.l, item.nat, item, "lay")}
           >
-            <span className="casino-odds">{sus ? 0 : item.l || 0}</span>
+            <span className="casino-odds">{item.l || 0}</span>
           </div>
         </div>
       </div>

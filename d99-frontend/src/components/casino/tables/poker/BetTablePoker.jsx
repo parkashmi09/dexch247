@@ -30,11 +30,11 @@ export default function BetTablePoker({ tableData = [], onBetClick, exposures = 
         </div>
         <div className={`casino-odds-box back${sus ? " suspended-box" : ""}`}
           onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}>
-          <span className="casino-odds">{sus ? 0 : item?.b || 0}</span>
+          <span className="casino-odds">{item?.b || 0}</span>
         </div>
         <div className={`casino-odds-box lay${sus ? " suspended-box" : ""}`}
           onClick={() => !sus && item?.l > 0 && onBetClick?.(item.l, item.nat, item, "lay")}>
-          <span className="casino-odds">{sus ? 0 : item?.l || 0}</span>
+          <span className="casino-odds">{item?.l || 0}</span>
         </div>
       </div>
     );

@@ -98,7 +98,6 @@ export default function Dum10Page() {
                 gameData={gameData}
                 onBet={handleBetClick}
                 exposures={exposures}
-                bets={myBets}
               />
 
               <div className="casino-last-result-title">

@@ -22,8 +22,8 @@ function isSus(item) {
 function BackLayRow({ item, label, onBetClick, exposures }) {
   const sus = isSus(item);
   const nat = item?.nat || label;
-  const backOdds = sus ? 0 : (item?.b || 0);
-  const layOdds = sus ? 0 : (item?.l || 0);
+  const backOdds = (item?.b || 0);
+  const layOdds = (item?.l || 0);
 
   return (
     <div className="casino-table-row">
@@ -50,7 +50,7 @@ function BackLayRow({ item, label, onBetClick, exposures }) {
 function BackOnlyRow({ item, label, onBetClick, exposures }) {
   const sus = isSus(item);
   const nat = item?.nat || label;
-  const backOdds = sus ? 0 : (item?.b || 0);
+  const backOdds = (item?.b || 0);
 
   return (
     <div className="casino-table-row">
@@ -83,14 +83,14 @@ function OddEvenRow({ oddItem, evenItem, label, onBetClick, exposures }) {
         className={`casino-odds-box back${oddSus ? " suspended-box" : ""}`}
         onClick={() => !oddSus && oddItem?.b > 0 && onBetClick?.(oddItem.b, oddNat, oddItem, "back")}
       >
-        <span className="casino-odds">{oddSus ? 0 : (oddItem?.b || 0)}</span>
+        <span className="casino-odds">{(oddItem?.b || 0)}</span>
         <ExposureSpan exposures={exposures} nat={oddNat} />
       </div>
       <div
         className={`casino-odds-box back${evenSus ? " suspended-box" : ""}`}
         onClick={() => !evenSus && evenItem?.b > 0 && onBetClick?.(evenItem.b, evenNat, evenItem, "back")}
       >
-        <span className="casino-odds">{evenSus ? 0 : (evenItem?.b || 0)}</span>
+        <span className="casino-odds">{(evenItem?.b || 0)}</span>
         <ExposureSpan exposures={exposures} nat={evenNat} />
       </div>
     </div>
@@ -126,7 +126,6 @@ export default function BetTableCard32EU({ tableData = [], onBetClick, exposures
 
   // Numbers section — get odds from first Single item (they're all the same)
   const singleOdds = find("Single 1")?.b || 0;
-  const singleSus = !find("Single 1") || find("Single 1")?.gstatus !== "OPEN";
 
   return (
     <div className="casino-table cards32b">
@@ -195,7 +194,7 @@ export default function BetTableCard32EU({ tableData = [], onBetClick, exposures
       {/* Section 3: Numbers grid */}
       <div className="casino-table-full-box mt-3 card32numbers">
         <h4 className="w-100 text-center mb-2">
-          <b>{singleSus ? 0 : singleOdds}</b>
+          <b>{singleOdds}</b>
         </h4>
         <div className="card32numbers-container">
           {DIGITS.map((digit) => {

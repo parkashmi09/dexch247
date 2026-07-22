@@ -35,11 +35,11 @@ export default function BetTableTeen({ tableData = [], onBetClick, exposures = {
         </div>
         <div className="casino-odds-box back"
           onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}>
-          <span className="casino-odds">{sus ? 0 : item?.b || 0}</span>
+          <span className="casino-odds">{item?.b || 0}</span>
         </div>
         <div className="casino-odds-box lay"
           onClick={() => !sus && item?.l > 0 && onBetClick?.(item.l, item.nat, item, "lay")}>
-          <span className="casino-odds">{sus ? 0 : item?.l || 0}</span>
+          <span className="casino-odds">{item?.l || 0}</span>
         </div>
       </div>
     );
@@ -101,7 +101,7 @@ export default function BetTableTeen({ tableData = [], onBetClick, exposures = {
               return (
                 <div key={i} className={`casino-odds-box back${cellSus ? " suspended-box" : ""}`}
                   onClick={() => !cellSus && oddVal > 0 && onBetClick?.(oddVal, selName, { ...card, nat: selName, b: oddVal }, "back")}>
-                  <span className="casino-odds">{cellSus ? 0 : oddVal}</span>
+                  <span className="casino-odds">{oddVal}</span>
                   {!isNaN(expN) && expN !== 0 && <div className={`casino-nation-book ${expN >= 0 ? "text-success" : "text-danger"}`}>{expN}</div>}
                 </div>
               );
@@ -123,7 +123,7 @@ export default function BetTableTeen({ tableData = [], onBetClick, exposures = {
               return (
                 <div key={i} className={`casino-odds-box back${cellSus ? " suspended-box" : ""}`}
                   onClick={() => !cellSus && evenVal > 0 && onBetClick?.(evenVal, selName, { ...card, nat: selName, b: evenVal }, "back")}>
-                  <span className="casino-odds">{cellSus ? 0 : evenVal}</span>
+                  <span className="casino-odds">{evenVal}</span>
                   {!isNaN(expN) && expN !== 0 && <div className={`casino-nation-book ${expN >= 0 ? "text-success" : "text-danger"}`}>{expN}</div>}
                 </div>
               );

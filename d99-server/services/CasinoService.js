@@ -9,7 +9,7 @@ import User from "../model/user/User.js";
 import Wallet from "../model/admin/Wallet.js";
 import TotalExposure from "../model/user/TotalExposure.js";
 import { emitBalanceUpdate } from "../utils/socketUtils.js";
-import { findCasinoMarket, calculateCasinoBook, casinoMarketGameType } from "../helper/casinoMarketBook.js";
+import { findCasinoMarket, calculateCasinoBook, calculateTwoWayBook, casinoMarketGameType } from "../helper/casinoMarketBook.js";
 import { QueryTypes } from "sequelize";
 
 const BASE_URL = process.env.DIAMOND_BASE_URL;
@@ -17,6 +17,8 @@ const API_KEY = process.env.DIAMOND_API_KEY;
 const FALLBACK_BASE_URL = process.env.CASINO_API_BASE_URL;
 const FALLBACK_API_KEY = process.env.CASINO_API_KEY;
 const CACHE_TTL = 2; // Cache time in seconds
+
+const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
 
 // Helper for caching
 const getCachedData = async (key, fetchFunction) => {
@@ -224,15 +226,80 @@ const CasinoService = {
 
       const currentCash = Number(wallet.cash);
 
-      if (currentCash < Math.abs(exposer)) {
+      // 1️⃣ BUILD THE BOOK FIRST — the wallet lock is derived from it.
+      //
+      // Book-managed games (see helper/casinoMarketBook.js) write ONE ROW PER
+      // RUNNER of the bet's market — the backed runner holds the profit, the
+      // others the loss — exactly like the sports side does. Everything else
+      // keeps the legacy single-row behaviour (the wallet liability only).
+      const market = findCasinoMarket(gameName, selection);
+      const gameType = market ? casinoMarketGameType(gameName, market.key) : null;
+
+      // Book markets need their existing rows up front, both to price the lock
+      // and because a two-outcome market's `<sel>` row is a min() over both
+      // sides, so it has to be recomputed from the whole book rather than
+      // nudged by a per-bet delta. calculateTwoWayBook returns absolute
+      // `value`s (SET below); every other path returns additive `delta`s.
+      const oldExposures = {};
+      if (market) {
+        const existing = await UserExposure.findAll({
+          where: {
+            user_id: userId,
+            match_id: String(roundId),
+            event_id: String(roundId),
+            game_type: gameType,
+          },
+          transaction,
+        });
+        for (const r of existing) oldExposures[r.team_name] = Number(r.exposure_amount) || 0;
+      }
+
+      let bookRows;
+      if (market?.twoWay) {
+        bookRows = calculateTwoWayBook({ selection, stake: amount, odds, type, oldExposures });
+      } else if (market) {
+        bookRows = calculateCasinoBook({ market, selection, stake: amount, odds, type });
+      } else {
+        bookRows = [{ team_name: gameName === 'abj' ? (player_name || selection) : selection, delta: Number(exposer ?? 0) }];
+      }
+
+      // 2️⃣ WALLET LOCK
+      //
+      // Book markets lock the MARGINAL worst case — how much this bet worsens
+      // the market's worst outcome — mirroring the sports side's oldMax→newMax
+      // delta (sportsbet/sportbetscontroller.js). Locking each bet's standalone
+      // liability instead double-counts hedges: backing and laying the same
+      // runner is risk-free, yet used to tie up both stakes.
+      //
+      // A hedge can make the delta NEGATIVE, which RELEASES cash — so `exposer`
+      // is not always ≤ 0 any more. It stays "the cash this bet locked", which
+      // is the contract settlement and the void scripts rely on, and it sums
+      // across a round to exactly the book's worst case.
+      let effExposer = Number(exposer ?? 0);
+      if (market) {
+        const newTotals = {};
+        for (const row of bookRows) {
+          newTotals[row.team_name] = row.value !== undefined
+            ? Number(row.value)
+            : round2((Number(oldExposures[row.team_name]) || 0) + Number(row.delta));
+        }
+        // Only rows that stand for a real OUTCOME count. A two-way market's
+        // back/lay rows are display aggregates — its single `<sel>` row already
+        // holds the min of the two sides.
+        const outcomeNames = market.twoWay ? [String(selection).trim()] : Object.keys(newTotals);
+        const worstOf = (book) => Math.min(0, ...outcomeNames.map((n) => Number(book[n]) || 0));
+
+        const lockDelta = round2(Math.abs(worstOf(newTotals)) - Math.abs(worstOf(oldExposures)));
+        effExposer = -lockDelta;
+      }
+
+      if (effExposer < 0 && currentCash < Math.abs(effExposer)) {
         throw new Error("Insufficient balance");
       }
 
       // Lock liability in cash; inr_balance moves only at settlement.
-      wallet.cash = currentCash + exposer;
+      wallet.cash = round2(currentCash + effExposer);
       await wallet.save({ transaction });
-
-
 
       const bet = await CasinoBet.create(
         {
@@ -241,7 +308,7 @@ const CasinoService = {
           odds,
           stake: amount,
           selection,
-          exposer: exposer ?? 0,
+          exposer: effExposer,
           libality: libality ?? 0,
           game_name: gameName,
           status: "open",
@@ -254,18 +321,8 @@ const CasinoService = {
         },
         { transaction }
       );
-      // 2️⃣ UPSERT user exposure (find -> update OR create)
-      //
-      // Book-managed games (see helper/casinoMarketBook.js) write ONE ROW PER
-      // RUNNER of the bet's market — the backed runner holds the profit, the
-      // others the loss — exactly like the sports side does. Everything else
-      // keeps the legacy single-row behaviour (the wallet liability only).
-      const market = findCasinoMarket(gameName, selection);
-      const bookRows = market
-        ? calculateCasinoBook({ market, selection, stake: amount, odds, type })
-        : [{ team_name: gameName === 'abj' ? (player_name || selection) : selection, delta: Number(exposer ?? 0) }];
-      const gameType = market ? casinoMarketGameType(gameName, market.key) : null;
 
+      // 3️⃣ UPSERT user exposure (find -> update OR create)
       for (const row of bookRows) {
         const existingExposure = await UserExposure.findOne({
           where: {
@@ -278,19 +335,21 @@ const CasinoService = {
           transaction,
         });
 
+        // `value` → absolute (already folds in the old amount); `delta` → additive.
+        const nextAmount = row.value !== undefined
+          ? row.value
+          : Number(existingExposure?.exposure_amount || 0) + row.delta;
+
         if (existingExposure) {
-          // ✅ UPDATE: add this bet's contribution to the running book
-          await existingExposure.update(
-            { exposure_amount: Number(existingExposure.exposure_amount || 0) + row.delta },
-            { transaction }
-          );
+          // ✅ UPDATE: this bet's contribution to the running book
+          await existingExposure.update({ exposure_amount: nextAmount }, { transaction });
         } else {
           // ✅ CREATE: first exposure row
           await UserExposure.create(
             {
               user_id: userId,
               match_id: String(roundId),
-              exposure_amount: row.delta,
+              exposure_amount: nextAmount,
               team_name: row.team_name,
               match_title: gameName,
               event_id: String(roundId),

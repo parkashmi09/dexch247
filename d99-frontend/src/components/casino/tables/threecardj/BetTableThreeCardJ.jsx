@@ -74,7 +74,7 @@ export default function BetTableThreeCardJ({ gameData, onBetClick, exposures = {
         </div>
         <div className="threecardj-cards">
           <h4 className="text-center w-100 mb-2">
-            <b>{yesSusp ? 0 : parseFloat(yesItem?.b) || 0}</b>
+            <b>{parseFloat(yesItem?.b) || 0}</b>
           </h4>
           {CARD_NUMS.map((n) => (
             <div
@@ -99,7 +99,7 @@ export default function BetTableThreeCardJ({ gameData, onBetClick, exposures = {
         </div>
         <div className="threecardj-cards">
           <h4 className="text-center w-100 mb-2">
-            <b>{noSusp ? 0 : parseFloat(noItem?.b) || 0}</b>
+            <b>{parseFloat(noItem?.b) || 0}</b>
           </h4>
           {CARD_NUMS.map((n) => (
             <div

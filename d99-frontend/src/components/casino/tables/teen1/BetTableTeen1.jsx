@@ -54,13 +54,13 @@ export default function BetTableTeen1({ tableData = [], onBetClick, exposures = 
                 className={`casino-odds-box back${playerSus ? " suspended-box" : ""}`}
                 onClick={() => !playerSus && player?.b > 0 && onBetClick?.(player.b, player.nat, player, "back")}
               >
-                <span className="casino-odds">{playerSus ? 0 : (player?.b || 0)}</span>
+                <span className="casino-odds">{(player?.b || 0)}</span>
               </div>
               <div
                 className={`casino-odds-box lay${playerSus ? " suspended-box" : ""}`}
                 onClick={() => !playerSus && player?.l > 0 && onBetClick?.(player.l, player.nat, player, "lay")}
               >
-                <span className="casino-odds">{playerSus ? 0 : (player?.l || 0)}</span>
+                <span className="casino-odds">{(player?.l || 0)}</span>
               </div>
             </div>
           </div>
@@ -77,13 +77,13 @@ export default function BetTableTeen1({ tableData = [], onBetClick, exposures = 
                 className={`casino-odds-box back${dealerSus ? " suspended-box" : ""}`}
                 onClick={() => !dealerSus && dealer?.b > 0 && onBetClick?.(dealer.b, dealer.nat, dealer, "back")}
               >
-                <span className="casino-odds">{dealerSus ? 0 : (dealer?.b || 0)}</span>
+                <span className="casino-odds">{(dealer?.b || 0)}</span>
               </div>
               <div
                 className={`casino-odds-box lay${dealerSus ? " suspended-box" : ""}`}
                 onClick={() => !dealerSus && dealer?.l > 0 && onBetClick?.(dealer.l, dealer.nat, dealer, "lay")}
               >
-                <span className="casino-odds">{dealerSus ? 0 : (dealer?.l || 0)}</span>
+                <span className="casino-odds">{(dealer?.l || 0)}</span>
               </div>
             </div>
           </div>

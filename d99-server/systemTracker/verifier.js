@@ -116,7 +116,7 @@ async function buildBettorReport(sequelize, u) {
   // from user_exposures (sports-only) + casino additive exposer.
   const lockRows = (await q(sequelize,
     `SELECT
-       (SELECT COALESCE(SUM(ABS(exposer)),0) FROM casino_bets WHERE user_id=:uid AND status IN ('open','processing')) AS c,
+       (SELECT COALESCE(SUM(-exposer),0) FROM casino_bets WHERE user_id=:uid AND status IN ('open','processing')) AS c,
        (SELECT COALESCE(SUM(grp),0) FROM (
           SELECT LEAST(0, MIN(exposure_amount)) AS grp FROM user_exposures
             WHERE user_id=:uid AND category<>'casino' AND game_type IS NOT NULL

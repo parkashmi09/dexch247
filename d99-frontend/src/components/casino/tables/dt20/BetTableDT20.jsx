@@ -77,7 +77,7 @@ export default function BetTableDT20({ tableData = [], onBetClick, exposures = {
     const nat = item?.nat || label;
     return (
       <div className={`dt20-odd-box ${className}`}>
-        <div className="casino-odds text-center">{sus ? 0 : getOdds(item)}</div>
+        <div className="casino-odds text-center">{getOdds(item)}</div>
         <div
           className={`casino-odds-box back casino-odds-box-theme${sus ? " suspended-box" : ""}`}
           onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, nat, item, "back")}
@@ -94,7 +94,7 @@ export default function BetTableDT20({ tableData = [], onBetClick, exposures = {
     const playerName = item?.nat || nat;
     return (
       <div className="dt20-odd-box dt20odds">
-        <div className="casino-odds text-center">{sus ? 0 : getOdds(item)}</div>
+        <div className="casino-odds text-center">{getOdds(item)}</div>
         <div
           className={`casino-odds-box back casino-odds-box-theme${sus ? " suspended-box" : ""}`}
           onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, playerName, item, "back")}
@@ -111,7 +111,7 @@ export default function BetTableDT20({ tableData = [], onBetClick, exposures = {
     const playerName = item?.nat || nat;
     return (
       <div className="dt20-odd-box dt20odds">
-        <div className="casino-odds text-center">{sus ? 0 : getOdds(item)}</div>
+        <div className="casino-odds text-center">{getOdds(item)}</div>
         <div
           className={`casino-odds-box back casino-odds-box-theme${sus ? " suspended-box" : ""}`}
           onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, playerName, item, "back")}

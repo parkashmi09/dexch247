@@ -84,7 +84,10 @@ export const CHECKS = [
   },
   {
     // WALLET CONSERVATION — total balance must equal available cash + actually-locked funds.
-    // Locked = per-market WORST-CASE exposure (team MIN / fancy SUM) + casino additive exposer:
+    // Locked = per-market WORST-CASE exposure (team MIN / fancy SUM) + casino exposer.
+    // SUM(-exposer), not SUM(ABS(...)): book-managed casino markets (aaa, dum10) lock the
+    // MARGINAL worst case, so a hedging bet stores a POSITIVE exposer — it released cash.
+    // ABS() would count that release as another lock and false-fail conservation.
     // exactly what placement removes from `cash`. NOT Σ(per-bet liability), which overstates
     // hedged/3-way markets (back+lay offset; the draw caps the loss). Catches any rupee that
     // drifts out of conservation, fleet-wide.
@@ -97,7 +100,7 @@ export const CHECKS = [
       FROM "Wallets" w
       JOIN users u ON CAST(u.user_id AS TEXT) = CAST(w.user_id AS TEXT)
       CROSS JOIN LATERAL (
-        SELECT (SELECT COALESCE(SUM(ABS(exposer)),0) FROM casino_bets WHERE user_id=w.user_id AND status IN ('open','processing'))
+        SELECT (SELECT COALESCE(SUM(-exposer),0) FROM casino_bets WHERE user_id=w.user_id AND status IN ('open','processing'))
              + ABS(COALESCE((SELECT SUM(grp) FROM (
                  SELECT LEAST(0,MIN(exposure_amount)) AS grp FROM user_exposures
                   WHERE user_id=w.user_id AND category<>'casino' AND game_type IS NOT NULL

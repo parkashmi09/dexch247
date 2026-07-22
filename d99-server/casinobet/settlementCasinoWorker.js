@@ -240,6 +240,11 @@ async function settleBetCommon(bet, winner, payoutRate = null) {
     let amt = 0;
     let resultStatus = "lost";
 
+    // Cash this bet locked at placement (exposer is stored negative). Book
+    // markets lock a MARGINAL worst case, which a hedge can make negative —
+    // i.e. the bet released cash — so this is signed, not an absolute value.
+    const lockedAmount = -Number(lockedBet.exposer || 0);
+
     // 🔐 2. LOCK WALLET AFTER BET LOCK
     const wallet = await Wallet.findOne({
       where: { user_id: String(user_id) },
@@ -285,26 +290,27 @@ async function settleBetCommon(bet, winner, payoutRate = null) {
         // Placement locked the worst case (max rate × stake), so the cash credit
         // is that whole lock back plus the actual winnings.
         netProfit = round2(stakeNum * payoutRate * (1 - CASINO_WIN_COMMISSION));
-        amt = round2(Math.abs(Number(lockedBet.exposer || 0)) + netProfit);
+        amt = round2(lockedAmount + netProfit);
       } else {
-        // Cash credit on win: liability return + winnings.
-        if (type === "lay") {
-          amt = mtype === "fancy" ? stakeNum * 2 : stakeNum * oddsNum;
-        } else {
-          // BACK: always pay the locked decimal odds. Back placement locks
-          // exposer = −stake regardless of mtype, so the old `fancy → stake*2`
-          // path mis-paid any casino back bet whose odds ≠ 2.0 (lowercase-etype
-          // "fancy" games — teen20, poker20, …). Casino `b` is always the decimal
-          // multiplier, so stake×odds is universally correct for back.
-          amt = stakeNum * oddsNum;
-        }
-
-        // Liability that was locked at placement (mirrors loss-amt formula).
-        // netProfit = cash credit minus locked liability => actual P/L for inr_balance.
-        const exp = (type === "lay")
-          ? (mtype === "fancy" ? stakeNum : stakeNum * (oddsNum - 1))
-          : stakeNum;
-        netProfit = amt - exp;
+        // Cash credit on win = the lock that was taken at placement + winnings.
+        //
+        // The lock comes from the stored `exposer` rather than being re-derived
+        // from stake/odds, because book-managed markets (aaa, dum10 — see
+        // helper/casinoMarketBook.js) lock the MARGINAL worst case, not each
+        // bet's standalone liability. Re-deriving it would credit back more
+        // cash than was ever taken on a hedged book. For every other game the
+        // stored exposer IS the standalone liability, so this is identical to
+        // the old `stake*odds` form:
+        //   back      lock=stake             + stake*(odds-1) = stake*odds
+        //   lay       lock=stake*(odds-1)    + stake          = stake*odds
+        //   lay fancy lock=stake             + stake          = stake*2
+        //
+        // BACK always pays the locked decimal odds. The old `fancy → stake*2`
+        // path mis-paid any casino back bet whose odds ≠ 2.0 (lowercase-etype
+        // "fancy" games — teen20, poker20, …). Casino `b` is always the decimal
+        // multiplier, so stake×(odds−1) is universally correct for back.
+        netProfit = (type === "lay") ? stakeNum : round2(stakeNum * (oddsNum - 1));
+        amt = round2(lockedAmount + netProfit);
       }
 
       resultStatus = "won";
@@ -365,11 +371,13 @@ async function settleBetCommon(bet, winner, payoutRate = null) {
         // Placement locked the worst case (max rate × stake), so whatever the
         // actual loss did not consume must go back to cash.
         amt = round2(stakeNum * payoutRate);
-        cashAdjust = round2(Math.abs(Number(lockedBet.exposer || 0)) - amt);
+        cashAdjust = round2(lockedAmount - amt);
       } else if (type === "lay") {
-        amt = mtype === "fancy" ? stakeNum : stakeNum * (oddsNum - 1);
+        amt = mtype === "fancy" ? stakeNum : round2(stakeNum * (oddsNum - 1));
+        cashAdjust = round2(lockedAmount - amt);
       } else {
         amt = stakeNum;
+        cashAdjust = round2(lockedAmount - amt);
       }
 
       resultStatus = "lost";

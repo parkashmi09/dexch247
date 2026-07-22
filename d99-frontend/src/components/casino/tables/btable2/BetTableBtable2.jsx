@@ -41,11 +41,11 @@ export default function BetTableBtable2({ tableData = [], onBetClick, exposures 
         </div>
         <div className={`casino-odds-box back${sus ? " suspended-box" : ""}`}
           onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}>
-          <span className="casino-odds">{sus ? 0 : item?.b || 0}</span>
+          <span className="casino-odds">{item?.b || 0}</span>
         </div>
         <div className={`casino-odds-box lay${sus ? " suspended-box" : ""}`}
           onClick={() => !sus && item?.l > 0 && onBetClick?.(item.l, item.nat, item, "lay")}>
-          <span className="casino-odds">{sus ? 0 : item?.l || 0}</span>
+          <span className="casino-odds">{item?.l || 0}</span>
         </div>
         <div className="casino-nation-book text-center d-none d-md-block w-100">
           {showExp && <span className={expN >= 0 ? "text-success" : "text-danger"}>{expN}</span>}
@@ -58,7 +58,7 @@ export default function BetTableBtable2({ tableData = [], onBetClick, exposures 
     const sus = isSus(item);
     return (
       <div className="aaa-odd-box">
-        <div className="casino-odds text-center">{sus ? 0 : item?.b || 0}</div>
+        <div className="casino-odds text-center">{item?.b || 0}</div>
         <div className={`casino-odds-box back casino-odds-box-theme${sus ? " suspended-box" : ""}`}
           onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}>
           <span className="casino-odds">{label}</span>
@@ -93,7 +93,7 @@ export default function BetTableBtable2({ tableData = [], onBetClick, exposures 
       <div className="casino-table-box mt-3">
         <div className="casino-table-left-box ">
           <div className="aaa-odd-box">
-            <div className="casino-odds text-center">{isSus(red) ? 0 : red?.b || 0}</div>
+            <div className="casino-odds text-center">{red?.b || 0}</div>
             <div className={`casino-odds-box back casino-odds-box-theme${isSus(red) ? " suspended-box" : ""}`}
               onClick={() => !isSus(red) && red?.b > 0 && onBetClick?.(red.b, red.nat, red, "back")}>
               <div className="casino-odds">
@@ -104,7 +104,7 @@ export default function BetTableBtable2({ tableData = [], onBetClick, exposures 
             <div className="casino-nation-book text-center"></div>
           </div>
           <div className="aaa-odd-box">
-            <div className="casino-odds text-center">{isSus(black) ? 0 : black?.b || 0}</div>
+            <div className="casino-odds text-center">{black?.b || 0}</div>
             <div className={`casino-odds-box back casino-odds-box-theme${isSus(black) ? " suspended-box" : ""}`}
               onClick={() => !isSus(black) && black?.b > 0 && onBetClick?.(black.b, black.nat, black, "back")}>
               <div className="casino-odds">

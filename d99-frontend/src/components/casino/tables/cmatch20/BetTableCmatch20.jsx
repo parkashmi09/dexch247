@@ -2,8 +2,8 @@ const BALL_BASE = "/assets/img/balls/cricket20";
 
 function ScoreBox({ item, ballNum, teamAScore, teamBScore, teamAOvers, teamBOvers, onBetClick }) {
   const suspended = !item || item.gstatus !== "OPEN";
-  const backOdds = suspended ? 0 : (item?.b || 0);
-  const layOdds = suspended ? 0 : (item?.l || 0);
+  const backOdds = (item?.b || 0);
+  const layOdds = (item?.l || 0);
 
   return (
     <div className="score-box">

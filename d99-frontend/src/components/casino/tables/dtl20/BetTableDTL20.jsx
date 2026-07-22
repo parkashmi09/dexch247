@@ -88,7 +88,7 @@ function RowLabel({ row }) {
 
 function OddsBox({ item, nat, onBetClick, exposures }) {
   const sus = isSus(item);
-  const odds = sus ? 0 : (item?.b || 0);
+  const odds = (item?.b || 0);
   return (
     <div
       className={`casino-odds-box back${sus ? " suspended-box" : ""}`}
