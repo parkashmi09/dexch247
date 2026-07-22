@@ -27,7 +27,6 @@ import {
   TOASTS,
   BET_BUFFER_SECONDS,
   FANCY_BUFFER_SECONDS,
-  getOddsFormat,
   getGameType,
   getBetCategory,
   isFancyCategory,
@@ -35,7 +34,6 @@ import {
   getStakeLimits,
   getOddsBounds,
   isRateCapped,
-  isLimitedOvers,
 } from "../utils/sportsBetRules.js";
 import { manualBetGate, manualBetLiveCheck, autoBetCheck, EPS } from "../utils/bookieFavour.js";
 import {
@@ -49,6 +47,7 @@ import MarketSection from "../components/sports/markets/MarketSection.jsx";
 import RightSidebar from "../components/sports/RightSidebar.jsx";
 import PlaceBetMobile from "../components/sports/PlaceBetMobile.jsx";
 import HorseBanner from "../components/sports/markets/HorseBanner.jsx";
+import RunAmountModal from "../components/sports/markets/RunAmountModal.jsx";
 
 // ---------------------------------------------------------------------------
 // Main GameDetails page
@@ -83,6 +82,9 @@ export default function GameDetails() {
   // Bet placement state
   const [betState, setBetState] = useState(INITIAL_BET_STATE);
   const [placing, setPlacing] = useState(false);
+
+  // Run Amount ladder modal — the Normal-market runner whose book is shown.
+  const [ladderRunner, setLadderRunner] = useState(null);
 
   const pollRef = useRef(null);
   const latestMarketsRef = useRef([]); // always-fresh markets for submit-time odds/suspended checks
@@ -366,42 +368,36 @@ export default function GameDetails() {
         else sizes.back_size = finalSize;
       }
 
+      // Field-for-field mirror of the reference lords payload
+      // (D:\Developer\lords-exch-new\exchange-payload\payloads\01_MATCH_ODDS.json).
+      // Order, names and TYPES match it exactly — the only deviation is the
+      // trailing `is_cashout`, which this server reads to skip the min-stake on a
+      // computed hedge (sportbetscontroller.js:797); lords never sent it.
       const payload = {
-        // ⚠ Known gap carried over from the reference: football/tennis bets are
-        // still saved as Cricket. Fixing it needs the server's sport mapping.
+        // ⚠ Known gap carried from the reference: football/tennis bets still save
+        // as Cricket. Fixing it needs the server's sport mapping.
         sports: "Cricket",
         event_name: eventName,
         market_name: market.mname || "",
-        // GOLDEN RULE (spec §3.3): market_type is the feed's mname VERBATIM.
-        // Never an internal/UI label — exposure and settlement key on this, and
-        // "Bookmaker" vs "Bookmaker 2" are only distinguishable here.
+        // GOLDEN RULE (spec §3.3): market_type is the feed's mname VERBATIM —
+        // never a UI label. Exposure + settlement key on it, and "Bookmaker" vs
+        // "Bookmaker 2" are only distinguishable here.
         market_type: market.mname || "",
         category: getBetCategory(market),
         eventid: String(gmid),
-        event_id: Number(gmid),
         fancy_name: String(fancyCat ? selectionName : ""),
         fixed: 0,
-        // match1 → BOOKMAKER (server maps to BM); Tied → FANCY so the server
-        // accepts sub-1 percent odds and routes to its Tied branch.
+        // match1 → BOOKMAKER (server maps to BM); Tied Match → FANCY so the
+        // server accepts sub-1 percent odds and routes to its Tied branch.
         game_type: getGameType(market),
-        match_id: String(market.mid),      // NB: this is the MARKET id
-        market_id: Number(market.mid),
+        match_id: String(market.mid),      // NB: MARKET id (string)
         match_start_time: String(matchInfo.time || ""),
         match_title: String(matchInfo.name || ""),
         odds: Number(finalOdds.toFixed(2)),
-        // Resolves the ambiguity that `gtype` alone cannot: `match1` + dtype 2 is
-        // structurally identical for Bookmaker 2 and Tied Match, opposite scales.
-        odds_format: getOddsFormat(market),
         original_amount: Number(stakeNum.toFixed(2)),
         original_currency: "INR",
         selection_name: String(selectionName),
-        // The runner's real feed id. Without it, settlement and exposure key on
-        // free-text names, which carry trailing dots/prefixes that drift.
-        selection_id: selectionId ?? null,
-        // `sid` keeps its legacy meaning (SPORT id, not runner id) for backward
-        // compatibility; sport_id is the same value under a name that says so.
-        sid: String(sid || ""),
-        sport_id: String(sid || ""),
+        sid: String(sid || ""),             // SPORT id (route param), not runner id
         stake_amount: Number(stakeNum.toFixed(2)),
         team_one: String(teamNames[0] || ""),
         team_two: String(teamNames[1] || ""),
@@ -409,26 +405,31 @@ export default function GameDetails() {
         user_id: String(user.user_id || user.id || "0"),
         count: sections.length || 2,
         bet_type: betType,
-        settlened: "pending",
+        settlened: "pending",               // reference typo — preserved verbatim
         nation: String(selectionName),
-        nat: String(selectionName),
+        // = odds; for the fancy family this carries the LINE, not the rate
+        // (reference behaviour preserved, lords report 03).
         user_rate: Number(finalOdds.toFixed(2)),
         amount: Number(stakeNum.toFixed(2)),
-        place_date: placeDate,
-        runners: teamNames,
-        limited_overs: isLimitedOvers(sid, eventName),
-        // Real feed sizes + top-tier prices — the server prices fancy bets off
-        // these, and zeroes here book zero liability. See deriveBetSizes().
+        place_date: placeDate,              // "YYYY-MM-DD HH:mm:ss" UTC
+        event_id: Number(gmid),             // number (eventid is the string form)
+        market_id: Number(market.mid),      // number (match_id is the string form)
+        // size = CLICKED rung size; back_size/lay_size = each SIDE's best (tno0)
+        // size independently (lords 01: back 2179.35 / lay 13981.64). deriveBetSizes.
         ...sizes,
-        // This frontend never places an unmatched bet: an accepted manual bet is
-        // a matched bet at the live price. The fields exist for the backend
-        // contract only.
-        unmatched: false,
-        unmatched_odds: isEdited ? Number(oddsNum.toFixed(2)) : null,
-        is_cashout: !!isCashout,
+        runners: teamNames,
+        // runner_odds inside ...sizes carries the top back1/lay1 prices.
         mname: String(market.mname || ""),
         gtype: String(market.gtype || "match"),
-        section: Array.isArray(sections) ? sections : [],
+        // Reference contract: section is a STRINGIFIED runners array — the server
+        // JSON.parse()s it. Sending a raw array is the bug we were carrying.
+        section: JSON.stringify(Array.isArray(sections) ? sections : []),
+        nat: String(selectionName),
+        // Frontend never places an unmatched bet — an accepted manual bet is a
+        // matched bet at the live price.
+        unmatched: false,
+        // dexch247-only: skips the min-stake gate for a computed cashout hedge.
+        is_cashout: !!isCashout,
       };
 
       const res = await sportsPlaceBet(payload);
@@ -731,6 +732,7 @@ export default function GameDetails() {
                 onBetClick={handleBetClick}
                 onCashout={user ? handleCashout : null}
                 widthClass={wc}
+                onRunnerClick={user ? setLadderRunner : null}
               />
             );
             });
@@ -753,6 +755,15 @@ export default function GameDetails() {
         placing={placing}
       />
     )}
+
+    {/* Run Amount ladder — opens on a Normal-market runner-name click */}
+    <RunAmountModal
+      show={!!ladderRunner}
+      onClose={() => setLadderRunner(null)}
+      runnerName={ladderRunner}
+      eventId={gmid}
+      userId={user?.user_id}
+    />
     </>
   );
 }

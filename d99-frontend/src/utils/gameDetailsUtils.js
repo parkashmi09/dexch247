@@ -254,12 +254,23 @@ export function deriveBetSizes(runnerLike, betType, oddsNum) {
   const topOf = (t) =>
     all.find((o) => typeOf(o) === t && Number(o?.tno) === 0) ||
     all.find((o) => typeOf(o) === t);
-  const runner_odds = ["back", "lay"]
-    .map((t) => topOf(t))
+  const back0 = topOf("back");
+  const lay0 = topOf("lay");
+  const runner_odds = [back0, lay0]
     .filter((o) => o && num(o.odds) > 0)
     .map((o) => ({ odds: num(o.odds), oname: `${typeOf(o)}1` }));
 
-  return { back_size: size, lay_size: size, size, runner_odds };
+  // Reference contract (lords 01_MATCH_ODDS): back_size = best BACK (tno0) size,
+  // lay_size = best LAY (tno0) size — the two SIDES independently, NOT both the
+  // clicked size. MATCH_ODDS proves it: back bet → back_size 2179.35 (back1) but
+  // lay_size 13981.64 (lay1). `size` stays the CLICKED rung's size (bet side).
+  const back_size = num(back0?.size) > 0 ? num(back0.size) : 0;
+  const lay_size = num(lay0?.size) > 0 ? num(lay0.size) : 0;
+  // Fall back to the bet side's best when the exact clicked tier couldn't be
+  // resolved (keeps the server priceable rather than booking zero liability).
+  const finalSize = size > 0 ? size : isLaySide ? lay_size : back_size;
+
+  return { back_size, lay_size, size: finalSize, runner_odds };
 }
 
 // ---------------------------------------------------------------------------
@@ -674,18 +685,25 @@ export const SPORTS_QUICK_STAKES = [
 export function getExposureForSelection(exposures, runner, marketMid) {
   if (!exposures || !runner || marketMid == null) return null;
   const arr = Array.isArray(exposures) ? exposures : Object.values(exposures);
-  const name = runner.nat || runner.name || "";
+  const norm = (v) => String(v ?? "").trim().toLowerCase();
+  const name = norm(runner.nat || runner.name);
   const sid = runner.sid;
   const mid = String(marketMid);
+  if (!name && !sid) return null;
   const found = arr.find((e) => {
     // ALWAYS scope to the market mid (exposure.match_id === market.mid). Selection
     // names repeat across markets (e.g. "0 Number" in the 25-over vs 30-over
     // fancy, "Hampshire W" in Match Odds vs Bookmaker), so matching by name alone
     // bleeds exposure between markets. mid disambiguates.
     if (String(e.match_id) !== mid) return false;
-    if (e.team_name && e.team_name === name) return true;
+    // Normalized EXACT name — for fancy markets the API also emits per-side
+    // breakdown rows ("<runner>lay", "<runner>back", "<runner>totalstake") that
+    // share the runner's prefix; only the un-suffixed row is the NET book, and
+    // exact match is what distinguishes it. Case/whitespace are normalized so a
+    // trailing-space feed name still resolves.
+    if (name && e.team_name != null && norm(e.team_name) === name) return true;
     if (sid && (String(e.selection_id) === String(sid) || String(e.sid) === String(sid))) return true;
-    if (e.nation === name || e.nat === name) return true;
+    if (name && (norm(e.nation) === name || norm(e.nat) === name)) return true;
     return false;
   });
   if (!found) return null;

@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 
-export function ExposureValue({ value }) {
+export function ExposureValue({ value, className = "" }) {
   if (value === null || value === undefined) return null;
   const num = Number(value);
   if (num === 0) return null;
-  const cls = `market-book ${num < 0 ? "text-danger" : "text-success "}`;
+  const cls = `market-book ${className} ${num < 0 ? "text-danger" : "text-success"}`
+    .replace(/\s+/g, " ")
+    .trim();
   return <span className={cls}>{Math.round(num)}</span>;
 }
 

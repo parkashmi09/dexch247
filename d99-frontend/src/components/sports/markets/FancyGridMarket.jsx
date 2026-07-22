@@ -1,7 +1,7 @@
 import BlinkBox, { ExposureValue } from "./BlinkBox.jsx";
 import { formatSize, formatLimit, getExposureForSelection } from "../../../utils/gameDetailsUtils.js";
 
-function FancyRunnerRows({ runner, showBook = false, marketType, market, onBetClick, exposures }) {
+function FancyRunnerRows({ runner, showBook = false, marketType, market, onBetClick, exposures, onRunnerClick }) {
   const gs = (runner.gstatus || "").toUpperCase();
   const susp = gs === "SUSPENDED" || gs === "BALL RUNNING" || gs === "BALLRUNNING";
   const exposure = getExposureForSelection(exposures, runner, market.mid);
@@ -41,8 +41,16 @@ function FancyRunnerRows({ runner, showBook = false, marketType, market, onBetCl
         data-title={susp ? "SUSPENDED" : (runner.gstatus || "")}
       >
         <div className="market-nation-detail">
-          {t === 0 && <span className="market-nation-name">{runner.nat}</span>}
-          {t === 0 && <div className="market-nation-book"><ExposureValue value={exposure} /></div>}
+          {t === 0 && (
+            <span
+              className="market-nation-name"
+              onClick={onRunnerClick ? () => onRunnerClick(runner.nat) : undefined}
+              style={onRunnerClick ? { cursor: "pointer" } : undefined}
+            >
+              {runner.nat}
+            </span>
+          )}
+          {t === 0 && <ExposureValue value={exposure} className="float-end" />}
         </div>
         <BlinkBox
           value={layVal}
@@ -79,7 +87,7 @@ function FancyRunnerRows({ runner, showBook = false, marketType, market, onBetCl
   return rows;
 }
 
-export default function FancyGridMarket({ market, exposures, showBook = false, headerLay = "No", headerBack = "Yes", marketType, onBetClick, colClass = "col-md-6" }) {
+export default function FancyGridMarket({ market, exposures, showBook = false, headerLay = "No", headerBack = "Yes", marketType, onBetClick, onRunnerClick, colClass = "col-md-6" }) {
   const isSuspended = market.status === "SUSPENDED";
   const sections = market.section || [];
 
@@ -127,6 +135,7 @@ export default function FancyGridMarket({ market, exposures, showBook = false, h
                   market={market}
                   onBetClick={onBetClick}
                   exposures={exposures}
+                  onRunnerClick={onRunnerClick}
                 />
                 {runner.rem && (
                   <div className="market-row">

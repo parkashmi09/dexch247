@@ -8,7 +8,7 @@ import OddEvenMarket from "./OddEvenMarket.jsx";
 import HtftMarket from "./HtftMarket.jsx";
 import RacingMarket from "./RacingMarket.jsx";
 
-export default function MarketSection({ market, exposures, onBetClick, widthClass, onCashout, onCombinedBetClick, combinedSlip, sportId }) {
+export default function MarketSection({ market, exposures, onBetClick, widthClass, onCashout, onCombinedBetClick, combinedSlip, sportId, onRunnerClick }) {
   const type = detectMarketType(market);
 
   switch (type) {
@@ -84,6 +84,8 @@ export default function MarketSection({ market, exposures, onBetClick, widthClas
           headerBack="Yes"
           marketType={type}
           onBetClick={onBetClick}
+          // Run Amount ladder opens on runner-name click for the Normal market.
+          onRunnerClick={type === MARKET_TYPE.NORMAL ? onRunnerClick : undefined}
         />
       );
     case MARKET_TYPE.FANCY1:
