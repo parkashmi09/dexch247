@@ -373,7 +373,13 @@ async function settleBetCommon(bet, winner, payoutRate = null) {
         amt = round2(stakeNum * payoutRate);
         cashAdjust = round2(lockedAmount - amt);
       } else if (type === "lay") {
-        amt = mtype === "fancy" ? stakeNum : round2(stakeNum * (oddsNum - 1));
+        // A lay always pays stake*(odds-1). The old `fancy → stakeNum` branch
+        // mirrored the placement shortcut removed from
+        // controller/casino/casinoController.js: casino `l` is a decimal price
+        // even on vendor-tagged "Fancy"/"Fancy1" tables, so charging the flat
+        // stake under-charged every lay loss whose odds ≠ 2.0. Both sides moved
+        // together — placement locks stake*(odds-1), settlement consumes it.
+        amt = round2(stakeNum * (oddsNum - 1));
         cashAdjust = round2(lockedAmount - amt);
       } else {
         amt = stakeNum;

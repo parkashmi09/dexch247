@@ -67,8 +67,14 @@ export default function BetTableTeen20b({ tableData = [], onBetClick, exposures 
         onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}
       >
         <div>{icons}</div>
-        <div><span className="casino-odds">{item?.b || 0}</span></div>
-        <ExpBook value={getExp(exposures, item?.nat)} />
+        {/* Odds and book share one column child: this section's box is
+            flex-direction:row (style.css → .teenpatti20 .teenpatti20-other-oods
+            .casino-odds-box), so three siblings would sit the book NEXT TO the
+            price instead of under it. */}
+        <div className="d-flex flex-column align-items-end">
+          <span className="casino-odds">{item?.b || 0}</span>
+          <ExpBook value={getExp(exposures, item?.nat)} />
+        </div>
       </div>
     );
   }

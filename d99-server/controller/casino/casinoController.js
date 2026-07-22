@@ -157,14 +157,18 @@ const CasinoController = {
     }
    let  exposer =0;
    let libality =0;
+    // LAY liability is always stake*(odds-1). There used to be an
+    // `mtype == 'fancy' → exposer = -amount` shortcut here, borrowed from the
+    // sports session lines where the stake IS the liability. Casino tables are
+    // not session lines: the vendor tags plenty of them "Fancy"/"Fancy1"
+    // (notenum, race17, cricketv3 …) while `l` stays a true decimal price, so
+    // the shortcut under-locked every one of them — a lay of 100 at 4.32 held
+    // 100 instead of 332. Same mistake the BACK side already corrected, see
+    // casinobet/settlementCasinoWorker.js → settleBetCommon.
     if(type == 'lay'){
        let value = odds -1;
        exposer = -value * amount
        libality = -amount;
-       if(mtype == 'fancy'){
-
-            exposer = -amount;
-         }
     }
     else{
 
