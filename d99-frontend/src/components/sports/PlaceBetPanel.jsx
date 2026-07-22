@@ -130,7 +130,7 @@ export default function PlaceBetPanel({ betState, exposures, onOddsChange, onSta
               disabled={submitDisabled}
               onClick={onSubmit}
             >
-              {placing ? "..." : "Submit"}
+              Submit
             </button>
           </div>
         </div>

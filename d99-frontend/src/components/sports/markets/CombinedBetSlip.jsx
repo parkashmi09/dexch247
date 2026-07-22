@@ -74,7 +74,7 @@ export default function CombinedBetSlip({
         <button className="btn btn-link" type="button" onClick={onClear}>Clear</button>
         <button className="btn btn-danger" type="button" onClick={onReset}>Reset</button>
         <button className="btn btn-success" type="button" disabled={submitDisabled} onClick={onSubmit}>
-          {placing ? <i className="fa fa-spinner fa-spin" /> : "Place Bet"}
+          Place Bet
         </button>
       </div>
 

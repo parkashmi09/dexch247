@@ -109,7 +109,7 @@ export default function PlaceBetMobile({
             <button className="btn btn-info" type="button">Edit</button>
             <button className="btn btn-danger" type="button" onClick={onReset}>Reset</button>
             <button className="btn btn-success" type="button" disabled={submitDisabled} onClick={onSubmit}>
-              {placing ? <i className="fa fa-spinner fa-spin" /> : "Place Bet"}
+              Place Bet
             </button>
           </div>
           <div className="mt-1 d-flex"></div>
