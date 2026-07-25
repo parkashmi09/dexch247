@@ -35,7 +35,7 @@ import {
   getOddsBounds,
   isRateCapped,
 } from "../utils/sportsBetRules.js";
-import { manualBetGate, manualBetLiveCheck, autoBetCheck, EPS } from "../utils/bookieFavour.js";
+import { manualBetGate, manualBetLiveCheck, autoBetCheck, autoCheckApplies, EPS } from "../utils/bookieFavour.js";
 import {
   monitorOddsBuffer,
   getFinalSuspensionStatus,
@@ -193,6 +193,14 @@ export default function GameDetails() {
     const selectionId = runner?.sid;
     const selectionName = runner?.nat || runner?.name || "";
     const oddsLocked = isOddsLocked(market);
+    // Bookmaker (match1) odds are NOT user-editable — `oddsLocked` stays true so
+    // the panel renders them read-only and the manual-edit gate never fires — but
+    // they DO move live, so they need the SAME directional bookie-favour check as
+    // Match Odds (auto path), NOT the fancy locked-odds drift check. This flag is
+    // tied to autoCheckApplies (match_odds / bookmaker / bookmaker 2) so live
+    // tracking fires exactly where the auto favour check will apply; Tied and the
+    // fancy family aren't auto-check markets, so they stay locked (drift check).
+    const oddsLiveTracked = !oddsLocked || autoCheckApplies(market);
     const eventName = matchInfo.name || "";
 
     // ── Step 0: anti-spam — 4 attempts per market per 60s ──
@@ -302,12 +310,15 @@ export default function GameDetails() {
     // Everything past this point MUST clear `placing` before returning.
     try {
       // ── Step 3: buffer — watch the feed, then take the last live price Y ──
-      const platformBuffer = oddsLocked ? 0 : await getPlatformBufferSeconds();
-      const bufferSeconds = oddsLocked
-        ? FANCY_BUFFER_SECONDS
-        : platformBuffer > 0
+      // Live-tracked markets (Match Odds + Bookmaker) use the real platform
+      // buffer to follow the live price; fancy/locked markets keep the shorter
+      // env buffer and their clicked price.
+      const platformBuffer = oddsLiveTracked ? await getPlatformBufferSeconds() : 0;
+      const bufferSeconds = oddsLiveTracked
+        ? platformBuffer > 0
           ? platformBuffer
-          : BET_BUFFER_SECONDS;
+          : BET_BUFFER_SECONDS
+        : FANCY_BUFFER_SECONDS;
 
       const clickedSizes = deriveBetSizes(runner, betType, oddsNum);
       const buffer = await monitorOddsBuffer({
@@ -320,6 +331,9 @@ export default function GameDetails() {
         initialOdds: oddsNum,
         initialSize: clickedSizes.size,
         bufferSeconds,
+        // Override the gtype-only lock: bookmaker must follow the live price so
+        // the auto favour check below compares live vs clicked.
+        liveTracked: oddsLiveTracked,
       });
       let finalOdds = Number(buffer.finalOdds);
       let finalSize = Number(buffer.finalSize) || 0;
@@ -338,7 +352,10 @@ export default function GameDetails() {
       }
 
       // ── Step 5: strict drift check on odds-locked (fancy) markets ──
-      if (oddsLocked &&
+      // Only markets whose odds don't move live. Bookmaker is oddsLocked (not
+      // editable) but IS live-tracked, so it SKIPS this and uses the directional
+      // auto bookie-favour check (Step 6) instead — the whole point of the fix.
+      if (!oddsLiveTracked &&
           hasFancyDrift({ markets: getMarkets(), marketId, selectionName, betType, odds: oddsNum })) {
         setPlacing(false);
         toast.error(TOASTS.ODDS_CHANGED);

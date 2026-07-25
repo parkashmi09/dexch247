@@ -77,8 +77,13 @@ export function monitorOddsBuffer({
   initialOdds,
   initialSize = 0,
   bufferSeconds = 0,
+  liveTracked,
 }) {
-  const locked = isOddsLocked(market);
+  // `liveTracked` overrides the gtype-only lock. Bookmaker (match1) odds are not
+  // user-editable but DO move live, so the caller passes liveTracked=true to make
+  // the buffer follow the live price for the directional favour check. When the
+  // caller doesn't specify, fall back to the gtype rule (editable = gtype match).
+  const locked = liveTracked !== undefined ? !liveTracked : isOddsLocked(market);
   const base = {
     finalOdds: Number(initialOdds),
     finalSize: Number(initialSize) || 0,
