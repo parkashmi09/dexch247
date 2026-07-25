@@ -31,7 +31,7 @@ export default function SicBo2Page() {
         <CasinoRightSidebar bets={myBets} showPlaceBet={showPlaceBet} betValue={betValue} betType={betType}
           selection={selectedSelection} min={selectedBetData?.min} max={selectedBetData?.max}
           stakeAmount={stakeAmount} setStakeAmount={setStakeAmount} placing={placing}
-          onClosePlaceBet={closeBetPanel} onSubmitBet={handlePlaceBet} />
+          onClosePlaceBet={closeBetPanel} onSubmitBet={handlePlaceBet} gameType="sicbo2" />
       }
     >
       <div className="casino-page-container sicbo">
@@ -62,7 +62,7 @@ export default function SicBo2Page() {
         <PlaceBetMobile show={showPlaceBet} betValue={betValue} betType={betType}
           selection={selectedSelection} min={selectedBetData?.min} max={selectedBetData?.max}
           stakeAmount={stakeAmount} setStakeAmount={setStakeAmount} placing={placing}
-          onClose={closeBetPanel} onSubmit={handlePlaceBet} />
+          onClose={closeBetPanel} onSubmit={handlePlaceBet} gameType="sicbo2" />
         <CasinoHiddenBetTable bets={myBets} />
       </div>
 

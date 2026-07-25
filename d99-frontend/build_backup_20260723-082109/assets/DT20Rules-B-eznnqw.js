@@ -1,0 +1,1 @@
+import{j as s}from"./index-BD6y06ts.js";function i(){return s.jsx("div",{className:"rules-section",children:s.jsx("div",{children:s.jsx("img",{src:"/assets/casino-rules/dt20.jpg",className:"img-fluid",alt:"20-20 Dragon Tiger Rules"})})})}export{i as default};

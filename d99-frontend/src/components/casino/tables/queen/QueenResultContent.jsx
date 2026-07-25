@@ -31,30 +31,23 @@ export default function QueenResultContent({ detailData }) {
   const t1 = detailData?.data?.data?.t1 || detailData?.data?.t1 || {};
   const { card = "", mtime = "", rid = "", win = "", winnat = "" } = t1;
 
-  const dealt = card ? card.split(",").map((t) => t.trim()).filter((t) => t && t !== "1") : [];
-
-  // Sequential pairs distribution + group_index bonus
-  const n = dealt.length;
-  const base = Math.floor(n / 4);
-  const extra = n % 4;
-  const groupSizes = [0, 0, 0, 0];
-  for (let i = 0; i < 4; i++) groupSizes[i] = base + (i < extra ? 1 : 0);
-
-  const groups = [[], [], [], []];
-  let pos = 0;
-  for (let gi = 0; gi < 4; gi++) {
-    for (let j = 0; j < groupSizes[gi]; j++) {
-      groups[gi].push(dealt[pos++]);
-    }
-  }
+  // The feed sends the dealt cards DENSE (front-packed) followed by "1" padding —
+  // e.g. "6DD,5DD,4CC,5CC,5HH,1,1,…". Cards are dealt COLUMN-MAJOR: one to each lane
+  // per column (Total 0,1,2,3), then the next column, until a lane wins. So the
+  // n-th dealt card belongs to lane (n % 4): filter the placeholders to the dense
+  // list, then round-robin.
+  const dealt = card ? card.split(",").map((t) => t.trim()).filter((t) => t && t !== "1" && t !== "0") : [];
+  const groups = Array.from({ length: 4 }, () => []);
+  dealt.forEach((token, i) => groups[i % 4].push(token));
 
   const groupTotals = groups.map((cards, gi) => {
     const pipSum = cards.reduce((sum, t) => sum + cardRankValue(t), 0);
     return cards.length > 0 ? pipSum + gi : 0;
   });
 
-  const winnerLabel = winnat || (win ? `Total ${win}` : "");
-  const winnerGroupIdx = win !== "" ? parseInt(win, 10) : -1;
+  // Feed `win` is 1-based (1 = Total 0, 4 = Total 3); lane index is 0-based.
+  const winnerLabel = winnat || (win !== "" ? `Total ${parseInt(win, 10) - 1}` : "");
+  const winnerGroupIdx = win !== "" ? parseInt(win, 10) - 1 : -1;
 
   return (
     <div className="casino-result-modal">

@@ -19,6 +19,7 @@ import {
   getLastResults,
   placeCasinoBet,
   getMatchExposure,
+  getMyBets,
 } from "../../../apiservices/CasionApi.js";
 import { CASINO_STREAM_URL } from "../../../config.js";
 import { fetchBalanceThunk } from "../../../features/user/userSlice.js";
@@ -106,6 +107,32 @@ export default function ABJPage() {
   const [stakeAmount, setStakeAmount] = useState("");
   const [placing, setPlacing] = useState(false);
   const [myBets, setMyBets] = useState([]);
+  const fetchMyBets = useCallback(async () => {
+    if (!mid) return;
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = user?.user_id || user?.id;
+      if (!userId) return;
+      const response = await getMyBets(userId, mid);
+      if (response?.success && response?.bets) {
+        setMyBets(response.bets.map((bet) => ({
+          matchedBet: bet.player_name || bet.selection || bet.nat || "",
+          nat: bet.nat || bet.player_name || bet.selection || "",
+          odds: bet.odds || bet.urate || "0",
+          stake: bet.stake || bet.amt || "0",
+          type: (bet.type || bet.btype || "").toLowerCase() || null,
+          selection: bet.selection || bet.player_name || "",
+          exposer: parseFloat(bet.exposer || bet.exposure_amount || "0") || 0,
+        })));
+      }
+    } catch { /* ignore */ }
+  }, [mid]);
+  useEffect(() => {
+    if (!mid) return;
+    fetchMyBets();
+    const iv = setInterval(fetchMyBets, 2000);
+    return () => clearInterval(iv);
+  }, [mid, fetchMyBets]);
   const [mobilePanelTab, setMobilePanelTab] = useState("game");
   const [resultModal, setResultModal] = useState({ show: false, mid: "" });
 
@@ -149,6 +176,7 @@ export default function ABJPage() {
         setStakeAmount("");
         const token = localStorage.getItem("token");
         if (token) dispatch(fetchBalanceThunk());
+        fetchMyBets();
       } else {
         toast.error(res?.error || res?.msg || "Failed");
       }
@@ -157,7 +185,7 @@ export default function ABJPage() {
     } finally {
       setPlacing(false);
     }
-  }, [stakeAmount, selectedBetData, betValue, betType, mid, selectedSelection, dispatch]);
+  }, [stakeAmount, selectedBetData, betValue, betType, mid, selectedSelection, dispatch, fetchMyBets]);
 
   const loading = !gameData;
   const iframeSrc = `${CASINO_STREAM_URL}?id=${GAME_ID}`;

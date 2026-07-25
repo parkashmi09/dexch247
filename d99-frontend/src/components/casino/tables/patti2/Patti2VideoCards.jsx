@@ -8,9 +8,12 @@ function getCardImage(token) {
 export default function Patti2VideoCards({ cardString = "" }) {
   const tokens = cardString.split(",").map((t) => t.trim());
 
-  // 4 cards: positions 0,1 = row 1 (Player A); positions 2,3 = row 2 (Player B)
-  const row1Cards = [0, 1].map((i) => getCardImage(tokens[i]));
-  const row2Cards = [2, 3].map((i) => getCardImage(tokens[i]));
+  // Cards are dealt ALTERNATELY: 1st→Player A, 2nd→Player B, 3rd→Player A,
+  // 4th→Player B. So a player's row is its every-other index, NOT a contiguous
+  // pair — Player A = positions 0,2; Player B = positions 1,3. This matches the
+  // feed's own scoring (rdesc "A : x | B : y") and Patti2ResultContent.
+  const row1Cards = [0, 2].map((i) => getCardImage(tokens[i])); // Player A
+  const row2Cards = [1, 3].map((i) => getCardImage(tokens[i])); // Player B
 
   return (
     <div className="casino-video-cards">

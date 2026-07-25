@@ -66,13 +66,14 @@ export default function TrapPage() {
           placing={placing}
           onClosePlaceBet={closeBetPanel}
           onSubmitBet={handlePlaceBet}
-        >
-          <div className="trap-number-icon d-none d-md-flex mt-3">
-            <img src="/assets/img/trap13.png" alt="13" />
-            <img src="/assets/img/trap14.png" alt="14" />
-            <img src="/assets/img/trap15.png" alt="15" />
-          </div>
-        </CasinoRightSidebar>
+          beforeBets={
+            <div className="trap-number-icon d-none d-md-flex">
+              <img src="/assets/img/trap13.png" alt="13" />
+              <img src="/assets/img/trap14.png" alt="14" />
+              <img src="/assets/img/trap15.png" alt="15" />
+            </div>
+          }
+        />
       }
     >
       <div className="casino-page-container trap position-relative">

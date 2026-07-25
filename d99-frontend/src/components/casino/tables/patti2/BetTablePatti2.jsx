@@ -70,12 +70,16 @@ function MiniBaccaratRow({ item, onBetClick, exposures }) {
 
 function TotalRow({ item, onBetClick, exposures }) {
   if (!item) return null;
-  // For Total rows: lay box shows l (volume) + ls (odds), back box shows b (volume) + bs (odds)
+  // Total A/B is a Fancy2 back/lay market. The rate is carried in bbhav/lbhav
+  // (profit-per-100), NOT in bs/ls — those are the max sizes (~300000) and were
+  // being shown as the odds by mistake. Display the bhav, but bet/settle at the
+  // decimal it implies (bhav/100 + 1): settlement pays stake × (odds − 1), so
+  // sending the raw bhav (or the size) would massively overpay.
   const suspended = item.gstatus !== "OPEN";
-  const layOdds = item.ls || 0;
-  const backOdds = item.bs || 0;
-  const laySuspended = suspended || layOdds === 0;
-  const backSuspended = suspended || backOdds === 0;
+  const layBhav = parseFloat(item.lbhav) || 0;
+  const backBhav = parseFloat(item.bbhav) || 0;
+  const laySuspended = suspended || layBhav <= 0;
+  const backSuspended = suspended || backBhav <= 0;
   const exp = getExp(exposures, item.nat);
   return (
     <div className="casino-table-row ">
@@ -87,17 +91,17 @@ function TotalRow({ item, onBetClick, exposures }) {
       </div>
       <div
         className={`casino-odds-box lay${laySuspended ? " suspended-box" : ""}`}
-        onClick={() => !laySuspended && onBetClick?.(layOdds, item.nat, item, "lay")}
+        onClick={() => !laySuspended && onBetClick?.(layBhav / 100 + 1, item.nat, item, "lay")}
       >
         <span className="casino-volume">{item.l}</span>
-        <span className="casino-odds">{layOdds}</span>
+        <span className="casino-odds">{layBhav}</span>
       </div>
       <div
         className={`casino-odds-box back${backSuspended ? " suspended-box" : ""}`}
-        onClick={() => !backSuspended && onBetClick?.(backOdds, item.nat, item, "back")}
+        onClick={() => !backSuspended && onBetClick?.(backBhav / 100 + 1, item.nat, item, "back")}
       >
         <span className="casino-volume">{item.b}</span>
-        <span className="casino-odds">{backOdds}</span>
+        <span className="casino-odds">{backBhav}</span>
       </div>
     </div>
   );

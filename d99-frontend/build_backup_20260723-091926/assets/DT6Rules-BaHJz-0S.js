@@ -1,0 +1,1 @@
+import{j as s}from"./index-BaiuZ3MK.js";function i(){return s.jsx("div",{className:"rules-section",children:s.jsx("div",{children:s.jsx("img",{src:"/assets/casino-rules/dt6.jpg",className:"img-fluid",alt:"1 Day Dragon Tiger Rules"})})})}export{i as default};

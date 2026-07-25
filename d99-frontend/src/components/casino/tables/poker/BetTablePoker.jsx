@@ -10,15 +10,17 @@ function ExpBook({ value }) {
 }
 
 export default function BetTablePoker({ tableData = [], onBetClick, exposures = {} }) {
-  const find = (name) => tableData.find((d) => d.nat === name);
+  const find = (name) => tableData.find((d) => d.nat?.toLowerCase() === name.toLowerCase());
   const isSus = (item) => !item || item.gstatus !== "OPEN";
 
   const playerA = find("Player A");
   const playerB = find("Player B");
-  const bonus2A = find("2 Cards Bonus A") || find("Bonus A");
-  const bonus7A = find("7 Cards Bonus A") || find("7 Bonus A");
-  const bonus2B = find("2 Cards Bonus B") || find("Bonus B");
-  const bonus7B = find("7 Cards Bonus B") || find("7 Bonus B");
+  // Feed nats are "Player A 2 card Bonus" / "Player A 7 card bonus" etc. The old
+  // lookups ("2 Cards Bonus A"/"Bonus A") never matched → bonuses always suspended.
+  const bonus2A = find("Player A 2 card Bonus") || find("2 Cards Bonus A") || find("Bonus A");
+  const bonus7A = find("Player A 7 card bonus") || find("7 Cards Bonus A") || find("7 Bonus A");
+  const bonus2B = find("Player B 2 card Bonus") || find("2 Cards Bonus B") || find("Bonus B");
+  const bonus7B = find("Player B 7 card bonus") || find("7 Cards Bonus B") || find("7 Bonus B");
 
   function renderPlayerRow(item, label) {
     const sus = isSus(item);
@@ -46,6 +48,7 @@ export default function BetTablePoker({ tableData = [], onBetClick, exposures = 
       <div className={`casino-odds-box back${sus ? " suspended-box" : ""}`}
         onClick={() => !sus && item?.b > 0 && onBetClick?.(item.b, item.nat, item, "back")}>
         <span className="casino-odds">{label}</span>
+        <ExpBook value={getExp(exposures, item?.nat)} />
       </div>
     );
   }

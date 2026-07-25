@@ -12,6 +12,9 @@ const TABS = [
 const isItemLocked = (item) =>
   !item || item?.gstatus?.toUpperCase() === "SUSPENDED" || !item?.b || item.b === 0;
 
+// Digits the player must pick before a bet is composed: Single=1, Double=2, Triple=3.
+const MODE_LEN = { single: 1, double: 2, tripple: 3 };
+
 export default function BetTableLottcard({ tableData = [], onBetClick, exposures = {} }) {
   const [activeTabKey, setActiveTabKey] = useState("single");
   const [selectedCards, setSelectedCards] = useState({ single: [], double: [], tripple: [] });
@@ -24,21 +27,29 @@ export default function BetTableLottcard({ tableData = [], onBetClick, exposures
 
   const cardToBall = (c) => (c === "A" ? "1" : c === "10" ? "0" : c);
 
+  // Accumulate the picked cards for the active mode. Once the mode's digit count
+  // is reached, compose the number and open the bet slip, then reset. Single fires
+  // on the first click; Double needs two picks, Triple three (repeats allowed).
   const handleCardClick = (card) => {
     if (isItemLocked(activeItem)) return;
+    const need = MODE_LEN[activeTabKey] || 1;
     setSelectedCards((prev) => {
       const cur = prev[activeTabKey] || [];
-      const isSelected = cur.includes(card);
-      const next = isSelected ? cur.filter((c) => c !== card) : [...cur, card];
+      const next = [...cur, card];
+      if (next.length >= need) {
+        const digits = next.slice(0, need).map(cardToBall); // "0".."9"
+        onBetClick(activeItem.b, activeItem.nat, { ...activeItem, lotteryDigits: digits, lotteryBall: digits }, "back");
+        return { ...prev, [activeTabKey]: [] };
+      }
       return { ...prev, [activeTabKey]: next };
     });
-    const ballNum = cardToBall(card);
-    onBetClick(activeItem.b, activeItem.nat, { ...activeItem, lotteryBall: ballNum }, "back");
   };
 
-  const handleRandomClick = (n) => {
+  const handleRandomClick = () => {
     if (isItemLocked(activeItem)) return;
-    onBetClick(activeItem.b, activeItem.nat, activeItem, "back");
+    const need = MODE_LEN[activeTabKey] || 1;
+    const digits = Array.from({ length: need }, () => String(Math.floor(Math.random() * 10)));
+    onBetClick(activeItem.b, activeItem.nat, { ...activeItem, lotteryDigits: digits, lotteryBall: digits }, "back");
   };
 
   const handleClear = () => {

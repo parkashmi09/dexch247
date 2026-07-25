@@ -14,9 +14,12 @@ import { Op } from "sequelize";
 // Games whose payout is a MULTIPLE of the stake rather than decimal odds.
 // Value = the highest multiple the punter can lose, which is what placement must
 // lock. 1 Card Meter pays the point difference between the two cards, max 12x.
+// Casino Meter pays the run difference between the Low and High zones, capped at
+// 50 — a losing bet pays stake × diff, so the worst case is 50 × stake.
 // Keep in sync with the settlement worker's payoutRate handling.
 const CASINO_MULTIPLIER_GAMES = {
     cmeter1: 12,
+    cmeter: 50,
 };
 
 const CasinoController = {

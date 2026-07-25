@@ -66,6 +66,9 @@ export default function useCasinoGame(gameId, options = {}) {
 
   // ─── Bet placement state ───
   const [betValue, setBetValue] = useState("");
+  // Odds shown in the bet slip. Usually === betValue, but Trio's Session shows
+  // the line (b/l, e.g. 21) while betting/settling at the bhav-derived decimal.
+  const [betDisplayOdds, setBetDisplayOdds] = useState("");
   const [betType, setBetType] = useState("");
   const [selectedSelection, setSelectedSelection] = useState("");
   const [selectedBetData, setSelectedBetData] = useState(null);
@@ -76,6 +79,9 @@ export default function useCasinoGame(gameId, options = {}) {
   // Keep fresh refs for buffer checks
   const gameDataRef = useRef(null);
   const betTypeRef = useRef("");
+  // Last non-zero Trio Session line (b/l). Between rounds the feed drops the row
+  // to 0/suspended; without this cache the My Bet odds column would blank to "-".
+  const trioSessionLineRef = useRef({ b: null, l: null });
   useEffect(() => { gameDataRef.current = gameData; }, [gameData]);
   useEffect(() => { betTypeRef.current = betType; }, [betType]);
 
@@ -155,7 +161,17 @@ export default function useCasinoGame(gameId, options = {}) {
     }));
     const sortedData = mappedData.sort((a, b) => (a.sr || 0) - (b.sr || 0));
     setTableData(sortedData);
-  }, [gameData]);
+
+    // Cache the live Trio Session line so My Bet can keep showing it during the
+    // between-rounds suspension when the feed reports it as 0.
+    if (gameId === "trio") {
+      const session = subData.find((s) => Number(s.sid) === 1);
+      if (session) {
+        if (Number(session.b) > 0) trioSessionLineRef.current.b = session.b;
+        if (Number(session.l) > 0) trioSessionLineRef.current.l = session.l;
+      }
+    }
+  }, [gameData, gameId]);
 
   // ─── Fetch exposure every 2s ───
   const fetchExposure = useCallback(async () => {
@@ -201,23 +217,48 @@ export default function useCasinoGame(gameId, options = {}) {
       const userId = user?.user_id || user?.id;
       if (!userId || !matchId) return;
 
+      // Trio: drop the My Bet card once the round is closing (countdown hit 0),
+      // so it clears before the next round begins — matching the original site,
+      // rather than carrying the current round's bets into the transition.
+      if (gameId === "trio") {
+        const gd = gameDataRef.current;
+        const lt = Number(gd?.data?.data?.lt ?? gd?.data?.lt ?? 0);
+        if (lt <= 0) { setMyBets([]); return; }
+      }
+
       const response = await getMyBets(userId, matchId);
       if (response?.success && response?.bets) {
-        const formattedBets = response.bets.map((bet) => ({
-          matchedBet: bet.player_name || bet.selection || bet.nat || "",
-          nat: bet.nat || bet.player_name || bet.selection || "",
-          odds: bet.odds || bet.urate || "0",
-          stake: bet.stake || bet.amt || "0",
-          type: (bet.type || bet.btype || "").toLowerCase() || null,
-          selection: bet.selection || bet.player_name || "",
-          exposer: parseFloat(bet.exposer || bet.exposure_amount || "0") || 0,
-        }));
+        // Trio Session stores the bhav-derived decimal (1.8/2.0) as its odds, but
+        // the slip and table show the line (b/l). Mirror that in My Bet using the
+        // live session line for this round (My Bet is scoped to the current mid).
+        const isTrio = gameId === "trio";
+        const cachedLine = trioSessionLineRef.current;
+
+        const formattedBets = response.bets.map((bet) => {
+          const type = (bet.type || bet.btype || "").toLowerCase() || null;
+          let odds = bet.odds || bet.urate || "0";
+          if (isTrio && String(bet.selection || bet.player_name || "").trim().toLowerCase() === "session") {
+            // Prefer the last known-good line (kept alive across the between-rounds
+            // suspension); only show the stored decimal if a line was never seen.
+            const line = type === "lay" ? cachedLine.l : cachedLine.b;
+            if (Number(line) > 0) odds = line;
+          }
+          return {
+            matchedBet: bet.player_name || bet.selection || bet.nat || "",
+            nat: bet.nat || bet.player_name || bet.selection || "",
+            odds,
+            stake: bet.stake || bet.amt || "0",
+            type,
+            selection: bet.selection || bet.player_name || "",
+            exposer: parseFloat(bet.exposer || bet.exposure_amount || "0") || 0,
+          };
+        });
         setMyBets(formattedBets);
       }
     } catch (error) {
       console.error("Error fetching my bets:", error);
     }
-  }, [matchId]);
+  }, [matchId, gameId]);
 
   useEffect(() => {
     if (!matchId) return;
@@ -262,12 +303,19 @@ export default function useCasinoGame(gameId, options = {}) {
   const handleBetClick = useCallback((value, selection, item, type) => {
     if (!value) return;
     setBetValue(value);
+    // Trio Session shows the line (b/l) in the slip, but bets/settles at the
+    // bhav-derived decimal (`value`). Every other market displays the same odds
+    // it bets at.
+    const display = (gameId === "trio" && Number(item?.sid) === 1)
+      ? (parseFloat(type === "lay" ? item?.l : item?.b) || value)
+      : value;
+    setBetDisplayOdds(display);
     setBetType(type);
     setSelectedSelection(item?.nat || selection);
     setSelectedBetData(item);
     setShowPlaceBet(true);
     setStakeAmount("");
-  }, []);
+  }, [gameId]);
 
   const closeBetPanel = useCallback(() => setShowPlaceBet(false), []);
 
@@ -328,6 +376,24 @@ export default function useCasinoGame(gameId, options = {}) {
             currentOdds = betTypeRef.current === "lay"
               ? (parseFloat(nestedOdd?.l) || 0)
               : (parseFloat(nestedOdd?.b) || 0);
+          } else if (gameId === "trio" && Number(currentItem.sid) === 1) {
+            // Trio Session (Fancy2): the real rate is bbhav/lbhav as profit-per-100
+            // (decimal = bhav/100 + 1), NOT the b/l line. Must match how
+            // BetTableTrio.handleBet priced the bet, or the monitor would overwrite
+            // the stored odds with the raw b/l line (~21) and overpay settlement.
+            const bhav = betTypeRef.current === "lay"
+              ? parseFloat(currentItem.lbhav)
+              : parseFloat(currentItem.bbhav);
+            currentOdds = bhav > 0 ? bhav / 100 + 1 : 0;
+          } else if (gameId === "patti2" && currentItem.subtype === "total") {
+            // Total A/B (Fancy2): rate is in bbhav/lbhav as profit-per-100 →
+            // decimal = bhav/100 + 1. Must match BetTablePatti2.TotalRow, else the
+            // monitor would overwrite the stored odds with the raw b/l line (~15)
+            // and overpay settlement.
+            const bhav = betTypeRef.current === "lay"
+              ? parseFloat(currentItem.lbhav)
+              : parseFloat(currentItem.bbhav);
+            currentOdds = bhav > 0 ? bhav / 100 + 1 : 0;
           } else {
             currentOdds = betTypeRef.current === "lay"
               ? (parseFloat(currentItem.l) || 0)
@@ -371,6 +437,12 @@ export default function useCasinoGame(gameId, options = {}) {
         if (lineSize != null && lineSize !== "") {
           selectionName = `${selectionName} ${lineSize}`.trim();
         }
+      }
+      // Lottery (lottcard): the player picks a number under Single/Double/Triple.
+      // Send it space-separated ("Single 2", "Double 2 5", "Tripple 1 0 5") so the
+      // server settles it positionally against the drawn cards. Scoped to lottcard.
+      if (gameId === "lottcard" && Array.isArray(selectedBetData.lotteryDigits) && selectedBetData.lotteryDigits.length) {
+        selectionName = `${selectionName} ${selectedBetData.lotteryDigits.join(" ")}`.trim();
       }
 
       const payload = {
@@ -423,6 +495,7 @@ export default function useCasinoGame(gameId, options = {}) {
 
     // Bet placement
     betValue,
+    betDisplayOdds,
     betType,
     selectedSelection,
     selectedBetData,

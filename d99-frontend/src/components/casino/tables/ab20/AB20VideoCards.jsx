@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect, memo } from "react";
+import { useMemo, memo } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -12,16 +12,6 @@ function cardSrc(code) {
 }
 
 const CardStrip = memo(function CardStrip({ cards }) {
-  const sliderRef = useRef(null);
-  const prevLen = useRef(cards.length);
-
-  useEffect(() => {
-    if (cards.length !== prevLen.current && sliderRef.current) {
-      prevLen.current = cards.length;
-      sliderRef.current.slickGoTo(Math.max(0, cards.length - 3));
-    }
-  }, [cards.length]);
-
   const settings = {
     dots: false,
     infinite: false,
@@ -36,7 +26,12 @@ const CardStrip = memo(function CardStrip({ cards }) {
 
   return (
     <div className="ms-4">
-      <Slider ref={sliderRef} {...settings}>
+      {/* key = card count forces react-slick to RE-INITIALISE whenever a card is
+          dealt, so newly dealt cards get added and revealed (slick otherwise keeps
+          the slide count it had at mount and the strip looks frozen). Navigation
+          is via slick's arrows — no scrollbar. initialSlide keeps the newest cards
+          in view as they land. */}
+      <Slider key={cards.length} {...settings}>
         {cards.map((code, i) => (
           <div key={i}>
             <img src={cardSrc(code)} alt="" style={{ width: "100%", display: "inline-block" }} />

@@ -9,7 +9,7 @@ import User from "../model/user/User.js";
 import Wallet from "../model/admin/Wallet.js";
 import TotalExposure from "../model/user/TotalExposure.js";
 import { emitBalanceUpdate } from "../utils/socketUtils.js";
-import { findCasinoMarket, calculateCasinoBook, calculateTwoWayBook, casinoMarketGameType } from "../helper/casinoMarketBook.js";
+import { findCasinoMarket, calculateCasinoBook, calculateTwoWayBook, casinoMarketGameType, isSuperOverFamily, extractBookmakerRunners, superOverFancyKey } from "../helper/casinoMarketBook.js";
 import { QueryTypes } from "sequelize";
 
 const BASE_URL = process.env.DIAMOND_BASE_URL;
@@ -232,7 +232,58 @@ const CasinoService = {
       // RUNNER of the bet's market — the backed runner holds the profit, the
       // others the loss — exactly like the sports side does. Everything else
       // keeps the legacy single-row behaviour (the wallet liability only).
-      const market = findCasinoMarket(gameName, selection);
+      let market = findCasinoMarket(gameName, selection);
+
+      // teen (Teenpatti 1-day): the Main market is a two-way Player A vs Player B
+      // book (exactly one wins), so a back on A must show +profit under A and
+      // −stake under B — it can't stay on the legacy single-row path. The
+      // Consecutive market reuses the SAME nats "Player A"/"Player B" (the feed
+      // distinguishes it only by mtype "fancy"), and it is an INDEPENDENT YES/NO
+      // per player, NOT a two-way book — so it keeps the single-row path but its
+      // exposure row is namespaced ("Player A Consecutive") to avoid colliding
+      // with the Main row under the same team_name. Odd/Even card bets (selection
+      // "Card N Odd") are untouched — they aren't the player nats.
+      let teenConsecutive = false;
+      if (!market && String(gameName).toLowerCase() === "teen") {
+        const isPlayer = /^player\s+[ab]$/i.test(String(selection).trim());
+        if (isPlayer && String(mtype).toLowerCase() === "match") {
+          market = { key: "main", runners: ["Player A", "Player B"] };
+        } else if (isPlayer) {
+          teenConsecutive = true;
+        }
+      }
+
+      // SuperOver / Five Five Cricket family: the Bookmaker runner names are
+      // per-round (not listable in the static registry), so resolve them from
+      // the live feed and book across BOTH teams; every fancy/Tie/Fancy1 line is
+      // an independent YES/NO market booked two-way (worst case). mtype tags the
+      // Bookmaker as "match" (the frontend already sends this).
+      if (!market && isSuperOverFamily(gameName)) {
+        if (String(mtype).toLowerCase() === "match") {
+          let runners = [];
+          try {
+            const feed = await CasinoService.fetchAllData(gameName);
+            const bm = extractBookmakerRunners(feed);
+            // Guard the round-boundary race: only trust the cached feed when its
+            // round id matches THIS bet's round.
+            if (bm.gmid && String(bm.gmid) === String(roundId) && bm.runners.length >= 2) {
+              runners = bm.runners;
+            }
+          } catch (e) {
+            console.error("[CasinoService.placeBet] superover bookmaker runners fetch failed:", e.message);
+          }
+          // Only book across both teams when we could resolve them. If the feed
+          // is unavailable / the round rolled, leave `market` null and fall
+          // through to the legacy single-row path — that still records the
+          // backed runner's worst case (the client-computed `exposer`), and
+          // avoids mixing a two-way `<sel>` row into the `bookmaker` game_type
+          // group should a later bet in the same round resolve the full book.
+          if (runners.length >= 2) market = { key: "bookmaker", runners };
+        } else {
+          market = { key: superOverFancyKey(selection), twoWay: true };
+        }
+      }
+
       const gameType = market ? casinoMarketGameType(gameName, market.key) : null;
 
       // Book markets need their existing rows up front, both to price the lock
@@ -260,7 +311,10 @@ const CasinoService = {
       } else if (market) {
         bookRows = calculateCasinoBook({ market, selection, stake: amount, odds, type });
       } else {
-        bookRows = [{ team_name: gameName === 'abj' ? (player_name || selection) : selection, delta: Number(exposer ?? 0) }];
+        const legacyTeam = teenConsecutive
+          ? `${String(selection).trim()} Consecutive`
+          : (gameName === 'abj' ? (player_name || selection) : selection);
+        bookRows = [{ team_name: legacyTeam, delta: Number(exposer ?? 0) }];
       }
 
       // 2️⃣ WALLET LOCK
@@ -415,7 +469,11 @@ const CasinoService = {
 
       const bets = await CasinoBet.findAll({
         where: { user_id: userId, event_id: match_id },
-
+        // Deterministic newest-first order. Without it Postgres returns rows in
+        // an unstable order that changes between the 2s My Bets polls (a row's
+        // physical position shifts after an UPDATE, e.g. open→closed), so the
+        // list visibly reshuffles.
+        order: [["id", "DESC"]],
       });
 
       return bets.map(bet => bet.get({ plain: true }));

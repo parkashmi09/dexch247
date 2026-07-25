@@ -285,11 +285,24 @@ async function settleBetCommon(bet, winner, payoutRate = null) {
       let netProfit;
 
       if (payoutRate) {
-        // MULTIPLIER GAME (1 Card Meter): the win is stake × point difference,
-        // not stake × odds, and commission is charged on the winnings only.
-        // Placement locked the worst case (max rate × stake), so the cash credit
-        // is that whole lock back plus the actual winnings.
-        netProfit = round2(stakeNum * payoutRate * (1 - CASINO_WIN_COMMISSION));
+        // MULTIPLIER GAMES: the win scales with a per-round rate, not stake×odds.
+        // payoutRate is the multiple (1 Card Meter: point difference 1..12;
+        // Casino Meter: run difference 1..50). Placement locked the worst case
+        // (max rate × stake), so the cash credit is that whole lock back plus the
+        // actual winnings.
+        //
+        //   1 Card Meter (cmeter1): win = stake × rate, less 2% commission.
+        //   Casino Meter (cmeter):  win = stake × rate × (odds−1). Odds are 2.15,
+        //     so (odds−1) = 1.15 — the "1.15 rate", +1.15 per run, no commission.
+        //     (Loss, in the branch below, is stake × rate — the reference site
+        //     deducted 25 × 15 = 375 for a 25 stake lost by 15 runs.)
+        //   ab20 Bahar-1st-card: win = stake × rate (rate 0.25), no commission.
+        const winMultiplier = lockedBet.game_name === "cmeter"
+          ? (oddsNum - 1)
+          : lockedBet.game_name === "cmeter1"
+          ? (1 - CASINO_WIN_COMMISSION)
+          : 1;
+        netProfit = round2(stakeNum * payoutRate * winMultiplier);
         amt = round2(lockedAmount + netProfit);
       } else {
         // Cash credit on win = the lock that was taken at placement + winnings.
@@ -309,7 +322,23 @@ async function settleBetCommon(bet, winner, payoutRate = null) {
         // path mis-paid any casino back bet whose odds ≠ 2.0 (lowercase-etype
         // "fancy" games — teen20, poker20, …). Casino `b` is always the decimal
         // multiplier, so stake×(odds−1) is universally correct for back.
-        netProfit = (type === "lay") ? stakeNum : round2(stakeNum * (oddsNum - 1));
+        //
+        // Lottery (lottcard) is the exception: the feed's `b` (9.5 / 95 / 900) is
+        // the "1 to X" PROFIT multiplier, not a decimal-odds return, and the whole
+        // number is paid (the fractional .5 is dropped, matching the reference
+        // site: Single pays ×9, Double ×95, Triple ×900). So win = stake×floor(odds).
+        const isLotteryPayout = String(lockedBet.game_name).toLowerCase() === "lottcard";
+        // baccarat / baccarat2: the feed `b` is the payout RATIO (profit = stake×odds)
+        // — Player 1.0 = even money, Big 0.54 = 0.54×, Either Pair 5.0 = 5×, Score 5-6
+        // 4.0 = win 4×, Pair 11.0 = 11×. TIE is the lone exception: it's quoted
+        // "8 for 1" (return 8 → profit 7×), so it keeps the decimal-odds (odds−1)
+        // form. Banker-wins-on-6 pays 50% via a payoutRate (the branch above), so it
+        // doesn't reach here.
+        const isBacGame = ["baccarat", "baccarat2"].includes(String(lockedBet.game_name).toLowerCase());
+        const isBacRatio = isBacGame && normalize(lockedBet.selection) !== "TIE";
+        netProfit = (type === "lay")
+          ? stakeNum
+          : round2(stakeNum * (isLotteryPayout ? Math.floor(oddsNum) : isBacRatio ? oddsNum : (oddsNum - 1)));
         amt = round2(lockedAmount + netProfit);
       }
 
@@ -1389,8 +1418,18 @@ function normalizeHandName(s) {
 
 // baccarat
 
+// Baccarat card point value: A=1, 2–9 = face, 10/J/Q/K = 0. `code` is like "7HH",
+// "10DD", "ACC" (rank + 2-letter suit); "1" is an undealt-slot placeholder.
+function baccaratCardValue(code) {
+  const rank = String(code).replace(/[A-Z]{2}$/i, "").toUpperCase();
+  if (rank === "A") return 1;
+  if (rank === "10" || rank === "J" || rank === "Q" || rank === "K") return 0;
+  const n = parseInt(rank, 10);
+  return Number.isFinite(n) ? n % 10 : 0;
+}
+
 async function resolveBaccarat(bet) {
-  const { game_name, event_id, selection } = bet;
+  const { game_name, event_id, selection, odds } = bet;
 
   if (!event_id || !selection) {
     console.warn("[Settlement] baccarat missing event_id/selection", bet.id);
@@ -1427,6 +1466,22 @@ async function resolveBaccarat(bet) {
     }
 
     const isWin = sel === winnerNorm;
+
+    // Banker winning on a total of 6 pays 50%. baccarat's result carries no score,
+    // so compute the banker total from the dealt cards. Deal order is
+    // P1,B1,P2,B2,P3,B3 — banker holds the odd slots (1,3,5); "1" = undealt.
+    if (sel === "BANKER" && isWin) {
+      const cards = String(t1.card || "").split(",").map((c) => c.trim());
+      const bankerTotal = [cards[1], cards[3], cards[5]]
+        .filter((c) => c && c !== "1")
+        .reduce((s, c) => s + baccaratCardValue(c), 0) % 10;
+      if (bankerTotal === 6) {
+        const rate = (Number(odds) || 0) * 0.5;
+        console.log("[Settlement] baccarat banker-wins-on-6 → 50%", { bet_id: bet.id, odds, rate, bankerTotal });
+        return { won: true, rate };
+      }
+    }
+
     console.log("[Settlement] baccarat player/banker check", { bet_id: bet.id, selection, winnat, winnerPart, isWin });
     return Boolean(isWin);
   }
@@ -1507,7 +1562,7 @@ function parseBaccaratRdesc(rdesc) {
 
 //baccarat2 
 async function resolveBaccarat2(bet) {
-  const { game_name, event_id, selection } = bet;
+  const { game_name, event_id, selection, odds } = bet;
 
   if (!event_id || !selection) {
     console.warn("[Settlement] baccarat2 missing event_id/selection", bet.id);
@@ -1543,6 +1598,16 @@ async function resolveBaccarat2(bet) {
     }
 
     const isWin = sel === winnerNorm;
+
+    // Banker winning on a total of 6 pays 50% (game rule). scorePart is the
+    // winner's score. Return a payoutRate = odds×0.5 so settleBetCommon pays half
+    // the normal banker (even-money) win.
+    if (sel === "BANKER" && isWin && String(scorePart).trim() === "6") {
+      const rate = (Number(odds) || 0) * 0.5;
+      console.log("[Settlement] baccarat2 banker-wins-on-6 → 50%", { bet_id: bet.id, odds, rate });
+      return { won: true, rate };
+    }
+
     console.log("[Settlement] baccarat2 player/banker check", { bet_id: bet.id, selection, winnat, winnerPart, isWin });
     return Boolean(isWin);
   }
@@ -3481,29 +3546,39 @@ async function resolveLottcard(bet) {
     return null;
   }
 
-  const rdesc = t1.rdesc || "";    // e.g. "6  3  9"
-  const resultNums = parseLottRdesc(rdesc); // [6,3,9]
-
-  // lottcard markets are the patti TYPE of the 3 drawn numbers (no number is
-  // picked by the player): Single = all 3 distinct (SP), Double = exactly 2 same
-  // (DP), Triple = all 3 same (TP). e.g. rdesc "5  5  0" → Double.
-  const nums = resultNums.slice(0, 3);
-  if (nums.length < 3) {
-    console.warn("[Settlement] lottcard incomplete result", { bet_id: bet.id, rdesc, resultNums });
+  const rdesc = t1.rdesc || "";    // e.g. "1  4  9" (the three drawn card faces)
+  const resultFaces = parseLottRdesc(rdesc).slice(0, 3); // [1,4,9]
+  if (resultFaces.length < 3) {
+    console.warn("[Settlement] lottcard incomplete result", { bet_id: bet.id, rdesc });
     return null;
   }
-  const uniq = new Set(nums).size;
-  const isTriple = uniq === 1;
-  const isDouble = uniq === 2;
-  const isSingle = uniq === 3;
+  // Card face → digit: Ace = 1, 2–9 = themselves, Ten = digit 0 (the frontend
+  // maps card "10" → ball "0" the same way), so the digit space is 0–9.
+  const faceToDigit = (f) => (Number(f) === 10 ? 0 : Number(f));
+  const resultDigits = resultFaces.map(faceToDigit); // [1,4,9]
 
-  const sel = normalize(selection);
   const betType = String(type || "back").toLowerCase();
   const applyLay = (w) => (betType === "lay" ? !w : w);
 
-  if (sel === "SINGLE") return applyLay(isSingle);
-  if (sel === "DOUBLE") return applyLay(isDouble);
-  if (sel === "TRIPLE" || sel === "TRIPPLE") return applyLay(isTriple);
+  // Intended game: the player picks a number and wins if it matches the drawn
+  // cards positionally — Single = 1st card, Double = 1st+2nd, Triple = 1st+2nd+3rd.
+  // The selection carries the number ("Single 2", "Double 2 5", "Tripple 1 0 5");
+  // parseSelectionNumbers pulls out {kind, numbers}.
+  const parsed = parseSelectionNumbers(selection);
+  const need = parsed && (parsed.kind === "SINGLE" ? 1 : parsed.kind === "DOUBLE" ? 2 : parsed.kind === "TRIPLE" ? 3 : 0);
+  if (parsed && need && Array.isArray(parsed.numbers) && parsed.numbers.length >= need) {
+    const picked = parsed.numbers.slice(0, need).map(faceToDigit); // player digits 0–9
+    const win = picked.every((d, i) => d === resultDigits[i]);     // positional match
+    return applyLay(win);
+  }
+
+  // Legacy fallback: bare "Single"/"Double"/"Triple" bets that carry no number
+  // (placed before the numbered format) settle on the draw's patti TYPE.
+  const uniq = new Set(resultFaces).size;
+  const sel = normalize(selection);
+  if (sel === "SINGLE") return applyLay(uniq === 3);
+  if (sel === "DOUBLE") return applyLay(uniq === 2);
+  if (sel === "TRIPLE" || sel === "TRIPPLE") return applyLay(uniq === 1);
 
   console.warn("[Settlement] lottcard unknown selection", { bet_id: bet.id, selection });
   return null;
@@ -4185,43 +4260,62 @@ async function resolveSicbo(bet) {
   const total = dice.reduce((a, b) => a + b, 0);
   const isTriple = dice[0] === dice[1] && dice[1] === dice[2];
 
+  // Fixed "X to 1" PROFIT ratios from the game rules. These are what the feed
+  // ships as each spot's `b` (Small/Big/Odd/Even=1, Double=8, Triple=150, Any
+  // Triple=30, Combination=5, Total per size). The feed value is a profit ratio,
+  // NOT decimal odds, so paying stake×(odds−1) short-changed every win by one
+  // stake (Small at b=1 paid nothing; Double at b=8 paid 7×). Settle at the true
+  // ratio via {won, rate} → stake×rate. Single is the exception: the feed only
+  // quotes its base 1:1, but it actually pays by how many dice match (1/2/3 → 1:1
+  // /2:1/3:1), so its rate is the match count.
+  const TOTAL_RATE = { 4: 50, 5: 20, 6: 15, 7: 12, 8: 8, 9: 6, 10: 6, 11: 6, 12: 6, 13: 8, 14: 12, 15: 15, 16: 20, 17: 50 };
+
   let marketWin = false;
+  let rate = 0; // profit ratio on a win
 
   // -------- Small / Big --------
   if (sel === "SMALL") {
     marketWin = total >= 4 && total <= 10 && !isTriple;
+    rate = 1;
   } else if (sel === "BIG") {
     marketWin = total >= 11 && total <= 17 && !isTriple;
+    rate = 1;
   }
 
-  // -------- Odd / Even --------
+  // -------- Odd / Even (any triple loses, mirroring Small/Big) --------
   else if (sel === "ODD") {
-    marketWin = total % 2 === 1;
+    marketWin = total % 2 === 1 && !isTriple;
+    rate = 1;
   } else if (sel === "EVEN") {
-    marketWin = total % 2 === 0;
+    marketWin = total % 2 === 0 && !isTriple;
+    rate = 1;
   }
 
   // -------- Any Triple --------
   else if (sel === "ANY TRIPLE") {
     marketWin = isTriple;
+    rate = 30;
   }
 
   // -------- Double N --------
   else if (/^DOUBLE\s+\d+$/i.test(selRaw)) {
     const n = parseInt(selRaw.match(/\d+/)[0], 10);
     marketWin = countOccurrences(dice, n) >= 2;
+    rate = 8;
   }
 
   // -------- Triple N --------
   else if (/^TRIPLE\s+\d+$/i.test(selRaw)) {
     const n = parseInt(selRaw.match(/\d+/)[0], 10);
     marketWin = isTriple && dice[0] === n;
+    rate = 150;
   }
 
   // -------- Total N --------
   else if (/^TOTAL\s+\d+$/i.test(selRaw)) {
     const n = parseInt(selRaw.match(/\d+/)[0], 10);
     marketWin = total === n;
+    rate = TOTAL_RATE[n] || 0;
   }
 
   // -------- Combination A and B --------
@@ -4229,12 +4323,15 @@ async function resolveSicbo(bet) {
     const nums = selRaw.match(/\d+/g).map(n => parseInt(n, 10));
     const [a, b] = nums;
     marketWin = dice.includes(a) && dice.includes(b);
+    rate = 5;
   }
 
-  // -------- Single N --------
+  // -------- Single N (pays by match count: 1→1:1, 2→2:1, 3→3:1) --------
   else if (/^SINGLE\s+\d+$/i.test(selRaw)) {
     const n = parseInt(selRaw.match(/\d+/)[0], 10);
-    marketWin = dice.includes(n);
+    const matches = countOccurrences(dice, n);
+    marketWin = matches >= 1;
+    rate = matches; // 1, 2, or 3
   }
 
   else {
@@ -4246,7 +4343,8 @@ async function resolveSicbo(bet) {
     return null;
   }
 
-  // BACK / LAY logic
+  // BACK / LAY logic (sicbo is back-only in the feed; keep the lay path on the
+  // legacy odds settlement rather than the fixed-ratio payout).
   const userWon = betType === "LAY" ? !marketWin : marketWin;
 
   console.log("[Settlement] sicbo resolve ✅", {
@@ -4257,9 +4355,15 @@ async function resolveSicbo(bet) {
     isTriple,
     type: betType,
     marketWin,
+    rate,
     userWon,
   });
 
+  // Win on a BACK → pay the fixed ratio (stake × rate). Loss → plain boolean so
+  // settleBetCommon deducts only the stake. Lay (none in practice) stays boolean.
+  if (userWon && betType !== "LAY") {
+    return { won: true, rate };
+  }
   return Boolean(userWon);
 }
 
@@ -4324,23 +4428,44 @@ async function resolveAbj(bet) {
   const betType = normalize(type || "BACK");
 
   const rankVal = jokerRankValue(rank);
-  let marketWin = false;
 
-  // -------- SA / SB --------
-  if (sel === "SA") {
-    marketWin = side === "ANDAR";
-  } else if (sel === "SB") {
-    marketWin = side === "BAHAR";
+  // Deal sequence: t1.card is "<joker>,<c1>,<c2>,…". card[0] is the joker; the
+  // dealt cards follow. Dealing starts on BAHAR, so dealt index 1,3,5,… land on
+  // Bahar and 2,4,6,… on Andar. The game ends at the FIRST dealt card whose rank
+  // matches the joker — its index gives the winning side and whether the match
+  // was a side's first card (idx 1 = Bahar's first, idx 2 = Andar's first).
+  const jokerRank = normalize(rank);
+  const cards = String(t1.card || "").split(",").map((x) => x.trim()).filter(Boolean);
+  let matchPos = 0;
+  for (let i = 1; i < cards.length; i++) {
+    const cr = normalize(cards[i].slice(0, -2)); // strip the 2-letter suit → rank
+    if (cr && cr === jokerRank) { matchPos = i; break; }
   }
 
-  // -------- 1st / 2nd Bet (joker rank low/high) --------
-  // The frontend groups these under each side and sends "1st Bet SA"/"2nd Bet SB"
-  // etc.; the win condition is the joker's rank range (the rdesc carries only the
-  // joker card, no per-side card data), so the SA/SB suffix is just UI grouping.
-  else if (sel.startsWith("1ST BET")) {
-    marketWin = rankVal !== null && rankVal <= 7;
-  } else if (sel.startsWith("2ND BET")) {
-    marketWin = rankVal !== null && rankVal >= 8;
+  let marketWin = false;
+
+  // -------- Side bets (1:14): the joker matches on that side's FIRST card ------
+  //   SB (Bahar) → dealt position 1;  SA (Andar) → dealt position 2.
+  if (sel === "SA" || sel === "SB") {
+    if (!matchPos) {
+      console.warn("[Settlement] abj side bet: cannot locate match card → retry", {
+        bet_id: bet.id, rdesc: t1.rdesc, card: t1.card,
+      });
+      return null;
+    }
+    marketWin = sel === "SB" ? matchPos === 1 : matchPos === 2;
+  }
+
+  // -------- 1st / 2nd Bet (1:1): which side the game ends on -------------------
+  //   The SA/SB suffix names the side backed (SA = Andar, SB = Bahar). Both the
+  //   1st- and 2nd-bet windows settle the same way — on the winning side.
+  else if (sel.startsWith("1ST BET") || sel.startsWith("2ND BET")) {
+    if (sel.includes("SA")) marketWin = side === "ANDAR";
+    else if (sel.includes("SB")) marketWin = side === "BAHAR";
+    else {
+      console.warn("[Settlement] abj 1st/2nd bet missing side", { bet_id: bet.id, selection });
+      return null;
+    }
   }
 
   // -------- Joker Rank / Suit / Odd-Even --------
@@ -4692,8 +4817,9 @@ async function resolveCmatch20(bet) {
     return null;
   }
 
-  const winRun = parseCmatch20Result(t1);
-  if (winRun === null) {
+  // The result is the FINAL-BALL CARD (1–10), NOT the winning "Run" market.
+  const cardRun = parseCmatch20Result(t1);
+  if (cardRun === null) {
     console.warn("[Settlement] cmatch20 invalid result", t1);
     return null;
   }
@@ -4702,7 +4828,7 @@ async function resolveCmatch20(bet) {
   const sel = normalize(selRaw);
   const betType = normalize(type || "BACK");
 
-  // Expect selection like "Run 4"
+  // Expect selection like "Run 4" — the ball-19.5 scoring shot the punter backed.
   const m = sel.match(/^RUN\s+(\d+)$/);
   if (!m) {
     console.warn("[Settlement] cmatch20 invalid selection", {
@@ -4715,7 +4841,14 @@ async function resolveCmatch20(bet) {
   const want = parseInt(m[1], 10);
   if (Number.isNaN(want)) return null;
 
-  const marketWin = want === winRun;
+  // Team B is 12 runs short with two balls left; it needs the scoring shot (want)
+  // PLUS the final-ball card (cardRun) to reach the target — a tie counts as a win
+  // (game rule). So a "Run N" BACK wins whenever N + card ≥ 12, NOT when N equals
+  // the card. The old exact-match (want === cardRun) settled almost every genuine
+  // winner as a loss and deducted the stake. The odds confirm the threshold:
+  // Run 6 pays 1.98 ≈ P(card ≥ 6) = 0.5, Run 2 pays 9.5 ≈ P(card = 10) = 0.1.
+  const WIN_TARGET = 12;
+  const marketWin = (want + cardRun) >= WIN_TARGET;
 
   const userWon = betType === "LAY" ? !marketWin : marketWin;
 
@@ -4723,7 +4856,9 @@ async function resolveCmatch20(bet) {
     bet_id: bet.id,
     selection,
     type: betType,
-    winRun,
+    want,
+    cardRun,
+    total: want + cardRun,
     marketWin,
     userWon,
   });
@@ -4737,6 +4872,39 @@ async function resolveCmatch20(bet) {
 function parseCmeterResult(t1) {
   return normalize(t1?.winnat || t1?.rdesc || "");
 }
+
+// Casino Meter settles on the RUN DIFFERENCE, not stake × odds. 11 cards are
+// split into a Low zone (A–9 → 1..9 runs) and a High zone (10,J,Q,K → 10..13
+// runs); the higher zone total wins. Payout scales with the run difference D
+// (capped at 50): a LOSS pays stake × D; a WIN pays stake × D × (odds−1). The
+// table's odds are 2.15, so (odds−1) = 1.15 — the "1.15 rate" (net +1.15 per run,
+// e.g. 25 @ 2.15 lost by 15 runs → −375; won by 15 → +431.25). The feed's rdesc
+// carries only the winner ("High"/"Low") — no totals — so D is derived from the
+// cards here.
+const CMETER_MAX_RUNS = 50;
+
+function cmeterCardValue(card) {
+  // feed card format: "QSS" / "10DD" / "9CC" — rank chars then a doubled suit.
+  const rank = String(card || "").trim().toUpperCase().replace(/[SHCD]+$/, "");
+  if (!rank) return null;
+  const map = { A: 1, J: 11, Q: 12, K: 13 };
+  if (map[rank]) return map[rank];
+  const n = parseInt(rank, 10);
+  return n >= 2 && n <= 10 ? n : null;
+}
+
+function cmeterZoneTotals(cardString) {
+  let lowTotal = 0;
+  let highTotal = 0;
+  for (const c of String(cardString || "").split(",")) {
+    const v = cmeterCardValue(c);
+    if (v == null) continue;        // "1" placeholder / unreadable → skip
+    if (v <= 9) lowTotal += v;      // A–9 → Low zone
+    else highTotal += v;            // 10, J, Q, K → High zone
+  }
+  return { lowTotal, highTotal };
+}
+
 async function resolveCmeter(bet) {
   const { game_name, event_id, selection, type } = bet;
 
@@ -4776,7 +4944,22 @@ async function resolveCmeter(bet) {
     return null;
   }
 
+  // Run difference drives the payout (stake × diff). Derive it from the cards —
+  // rdesc has only the winning side. Leave the bet OPEN (return null) rather than
+  // mis-settle if the totals are not readable yet or come out as a dead heat.
+  const { lowTotal, highTotal } = cmeterZoneTotals(t1.card);
+  const diff = Math.min(Math.abs(highTotal - lowTotal), CMETER_MAX_RUNS);
+  if (!(diff > 0)) {
+    console.warn("[Settlement] cmeter no run difference yet", {
+      bet_id: bet.id, card: t1?.card, lowTotal, highTotal,
+    });
+    return null;
+  }
+
   const marketWin = sel === result;
+  // Table offers BACK only; the lay flip is kept for safety. rate = run diff:
+  // settleBetCommon pays the cmeter win at stake × diff × (odds−1) and the loss at
+  // stake × diff (see its payoutRate branch, game-scoped to cmeter).
   const userWon = betType === "LAY" ? !marketWin : marketWin;
 
   console.log("[Settlement] cmeter resolve ✅", {
@@ -4784,11 +4967,14 @@ async function resolveCmeter(bet) {
     selection,
     type: betType,
     result,
+    lowTotal,
+    highTotal,
+    diff,
     marketWin,
     userWon,
   });
 
-  return Boolean(userWon);
+  return { won: Boolean(userWon), rate: diff };
 }
 
 //helper war
@@ -5391,6 +5577,14 @@ async function resolveAb20(bet) {
   const marketWin = actualSide === wantSide;
   const userWon = betType === "LAY" ? !marketWin : marketWin;
 
+  // Payout rule (ab20 ONLY): a BACK Bahar bet that wins because the joker matched
+  // on the very first dealt card (index 0 = Bahar's first card) pays 25%, not the
+  // stored 100% odds. Every other winning outcome (Andar any card, Bahar 2nd+
+  // card) keeps 100% via the normal stake×(odds−1) path. ab3/ab4 share this
+  // resolver but are deliberately excluded — the rule is scoped to ab20 for now.
+  const bahar1stCard = game_name === "ab20" && betType === "BACK"
+    && wantSide === "BAHAR" && firstIndex === 0 && marketWin;
+
   console.log("[Settlement] ab20 resolve ✅", {
     bet_id: bet.id,
     selection,
@@ -5400,8 +5594,10 @@ async function resolveAb20(bet) {
     type: betType,
     marketWin,
     userWon,
+    bahar1stCard,
   });
 
+  if (bahar1stCard) return { won: true, rate: 0.25 };
   return Boolean(userWon);
 }
 //
@@ -6786,7 +6982,7 @@ async function resolve3cardj(bet) {
     return null;
   }
 
-  const ranks = parse3CardJResult(t1.rdesc);
+  const ranks = parse3CardJResult(t1.rdesc); // e.g. ["Q","10","5"] — card faces
 
   if (ranks.length !== 3) {
     console.warn("[Settlement] 3cardj invalid rdesc", {
@@ -6796,41 +6992,48 @@ async function resolve3cardj(bet) {
     return null;
   }
 
-  // count ranks
+  const betType = normalize(type || "BACK");
+  const selRaw = String(selection).trim();
+
+  // Rule-based settlement: the selection carries the picked cards
+  // ("Yes 3,4,7" / "No 1,10,13"). The player wins if AT LEAST ONE of their cards
+  // appears in the drawn cards (that's the "Yes" event); a "No" bet (placed on the
+  // lay side) is the inverse — it wins when NONE appear. So marketWin = "≥1 picked
+  // card is drawn" and the standard back/lay inversion turns that into No.
+  // Card numbers 1–13 map to faces: 1→A, 2–10 literal, 11→J, 12→Q, 13→K.
+  const cardMatch = selRaw.match(/^(?:YES|NO)\b\s*(.*)$/i);
+  const cardBody = cardMatch ? cardMatch[1] : "";
+  if (cardBody && /\d/.test(cardBody)) {
+    const numToFace = (n) => (n === 1 ? "A" : n === 11 ? "J" : n === 12 ? "Q" : n === 13 ? "K" : String(n));
+    const drawn = ranks.map((r) => String(r).toUpperCase());
+    const pickedFaces = (cardBody.match(/\d+/g) || []).map((x) => numToFace(parseInt(x, 10)));
+    const marketWin = pickedFaces.some((f) => drawn.includes(f)); // ≥1 picked card drawn
+    const userWon = betType === "LAY" ? !marketWin : marketWin;
+    console.log("[Settlement] 3cardj resolve ✅ (cards)", {
+      bet_id: bet.id, selection, type: betType, drawn, pickedFaces, marketWin, userWon,
+    });
+    return Boolean(userWon);
+  }
+
+  // Legacy fallback: bare "Yes"/"No" bets (no picked cards) settle on the draw's
+  // pair type (Yes = a pair/triple exists), preserving the old behaviour.
   const count = {};
   for (const r of ranks) count[r] = (count[r] || 0) + 1;
-
-  // YES if any pair (or triple)
-  const isYes = Object.values(count).some(v => v >= 2);
+  const isYes = Object.values(count).some((v) => v >= 2);
 
   const sel = normalize(selection);
-  const betType = normalize(type || "BACK");
-
   let marketWin = false;
-
   if (sel === "YES") marketWin = isYes;
   else if (sel === "NO") marketWin = !isYes;
   else {
-    console.warn("[Settlement] 3cardj unknown selection", {
-      bet_id: bet.id,
-      selection,
-    });
+    console.warn("[Settlement] 3cardj unknown selection", { bet_id: bet.id, selection });
     return null;
   }
 
-  // normal BACK / LAY behaviour
   const userWon = betType === "LAY" ? !marketWin : marketWin;
-
-  console.log("[Settlement] 3cardj resolve ✅", {
-    bet_id: bet.id,
-    selection,
-    type: betType,
-    ranks,
-    isYes,
-    marketWin,
-    userWon,
+  console.log("[Settlement] 3cardj resolve ✅ (legacy)", {
+    bet_id: bet.id, selection, type: betType, ranks, isYes, marketWin, userWon,
   });
-
   return Boolean(userWon);
 }
 

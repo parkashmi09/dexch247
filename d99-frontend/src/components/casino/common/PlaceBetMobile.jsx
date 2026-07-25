@@ -27,6 +27,7 @@ function useIsMobile() {
 export default function PlaceBetMobile({
   show,
   betValue,
+  displayOdds,
   betType,
   selection,
   min = 1000,
@@ -42,11 +43,23 @@ export default function PlaceBetMobile({
 }) {
   const isMobile = useIsMobile();
   const odds = Number(betValue) || 0;
+  // Odds box display — defaults to the bet odds; a market may show a different
+  // figure (Trio Session shows its line). Profit always uses the real bet odds.
+  const shownOdds = displayOdds != null && displayOdds !== "" ? displayOdds : betValue;
   const stakeNum = Number(stakeAmount) || 0;
   const profit = useMemo(() => {
     if (!odds || !stakeNum) return 0;
-    return Math.round((odds - 1) * stakeNum * 100) / 100;
-  }, [odds, stakeNum]);
+    // Lottery (lottcard) quotes a "1 to X" profit multiplier (Single 9.5, Double
+    // 95, Triple 900), paid as the whole number — Single ×9, Double ×95, Triple
+    // ×900 (the .5 is dropped) — not the decimal-odds stake×(odds−1).
+    // Sic Bo (sicbo/sicbo2) likewise quotes the payout as a "X to 1" profit ratio
+    // in `b` (Small/Big/Odd/Even 1, Double 8, Triple 150, Any Triple 30, Combo 5,
+    // Total per size), so the profit is stake×ratio, not stake×(odds−1). Single
+    // shows its base 1:1 here; it settles at the actual match count (1/2/3).
+    const isRatioGame = gameType === "lottcard" || gameType === "sicbo" || gameType === "sicbo2";
+    const mult = isRatioGame ? Math.floor(odds) : odds - 1;
+    return Math.round(mult * stakeNum * 100) / 100;
+  }, [odds, stakeNum, gameType]);
 
   function handleQuickStake(val) {
     setStakeAmount(String((Number(stakeAmount) || 0) + val));
@@ -74,7 +87,9 @@ export default function PlaceBetMobile({
             <div className="col-6">
               {gameType === "lottcard" && lotteryBall != null ? (
                 <div className="lottery-place-balls">
-                  <img src={`/assets/img/lottery/ball${lotteryBall}.png`} alt={`ball${lotteryBall}`} />
+                  {(Array.isArray(lotteryBall) ? lotteryBall : [lotteryBall]).map((d, i) => (
+                    <img key={i} src={`/assets/img/lottery/ball${d}.png`} alt={`ball${d}`} />
+                  ))}
                 </div>
               ) : gameType === "teenunique" ? (
                 <div className="unique-teen20-place-balls">
@@ -98,7 +113,7 @@ export default function PlaceBetMobile({
             </div>
             <div className="row row5 mt-1">
               <div className="col-6">
-                <input type="text" className="stakeinput w-100" disabled value={odds} />
+                <input type="text" className="stakeinput w-100" disabled value={shownOdds} />
               </div>
               <div className="col-6">
                 <div className="float-end">

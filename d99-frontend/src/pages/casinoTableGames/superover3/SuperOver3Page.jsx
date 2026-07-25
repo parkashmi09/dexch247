@@ -7,7 +7,7 @@ import { FlipClock } from "../../../components/casino/tables/teen62/index.jsx";
 import SuperOverBalls from "../../../components/casino/tables/superover3/SuperOverBalls.jsx";
 import SuperOverScorecard from "../../../components/casino/tables/superover3/SuperOverScorecard.jsx";
 import SuperOverMarkets from "../../../components/casino/tables/superover3/SuperOverMarkets.jsx";
-import { getCasinoGameDetails, getLastResults, placeCasinoBet, getMatchExposure } from "../../../apiservices/CasionApi.js";
+import { getCasinoGameDetails, getLastResults, placeCasinoBet, getMatchExposure, getMyBets } from "../../../apiservices/CasionApi.js";
 import { CASINO_STREAM_URL } from "../../../config.js";
 import { fetchBalanceThunk } from "../../../features/user/userSlice.js";
 import toast from "react-hot-toast";
@@ -77,31 +77,34 @@ export default function SuperOver3Page() {
     return () => clearInterval(tick);
   }, []);
 
-  // Exposure polling
+  // Exposure polling. The per-runner book (profit / worst-case) is computed and
+  // stored server-side at placement (see d99-server casinoMarketBook +
+  // CasinoService.placeBet); here we only read it back and render it.
   const [exposures, setExposures] = useState({});
+  const refreshExposures = useCallback(async () => {
+    if (!gmid) return;
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = user?.user_id || user?.id;
+      if (!userId) return;
+      const res = await getMatchExposure(userId, gmid);
+      if (res?.success && res?.data) {
+        const map = {};
+        res.data.forEach((e) => {
+          const name = e.team_name || "";
+          const exp = parseFloat(e.exposure_amount) || 0;
+          if (name && exp !== 0) { map[name] = exp; map[name.toLowerCase()] = exp; }
+        });
+        setExposures(map);
+      }
+    } catch { /* ignore */ }
+  }, [gmid]);
   useEffect(() => {
     if (!gmid) return;
-    const fetchExp = async () => {
-      try {
-        const user = JSON.parse(localStorage.getItem("user") || "{}");
-        const userId = user?.user_id || user?.id;
-        if (!userId) return;
-        const res = await getMatchExposure(userId, gmid);
-        if (res?.success && res?.data) {
-          const map = {};
-          res.data.forEach((e) => {
-            const name = e.team_name || "";
-            const exp = parseFloat(e.exposure_amount) || 0;
-            if (name && exp !== 0) { map[name] = exp; map[name.toLowerCase()] = exp; }
-          });
-          setExposures(map);
-        }
-      } catch { /* ignore */ }
-    };
-    fetchExp();
-    const iv = setInterval(fetchExp, 2000);
+    refreshExposures();
+    const iv = setInterval(refreshExposures, 2000);
     return () => clearInterval(iv);
-  }, [gmid]);
+  }, [gmid, refreshExposures]);
 
   // Extract team names
   const bookmakerMarket = t2.find((m) => m.dtype === 2 || m.gtype === "match1");
@@ -118,6 +121,32 @@ export default function SuperOver3Page() {
   const [stakeAmount, setStakeAmount] = useState("");
   const [placing, setPlacing] = useState(false);
   const [myBets, setMyBets] = useState([]);
+  const fetchMyBets = useCallback(async () => {
+    if (!gmid) return;
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = user?.user_id || user?.id;
+      if (!userId) return;
+      const response = await getMyBets(userId, gmid);
+      if (response?.success && response?.bets) {
+        setMyBets(response.bets.map((bet) => ({
+          matchedBet: bet.player_name || bet.selection || bet.nat || "",
+          nat: bet.nat || bet.player_name || bet.selection || "",
+          odds: bet.odds || bet.urate || "0",
+          stake: bet.stake || bet.amt || "0",
+          type: (bet.type || bet.btype || "").toLowerCase() || null,
+          selection: bet.selection || bet.player_name || "",
+          exposer: parseFloat(bet.exposer || bet.exposure_amount || "0") || 0,
+        })));
+      }
+    } catch { /* ignore */ }
+  }, [gmid]);
+  useEffect(() => {
+    if (!gmid) return;
+    fetchMyBets();
+    const iv = setInterval(fetchMyBets, 2000);
+    return () => clearInterval(iv);
+  }, [gmid, fetchMyBets]);
   const [mobilePanelTab, setMobilePanelTab] = useState("game");
   const [resultModal, setResultModal] = useState({ show: false, mid: "" });
 
@@ -171,12 +200,14 @@ export default function SuperOver3Page() {
         setStakeAmount("");
         const token = localStorage.getItem("token");
         if (token) dispatch(fetchBalanceThunk());
+        refreshExposures();
+        fetchMyBets();
       } else {
         toast.error(res?.error || res?.msg || "Failed");
       }
     } catch { toast.error("Error placing bet"); }
     finally { setPlacing(false); }
-  }, [stakeAmount, selectedBetData, betValue, betType, gmid, selectedSelection, dispatch]);
+  }, [stakeAmount, selectedBetData, betValue, betType, gmid, selectedSelection, dispatch, refreshExposures, fetchMyBets]);
 
   const iframeSrc = `${CASINO_STREAM_URL}?id=${GAME_TYPE}`;
 

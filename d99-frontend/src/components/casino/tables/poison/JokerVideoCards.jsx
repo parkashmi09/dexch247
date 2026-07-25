@@ -8,9 +8,11 @@ function getCardImage(token) {
 export default function JokerVideoCards({ cardString = "" }) {
   const tokens = cardString.split(",").map((t) => t.trim());
 
+  // card string: token[0]=joker, then player cards are dealt alternately —
+  // [1]=pA card1, [2]=pB card1, [3]=pA card2, [4]=pB card2, [5]=pA card3, [6]=pB card3
   const jokerCard = getCardImage(tokens[0]);
-  const playerACards = [1, 2, 3].map((i) => getCardImage(tokens[i]));
-  const playerBCards = [4, 5, 6].map((i) => getCardImage(tokens[i]));
+  const playerACards = [1, 3, 5].map((i) => getCardImage(tokens[i]));
+  const playerBCards = [2, 4, 6].map((i) => getCardImage(tokens[i]));
 
   return (
     <div className="casino-video-cards">

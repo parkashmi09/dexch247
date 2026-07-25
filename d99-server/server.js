@@ -74,7 +74,6 @@ dotenv.config();
 
 // platform  domain only  
 const allowedOrigins = [
-
   'https://diamond99.codefactory.games',
   'https://www.diamond99.codefactory.games',
   'https://admindiamond99.codefactory.games',

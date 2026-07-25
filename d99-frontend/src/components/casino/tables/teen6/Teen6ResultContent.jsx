@@ -47,8 +47,11 @@ export default function Teen6ResultContent({ detailData }) {
   const { card = "", mtime = "", rid = "", win = "", winnat = "" } = t1;
 
   const tokens = card.split(",").map((c) => c.trim()).filter(Boolean);
-  const pACards = tokens.slice(0, 3);
-  const pBCards = tokens.slice(3, 6);
+  // Cards are dealt ALTERNATELY: 1st→A, 2nd→B, 3rd→A, 4th→B, 5th→A, 6th→B. So a
+  // player's cards are its every-other index, NOT a contiguous block — Player A =
+  // positions 0,2,4; Player B = positions 1,3,5. Matches the feed's rdesc scoring.
+  const pACards = [tokens[0], tokens[2], tokens[4]].filter(Boolean);
+  const pBCards = [tokens[1], tokens[3], tokens[5]].filter(Boolean);
 
   const winner = winnat || (String(win) === "1" ? "Player A" : String(win) === "2" ? "Player B" : "");
   const isAWinner = winner === "Player A" || String(win) === "1";
