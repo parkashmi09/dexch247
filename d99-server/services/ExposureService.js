@@ -22,12 +22,18 @@ import TotalExposure from '../model/user/TotalExposure.js'; // total exposure ta
 async function getexpossurebyid(user_id, match_id) {
   console.log("Fetching exposure for user_id:", user_id, "and match_id:", match_id);
   const { Op } = (await import("sequelize"));
+  // match_id / event_id are VARCHAR columns; the caller often passes a numeric
+  // round id (casino gmid comes off the feed as a number). Comparing a varchar
+  // column to a bigint makes Postgres throw 42883 ("operator does not exist:
+  // character varying = bigint") and the whole exposure read 500s — which is why
+  // no book was ever shown. Coerce to string so it stays a varchar = varchar match.
+  const mid = String(match_id);
   return await Exposure.findAll({
     where: {
       user_id,
         [Op.or]: [
-          { match_id: match_id },
-          { event_id: match_id }
+          { match_id: mid },
+          { event_id: mid }
         ]
     },
   });

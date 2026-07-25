@@ -5,8 +5,10 @@ import PlaceBet from "../PlaceBet.jsx";
 export default function CasinoRightSidebar({
   bets = [],
   children,
+  beforeBets,
   showPlaceBet,
   betValue,
+  displayOdds,
   betType,
   selection,
   min,
@@ -39,6 +41,7 @@ export default function CasinoRightSidebar({
       <PlaceBet
         show={showPlaceBet}
         betValue={betValue}
+        displayOdds={displayOdds}
         betType={betType}
         selection={selection}
         min={min}
@@ -52,6 +55,7 @@ export default function CasinoRightSidebar({
         lotteryBall={lotteryBall}
         jokerCardSrc={jokerCardSrc}
       />
+      {beforeBets}
       <BetTable bets={bets} />
       {children}
     </div>

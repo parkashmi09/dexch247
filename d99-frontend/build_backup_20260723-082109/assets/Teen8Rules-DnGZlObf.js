@@ -1,0 +1,1 @@
+import{j as e}from"./index-BD6y06ts.js";function t(){return e.jsx("div",{className:"rules-section",children:e.jsx("div",{children:e.jsx("img",{src:"https://sitethemedata.com/v3/static/front/img/casino-rules/teen6.jpg",className:"img-fluid",alt:"Teenpatti Open Rules"})})})}export{t as default};

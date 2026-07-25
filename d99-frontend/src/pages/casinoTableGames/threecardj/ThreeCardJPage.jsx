@@ -19,6 +19,7 @@ import {
   getLastResults,
   placeCasinoBet,
   getMatchExposure,
+  getMyBets,
 } from "../../../apiservices/CasionApi.js";
 import { CASINO_STREAM_URL } from "../../../config.js";
 import { fetchBalanceThunk } from "../../../features/user/userSlice.js";
@@ -26,6 +27,19 @@ import toast from "react-hot-toast";
 
 const GAME_ID = "3cardj";
 const GAME_NAME = "3 Cards Judgement";
+
+// Display helper: turn a numeric pick ("Yes 1,11,12,13") into card faces
+// ("Yes AJQK") — 1→A, 11→J, 12→Q, 13→K, 2–10 stay as-is. Used only for display;
+// the payload's `selection` keeps the numeric/comma form the server settles on.
+function toFaceLabel(sel) {
+  const m = String(sel || "").match(/^(\S+)\s*(.*)$/);
+  if (!m) return sel;
+  const nums = (m[2].match(/\d+/g) || []).map((n) => {
+    const x = parseInt(n, 10);
+    return x === 1 ? "A" : x === 11 ? "J" : x === 12 ? "Q" : x === 13 ? "K" : String(x);
+  });
+  return nums.length ? `${m[1]} ${nums.join("")}` : String(sel || "");
+}
 
 function formatResult(r) {
   return {
@@ -114,6 +128,32 @@ export default function ThreeCardJPage() {
   const [stakeAmount, setStakeAmount] = useState("");
   const [placing, setPlacing] = useState(false);
   const [myBets, setMyBets] = useState([]);
+  const fetchMyBets = useCallback(async () => {
+    if (!mid) return;
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = user?.user_id || user?.id;
+      if (!userId) return;
+      const response = await getMyBets(userId, mid);
+      if (response?.success && response?.bets) {
+        setMyBets(response.bets.map((bet) => ({
+          matchedBet: bet.player_name || bet.selection || bet.nat || "",
+          nat: bet.nat || bet.player_name || bet.selection || "",
+          odds: bet.odds || bet.urate || "0",
+          stake: bet.stake || bet.amt || "0",
+          type: (bet.type || bet.btype || "").toLowerCase() || null,
+          selection: bet.selection || bet.player_name || "",
+          exposer: parseFloat(bet.exposer || bet.exposure_amount || "0") || 0,
+        })));
+      }
+    } catch { /* ignore */ }
+  }, [mid]);
+  useEffect(() => {
+    if (!mid) return;
+    fetchMyBets();
+    const iv = setInterval(fetchMyBets, 2000);
+    return () => clearInterval(iv);
+  }, [mid, fetchMyBets]);
   const [mobilePanelTab, setMobilePanelTab] = useState("game");
   const [resultModal, setResultModal] = useState({ show: false, mid: "" });
 
@@ -121,7 +161,9 @@ export default function ThreeCardJPage() {
     if (!value) return;
     setBetValue(value);
     setBetType(type);
-    setSelectedSelection(item?.nat || selection);
+    // `selection` carries the composed pick with the chosen cards (e.g. "Yes 347");
+    // prefer it over the plain "Yes"/"No" feed nat so the cards show in the slip + My Bets.
+    setSelectedSelection(selection || item?.nat);
     setSelectedBetData(item);
     setShowPlaceBet(true);
     setStakeAmount("");
@@ -139,13 +181,16 @@ export default function ThreeCardJPage() {
       const userId = (user?.user_id || user?.id || "").toString();
       const payload = {
         userId,
-        player_name: selectedBetData.nat || selectedSelection,
+        // selection keeps the comma-separated card numbers ("Yes 4,5,8") so the
+        // server can parse them unambiguously (incl. 10–13); player_name shows the
+        // card faces for a compact My Bets display ("Yes 458", "Yes JQK").
+        player_name: toFaceLabel(selectedSelection || selectedBetData.nat),
         gameId: mid?.toString() || "",
         gameName: GAME_ID,
         gtype: GAME_ID,
         amount,
         odds: parseFloat(betValue) || 0,
-        selection: selectedBetData.nat || selectedSelection,
+        selection: selectedSelection || selectedBetData.nat,
         roundId: mid || 0,
         mtype: "fancy",
         type: betType,
@@ -157,6 +202,7 @@ export default function ThreeCardJPage() {
         setStakeAmount("");
         const token = localStorage.getItem("token");
         if (token) dispatch(fetchBalanceThunk());
+        fetchMyBets();
       } else {
         toast.error(res?.error || res?.msg || "Failed");
       }
@@ -165,7 +211,7 @@ export default function ThreeCardJPage() {
     } finally {
       setPlacing(false);
     }
-  }, [stakeAmount, selectedBetData, betValue, betType, mid, selectedSelection, dispatch]);
+  }, [stakeAmount, selectedBetData, betValue, betType, mid, selectedSelection, dispatch, fetchMyBets]);
 
   const loading = !gameData;
   const iframeSrc = `${CASINO_STREAM_URL}?id=${GAME_ID}`;
@@ -179,7 +225,7 @@ export default function ThreeCardJPage() {
           showPlaceBet={showPlaceBet}
           betValue={betValue}
           betType={betType}
-          selection={selectedSelection}
+          selection={toFaceLabel(selectedSelection)}
           min={selectedBetData?.min}
           max={selectedBetData?.max}
           stakeAmount={stakeAmount}
@@ -222,6 +268,7 @@ export default function ThreeCardJPage() {
                 gameData={gameData}
                 onBetClick={handleBetClick}
                 exposures={exposures}
+                showPlaceBet={showPlaceBet}
               />
 
               <div className="casino-last-result-title">
@@ -250,7 +297,7 @@ export default function ThreeCardJPage() {
           show={showPlaceBet}
           betValue={betValue}
           betType={betType}
-          selection={selectedSelection}
+          selection={toFaceLabel(selectedSelection)}
           min={selectedBetData?.min}
           max={selectedBetData?.max}
           stakeAmount={stakeAmount}

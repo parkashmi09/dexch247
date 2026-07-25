@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 
 const AB_CARD_BASE = "/assets/img/andar-bahar-cards/";
 
@@ -50,16 +50,27 @@ export default function BetTableAB20({ gameData, onBetClick, exposures = {} }) {
   const raw = gameData?.data?.data || gameData?.data || {};
   const sub = raw.sub || [];
 
-  // ares/bres directly give the image numbers for each position
+  // ares/bres give the image number for each Andar/Bahar position (0 = face-down).
+  // During the OPEN betting window the feed sends them EMPTY, which would blank the
+  // rows to all face-down cards. The reference site keeps the previous round's
+  // revealed cards visible while the user bets, then resets and re-reveals
+  // one-by-one once dealing starts. So we retain the last non-empty ares/bres and
+  // fall back to them whenever the live values are empty; as soon as the new deal
+  // populates them (even all-zeros), the live values take over and reveal normally.
+  const lastAres = useRef("");
+  const lastBres = useRef("");
+  if (raw.ares) lastAres.current = raw.ares;
+  if (raw.bres) lastBres.current = raw.bres;
+  const aresStr = raw.ares || lastAres.current;
+  const bresStr = raw.bres || lastBres.current;
+
   const andarRes = useMemo(() => {
-    const str = raw.ares || "";
-    return str ? str.split(",").map((v) => parseInt(v, 10) || 0) : Array(13).fill(0);
-  }, [raw.ares]);
+    return aresStr ? aresStr.split(",").map((v) => parseInt(v, 10) || 0) : Array(13).fill(0);
+  }, [aresStr]);
 
   const baharRes = useMemo(() => {
-    const str = raw.bres || "";
-    return str ? str.split(",").map((v) => parseInt(v, 10) || 0) : Array(13).fill(0);
-  }, [raw.bres]);
+    return bresStr ? bresStr.split(",").map((v) => parseInt(v, 10) || 0) : Array(13).fill(0);
+  }, [bresStr]);
 
   const andarItems = useMemo(() => sub.filter((s) => s.nat?.startsWith("Andar")), [sub]);
   const baharItems = useMemo(() => sub.filter((s) => s.nat?.startsWith("Bahar")), [sub]);

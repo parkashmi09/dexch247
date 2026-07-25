@@ -19,6 +19,7 @@ const SELECTION_BALLS = [
 export default function PlaceBet({
   show,
   betValue,
+  displayOdds,
   betType,
   selection,
   min = 1000,
@@ -33,11 +34,23 @@ export default function PlaceBet({
   jokerCardSrc,
 }) {
   const odds = Number(betValue) || 0;
+  // What the odds box shows — defaults to the bet odds, but a market may show a
+  // different figure (e.g. Trio Session shows its line while betting at the bhav
+  // decimal). Profit below always uses the real bet odds.
+  const shownOdds = displayOdds != null && displayOdds !== "" ? displayOdds : betValue;
   const stakeNum = Number(stakeAmount) || 0;
   const profit = useMemo(() => {
     if (!odds || !stakeNum) return 0;
-    return Math.round((odds - 1) * stakeNum * 100) / 100;
-  }, [odds, stakeNum]);
+    // Lottery (lottcard) quotes a "1 to X" profit multiplier (Single 9.5, Double
+    // 95, Triple 900), paid as the whole number — Single ×9, Double ×95, Triple
+    // ×900 (the .5 is dropped) — not the decimal-odds stake×(odds−1).
+    // Sic Bo (sicbo/sicbo2) likewise quotes the payout as a "X to 1" profit ratio
+    // in `b`, so profit is stake×ratio. Single shows its base 1:1 here; it settles
+    // at the actual match count (1/2/3).
+    const isRatioGame = gameType === "lottcard" || gameType === "sicbo" || gameType === "sicbo2";
+    const mult = isRatioGame ? Math.floor(odds) : odds - 1;
+    return Math.round(mult * stakeNum * 100) / 100;
+  }, [odds, stakeNum, gameType]);
 
   function handleQuickStake(val) {
     setStakeAmount(String((Number(stakeAmount) || 0) + val));
@@ -63,7 +76,9 @@ export default function PlaceBet({
         {placing && <CasinoLoader />}
         <div className="place-bet-box-header">
           <div className="place-bet-for">(Bet for)</div>
-          <div className="place-bet-odds">Odds</div>
+          {/* Lottery has no meaningful decimal odds to show in the slip — the
+              payout is a fixed 1-to-X multiplier — so its odds column is hidden. */}
+          {gameType !== "lottcard" && <div className="place-bet-odds">Odds</div>}
           <div className="place-bet-stake">Stake</div>
           <div className="place-bet-profit">Profit</div>
         </div>
@@ -71,7 +86,9 @@ export default function PlaceBet({
           <div className="place-bet-for">
             {gameType === "lottcard" && lotteryBall != null ? (
               <div className="lottery-place-balls">
-                <img src={`/assets/img/lottery/ball${lotteryBall}.png`} alt={`ball${lotteryBall}`} />
+                {(Array.isArray(lotteryBall) ? lotteryBall : [lotteryBall]).map((d, i) => (
+                  <img key={i} src={`/assets/img/lottery/ball${d}.png`} alt={`ball${d}`} />
+                ))}
               </div>
             ) : gameType === "teenunique" ? (
               <div className="unique-teen20-place-balls">
@@ -91,9 +108,11 @@ export default function PlaceBet({
               </>
             )}
           </div>
-          <div className="place-bet-odds">
-            <input type="text" className="form-control" disabled value={odds} />
-          </div>
+          {gameType !== "lottcard" && (
+            <div className="place-bet-odds">
+              <input type="text" className="form-control" disabled value={shownOdds} />
+            </div>
+          )}
           <div className="place-bet-stake">
             <input
               type="number"

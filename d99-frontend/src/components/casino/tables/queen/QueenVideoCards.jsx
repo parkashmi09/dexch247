@@ -17,29 +17,26 @@ function cardRankValue(token) {
 }
 
 const GROUP_LABELS = ["Total 0", "Total 1", "Total 2", "Total 3"];
+const GROUPS = 4;
+
+// The feed sends the dealt cards DENSE (front-packed) followed by "1" padding —
+// e.g. "6DD,5DD,4CC,5CC,5HH,1,1,…". Cards are dealt COLUMN-MAJOR: one to each lane
+// per column (Total 0,1,2,3), then the next column, until a lane wins. So the
+// n-th dealt card belongs to lane (n % 4): filter the placeholders to the dense
+// list, then round-robin. This keeps each card's lane FIXED as more cards append
+// (index n never changes lane), so the first column stays put when the second
+// begins — unlike an even-split by count, which reshuffles earlier lanes.
+function isRealCard(token) {
+  return token && token !== "1" && token !== "0";
+}
 
 export default function QueenVideoCards({ cardString = "" }) {
   const tokens = cardString ? cardString.split(",").map((t) => t.trim()) : [];
-  const dealt = tokens.filter((t) => t && t !== "1");
+  const dealt = tokens.filter(isRealCard);
   if (dealt.length === 0) return null;
 
-  // Distribute dealt cards evenly across 4 groups, filled sequentially.
-  // With N cards: first (N % 4) groups get ceil(N/4) cards, rest get floor(N/4).
-  const n = dealt.length;
-  const base = Math.floor(n / 4);
-  const extra = n % 4;
-  const groupSizes = [0, 0, 0, 0];
-  for (let i = 0; i < 4; i++) {
-    groupSizes[i] = base + (i < extra ? 1 : 0);
-  }
-
-  const groups = [[], [], [], []];
-  let pos = 0;
-  for (let gi = 0; gi < 4; gi++) {
-    for (let j = 0; j < groupSizes[gi]; j++) {
-      groups[gi].push(dealt[pos++]);
-    }
-  }
+  const groups = Array.from({ length: GROUPS }, () => []);
+  dealt.forEach((token, i) => groups[i % GROUPS].push(token));
 
   // Group total = sum of pip values + group_index
   return (

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 const AB_CARD_BASE = "/assets/img/andar-bahar-cards/";
 const CARD_NUMS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
@@ -7,7 +7,7 @@ function isSuspended(item) {
   return !item || item.gstatus !== "OPEN" || !parseFloat(item.b);
 }
 
-export default function BetTableThreeCardJ({ gameData, onBetClick, exposures = {} }) {
+export default function BetTableThreeCardJ({ gameData, onBetClick, exposures = {}, showPlaceBet = false }) {
   const raw = gameData?.data?.data || gameData?.data || {};
   const sub = raw.sub || [];
   const remark = raw.remark || "";
@@ -27,40 +27,38 @@ export default function BetTableThreeCardJ({ gameData, onBetClick, exposures = {
   const [yesSelected, setYesSelected] = useState([]);
   const [noSelected, setNoSelected] = useState([]);
 
+  // Clear the picks once the bet panel closes (after submit or cancel) so the
+  // next bet starts fresh.
+  useEffect(() => {
+    if (!showPlaceBet) {
+      setYesSelected([]);
+      setNoSelected([]);
+    }
+  }, [showPlaceBet]);
+
   function toggleCard(cardNum, type) {
-    const item = type === "back" ? yesItem : noItem;
+    const back = type === "back";
+    const item = back ? yesItem : noItem;
     if (isSuspended(item)) return;
 
-    if (type === "back") {
-      setYesSelected((prev) => {
-        if (prev.includes(cardNum)) return prev.filter((n) => n !== cardNum);
-        if (prev.length >= 3) return prev;
-        const next = [...prev, cardNum];
-        if (next.length === 3) {
-          const label = `Yes ${next.join("")}`;
-          const odds = parseFloat(item.b) || 0;
-          setTimeout(() => {
-            onBetClick?.(odds, label, item, "back");
-            setYesSelected([]);
-          }, 100);
-        }
-        return next;
-      });
+    const selected = back ? yesSelected : noSelected;
+    const setSelected = back ? setYesSelected : setNoSelected;
+    const prefix = back ? "Yes" : "No";
+
+    let next;
+    if (selected.includes(cardNum)) {
+      next = selected.filter((n) => n !== cardNum); // deselect
     } else {
-      setNoSelected((prev) => {
-        if (prev.includes(cardNum)) return prev.filter((n) => n !== cardNum);
-        if (prev.length >= 3) return prev;
-        const next = [...prev, cardNum];
-        if (next.length === 3) {
-          const label = `No ${next.join("")}`;
-          const odds = parseFloat(item.b) || 0;
-          setTimeout(() => {
-            onBetClick?.(odds, label, item, "lay");
-            setNoSelected([]);
-          }, 100);
-        }
-        return next;
-      });
+      if (selected.length >= 3) return; // max 3 cards
+      next = [...selected, cardNum];
+    }
+    setSelected(next);
+
+    // Open the bet panel from the FIRST card and keep it in sync as more are
+    // picked (up to 3). The panel's selection/label reflects the running picks.
+    if (next.length > 0) {
+      const odds = parseFloat(item.b) || 0;
+      onBetClick?.(odds, `${prefix} ${next.join(",")}`, item, back ? "back" : "lay");
     }
   }
 

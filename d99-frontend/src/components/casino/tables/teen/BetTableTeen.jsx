@@ -23,9 +23,14 @@ export default function BetTableTeen({ tableData = [], onBetClick, exposures = {
 
   const isSus = (item) => !item || item.gstatus !== "OPEN";
 
-  function renderRow(item, label) {
+  // Main is a two-way A-vs-B book — the backed player holds +profit, the other
+  // −stake — so read each Main row under the player nat ("Player A"/"Player B").
+  // Consecutive reuses the same nats in the feed, but its exposure is stored
+  // namespaced ("Player A Consecutive") so it no longer bleeds the Main loss
+  // into both rows; read it under that key. expKey defaults to the item nat.
+  function renderRow(item, label, expKey) {
     const sus = isSus(item);
-    const exp = getExp(exposures, item?.nat);
+    const exp = getExp(exposures, expKey || item?.nat);
     const expN = exp !== null && exp !== undefined ? parseFloat(exp) : NaN;
     return (
       <div className={`casino-table-row${sus ? " suspended-row" : ""}`}>
@@ -56,8 +61,8 @@ export default function BetTableTeen({ tableData = [], onBetClick, exposures = {
             <div className="casino-odds-box lay">Lay</div>
           </div>
           <div className="casino-table-body">
-            {renderRow(playerA, "Main")}
-            {renderRow(consA, "Consecutive")}
+            {renderRow(playerA, "Main", "Player A")}
+            {renderRow(consA, "Consecutive", "Player A Consecutive")}
           </div>
         </div>
 
@@ -70,8 +75,8 @@ export default function BetTableTeen({ tableData = [], onBetClick, exposures = {
             <div className="casino-odds-box lay">Lay</div>
           </div>
           <div className="casino-table-body">
-            {renderRow(playerB, "Main")}
-            {renderRow(consB, "Consecutive")}
+            {renderRow(playerB, "Main", "Player B")}
+            {renderRow(consB, "Consecutive", "Player B Consecutive")}
           </div>
         </div>
       </div>

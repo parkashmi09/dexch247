@@ -32,6 +32,7 @@ export default function TrioPage() {
     showPlaceBet,
     setShowPlaceBet,
     betValue,
+    betDisplayOdds,
     betType,
     selectedSelection,
     selectedBetData,
@@ -54,6 +55,7 @@ export default function TrioPage() {
           bets={myBets}
           showPlaceBet={showPlaceBet}
           betValue={betValue}
+          displayOdds={betDisplayOdds}
           betType={betType}
           selection={selectedSelection}
           min={selectedBetData?.min}
@@ -124,6 +126,7 @@ export default function TrioPage() {
         <PlaceBetMobile
           show={showPlaceBet}
           betValue={betValue}
+          displayOdds={betDisplayOdds}
           betType={betType}
           selection={selectedSelection}
           min={selectedBetData?.min}

@@ -1,12 +1,32 @@
 function formatAmount(n) {
   if (!n && n !== 0) return "";
-  if (n >= 100000) return `${n / 100000}L`;
-  if (n >= 1000) return `${n / 1000}K`;
+  // Show the full amount (e.g. 300000) rather than an abbreviation (3L / 10K).
   return String(n);
 }
 
 function isOddsEmpty(v) {
   return !v || Number(v) === 0;
+}
+
+// ---------------------------------------------------------------------------
+// Book display
+// The per-runner book (profit under the backed runner, worst-case exposure under
+// the others; fancy/session worst case) is computed and stored SERVER-SIDE at
+// placement — see d99-server/helper/casinoMarketBook.js + CasinoService.placeBet.
+// The page polls it via getMatchExposure and passes it down as `exposures`; this
+// component only renders whatever the server holds for each runner.
+// ---------------------------------------------------------------------------
+function getExisting(exposures, nat) {
+  if (!nat || !exposures) return 0;
+  const key = String(nat);
+  return Number(exposures[key] ?? exposures[key.toLowerCase()] ?? 0) || 0;
+}
+
+// Renders the runner's stored book — green for profit, red for exposure.
+function NationBook({ value }) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || Math.round(n) === 0) return null;
+  return <span className={`market-book ${n >= 0 ? "text-success" : "text-danger"}`}>{Math.round(n)}</span>;
 }
 
 function BookmakerMarket({ market, onBet, exposures }) {
@@ -32,14 +52,14 @@ function BookmakerMarket({ market, onBet, exposures }) {
           const backVal = backOdd?.odds;
           const layVal = layOdd?.odds;
           const suspended = sec.gstatus === "SUSPENDED" || sec.gstatus === "Ball Running";
-          const exp = exposures?.[sec.nat] || 0;
+          const exp = getExisting(exposures, sec.nat);
 
           return (
             <div key={sec.sid} className={`market-row${suspended ? " suspended-row" : ""}`} data-title={sec.gstatus}>
               <div className="market-nation-detail">
                 <span className="market-nation-name">{sec.nat}</span>
                 <div className="market-nation-book">
-                  {exp !== 0 && <span className={exp >= 0 ? "text-success" : "text-danger"}>{Math.round(exp)}</span>}
+                  <NationBook value={exp} />
                 </div>
               </div>
               <div className={`market-odd-box back`}
@@ -60,13 +80,14 @@ function BookmakerMarket({ market, onBet, exposures }) {
   );
 }
 
-function TieMarket({ item, onBet }) {
+function TieMarket({ item, onBet, exposures }) {
   if (!item) return null;
   const suspended = item.gstatus === "SUSPENDED" || item.gstatus === "Ball Running";
   const backOdd = item.odds?.find((o) => o.otype === "back");
   const layOdd = item.odds?.find((o) => o.otype === "lay");
   const tieBack = backOdd?.odds || item.back || 0;
   const tieLay = layOdd?.odds || item.lay || 0;
+  const tieExp = getExisting(exposures, item.nat || "Tie");
 
   return (
     <div className="game-market market-6">
@@ -88,7 +109,9 @@ function TieMarket({ item, onBet }) {
               <div className="market-row">
                 <div className="market-nation-detail">
                   <span className="market-nation-name">Tie</span>
-                  <div className="market-nation-book"></div>
+                  <div className="market-nation-book">
+                    <NationBook value={tieExp} />
+                  </div>
                 </div>
                 <div className={`market-odd-box back`}
                   onClick={() => !isOddsEmpty(tieBack) && !suspended && onBet?.(tieBack, "Tie", { ...item, _marketName: "Tie" }, "back")}>
@@ -115,7 +138,7 @@ function TieMarket({ item, onBet }) {
   );
 }
 
-function Fancy1Market({ items, onBet }) {
+function Fancy1Market({ items, onBet, exposures }) {
   if (!items || items.length === 0) return null;
 
   return (
@@ -150,13 +173,16 @@ function Fancy1Market({ items, onBet }) {
             const layVal = layOdd?.odds || item.lay || 0;
             const backSize = backOdd?.size || item.min || 0;
             const laySize = layOdd?.size || 0;
+            const exp = getExisting(exposures, item.nat);
             return (
               <div key={item.sid || item.psid} className="col-md-6">
                 <div className={`fancy-market${suspended ? " suspended-row" : " "}`} data-title={suspended ? "SUSPENDED" : "ACTIVE"}>
                   <div className="market-row">
                     <div className="market-nation-detail">
                       <span className="market-nation-name">{item.nat}</span>
-                      <div className="market-nation-book"></div>
+                      <div className="market-nation-book">
+                        <NationBook value={exp} />
+                      </div>
                     </div>
                     <div className={`market-odd-box back `}
                       onClick={() => !isOddsEmpty(backVal) && !suspended && onBet?.(backVal, item.nat, { ...item, _marketName: "Fancy1" }, "back")}>
@@ -208,6 +234,7 @@ function FancyMarket({ market, onBet, exposures }) {
           const layVal = layOdd?.odds;
           const laySize = layOdd?.size || 0;
           const backSize = backOdd?.size || 0;
+          const exp = getExisting(exposures, sec.nat);
 
           return (
             <div key={sec.sid}>
@@ -215,7 +242,9 @@ function FancyMarket({ market, onBet, exposures }) {
                 <div className="market-row">
                   <div className="market-nation-detail">
                     <span className="market-nation-name pointer">{sec.nat}</span>
-                    <div className="market-nation-book"></div>
+                    <div className="market-nation-book">
+                      <NationBook value={exp} />
+                    </div>
                   </div>
                   <div className="market-odd-box lay "
                     onClick={() => !isOddsEmpty(layVal) && !suspended && onBet?.(layVal, sec.nat, { ...sec, _marketName: "Fancy" }, "lay")}>
@@ -256,8 +285,8 @@ export default function SuperOverMarkets({ markets = [], onBet, exposures = {} }
     <>
       <BookmakerMarket market={bookmakerMarket} onBet={onBet} exposures={exposures} />
       <FancyMarket market={fancyMarket} onBet={onBet} exposures={exposures} />
-      <TieMarket item={tieItem} onBet={onBet} />
-      <Fancy1Market items={fancy1Items} onBet={onBet} />
+      <TieMarket item={tieItem} onBet={onBet} exposures={exposures} />
+      <Fancy1Market items={fancy1Items} onBet={onBet} exposures={exposures} />
     </>
   );
 }

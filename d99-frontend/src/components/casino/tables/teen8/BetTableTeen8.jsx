@@ -96,19 +96,21 @@ export default function BetTableTeen8({ tableData = [], onBetClick, exposures = 
                       </div>
                     )}
                   </div>
-                  <ExpBook value={getExp(exposures, playerItem?.nat)} />
                 </div>
                 <div className={`casino-odds-box back${susPl ? " suspended-box" : ""}`}
                   onClick={() => !susPl && playerItem?.b > 0 && onBetClick?.(playerItem.b, playerItem.nat, playerItem, "back")}>
                   <span className="casino-odds">{playerItem?.b || 0}</span>
+                  <ExpBook value={getExp(exposures, playerItem?.nat)} />
                 </div>
                 <div className={`casino-odds-box back${susPP ? " suspended-box" : ""}`}
                   onClick={() => !susPP && pairPlusItem?.b > 0 && onBetClick?.(pairPlusItem.b, pairPlusItem.nat, pairPlusItem, "back")}>
                   <span className="casino-odds">{`Pair Plus ${num}`}</span>
+                  <ExpBook value={getExp(exposures, pairPlusItem?.nat)} />
                 </div>
                 <div className={`casino-odds-box back${susTo ? " suspended-box" : ""}`}
                   onClick={() => !susTo && totalItem?.b > 0 && onBetClick?.(totalItem.b, totalItem.nat, totalItem, "back")}>
                   <span className="casino-odds">{totalItem?.b || 0}</span>
+                  <ExpBook value={getExp(exposures, totalItem?.nat)} />
                 </div>
               </div>
             );

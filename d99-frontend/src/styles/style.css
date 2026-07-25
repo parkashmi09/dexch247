@@ -7012,6 +7012,10 @@ img.r-rotate {
   -moz-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
   -o-transform: translateX(-50%);
+  /* Sit above the Low/High suspended overlays (::after has no z-index, ::before
+     is z-index:1) so the High box's overlay no longer covers the 7 image. */
+  z-index: 3;
+  pointer-events: none;
 }
 
 .trap .seven-box img {

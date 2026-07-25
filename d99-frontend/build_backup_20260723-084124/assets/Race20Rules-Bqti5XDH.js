@@ -1,0 +1,1 @@
+import{j as s}from"./index-B6W1kNJe.js";function a(){return s.jsx("div",{className:"rules-section",children:s.jsx("img",{src:"/assets/img/casino-rules/race20.jpg",alt:"Race 20 Rules",className:"img-fluid"})})}export{a as default};

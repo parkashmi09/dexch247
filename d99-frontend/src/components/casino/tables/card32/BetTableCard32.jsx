@@ -9,8 +9,10 @@ function ExposureSpan({ exposures, nat }) {
   const n = parseFloat(raw);
   if (isNaN(n) || n === 0) return null;
   return (
-    <div style={{ color: n < 0 ? "#ff0000" : "#00ff00", fontSize: 10, marginTop: 2 }}>
-      {n < 0 ? n.toFixed(2) : `+${n.toFixed(2)}`}
+    <div className="casino-nation-book text-center">
+      <span className={n >= 0 ? "text-success" : "text-danger"}>
+        {n >= 0 ? `+${n.toFixed(2)}` : n.toFixed(2)}
+      </span>
     </div>
   );
 }

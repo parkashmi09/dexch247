@@ -38,7 +38,7 @@ export default function TrapVideoCards({ cardString = "" }) {
     <div className="casino-video-cards">
       <div className="row row5">
         <div className="col-6">
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 4 }}>
             <div><b>A</b></div>
             <div className="text-fancy">{playerATotal}</div>
           </div>
@@ -54,7 +54,7 @@ export default function TrapVideoCards({ cardString = "" }) {
           </div>
         </div>
         <div className="col-6">
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 4 }}>
             <div><b>B</b></div>
             <div className="text-fancy">{playerBTotal}</div>
           </div>

@@ -1,0 +1,1 @@
+import{j as s}from"./index-B6W1kNJe.js";function t(){return s.jsx("div",{className:"rules-section",children:s.jsx("div",{children:s.jsx("img",{src:"https://sitethemedata.com/v3/static/front/img/casino-rules/poker6.jpg",className:"img-fluid",alt:"Poker 1-Day Rules"})})})}export{t as default};

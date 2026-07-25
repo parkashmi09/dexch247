@@ -48,9 +48,20 @@ const BetTableTrio = memo(function BetTableTrio({ tableData = [], onBetClick, ex
 
   function handleBet(item, side) {
     if (!item || isSuspended(item)) return;
-    const odds = side === "back" ? item.b : item.l;
-    if (!odds || parseFloat(odds) <= 0) return;
-    onBetClick?.(parseFloat(odds), item.nat, item, side);
+    let odds;
+    if (Number(item.sid) === SESSION_SID) {
+      // Session is a Fancy2 market: b/l carry the line (e.g. 21), while the real
+      // rate lives in bbhav/lbhav as profit-per-100 → decimal = bhav/100 + 1
+      // (80 → 1.8 back, 100 → 2.0 lay). Settlement pays stake×decimal, so this is
+      // the odds that must be stored — NOT b/l, which would overpay ~21×.
+      const bhav = parseFloat(side === "back" ? item.bbhav : item.lbhav);
+      if (!bhav || bhav <= 0) return;
+      odds = bhav / 100 + 1;
+    } else {
+      odds = parseFloat(side === "back" ? item.b : item.l);
+    }
+    if (!odds || odds <= 0) return;
+    onBetClick?.(odds, item.nat, item, side);
   }
 
   function renderSessionRow(item) {
@@ -58,8 +69,8 @@ const BetTableTrio = memo(function BetTableTrio({ tableData = [], onBetClick, ex
     const susp = isSuspended(item);
     const backSusp = susp || !parseFloat(item.b);
     const laySusp = susp || !parseFloat(item.l);
-    const backVol = item.bs ?? 80;
-    const layVol = item.ls ?? 100;
+    const backVol = item.bbhav ?? 80;
+    const layVol = item.lbhav ?? 100;
 
     return (
       <div className="casino-odd-box-container">
