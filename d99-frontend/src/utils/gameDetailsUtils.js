@@ -1,4 +1,4 @@
-import { getOddsFormat, isTiedMarket } from "./sportsBetRules.js";
+import { TOASTS, getOddsFormat, isTiedMarket } from "./sportsBetRules.js";
 
 // ---------------------------------------------------------------------------
 // Helper utilities
@@ -654,8 +654,10 @@ export function cashoutToastMessage(reason) {
     case "no_odds":
     case "worsens":
       return "You are not eligible for cashout";
+    // Computed stake outside the market's Min/Max range — same reference text
+    // as the submit-time (Step 0c) reject, so click-time and confirm-time agree.
     case "above_max":
-      return "Cashout stake above the market limit";
+      return TOASTS.BET_NOT_CONFIRM_RANGE;
     case "invalid_market":
       return "Cashout not available for this market";
     default:

@@ -18,6 +18,10 @@ export const TOASTS = {
   MAX_BET_LIMIT: "Check Maximum Bet Limit2.",
   RATE_OVER_LIMIT: "Bet Not Accept Rate Over 4.00 on Oneday and T20",
   GAME_NOT_ACTIVE: "Bet Not Confirm Reason Game Not Active.",
+  // MATCH_ODDS maxb:1 kill-switch — exact reference text, trailing "2" included.
+  GAME_NOT_ACTIVE_2: "Game Not Active2.",
+  // Cashout hedge stake outside the market's Min/Max header range.
+  BET_NOT_CONFIRM_RANGE: "Bet Not Confirm Reason Min and Max Bet Range Not Valid.",
   INVALID_BET: "Invalid bet",
   BALL_RUNNING: "Ball Running",
   ODDS_CHANGED: "Odds changed",

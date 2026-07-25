@@ -201,6 +201,45 @@ export default function GameDetails() {
       return;
     }
 
+    // ── Step 0b: MATCH_ODDS maxb:1 kill-switch ──
+    // The feed marks MATCH_ODDS unbettable by quoting maxb:1 while the market
+    // still renders OPEN. Reference: submit runs the loader ~5s, then rejects
+    // with "Game Not Active2." — no validation, no buffer, no API call. Must
+    // run BEFORE stake validation (maxb:1 makes maxStake 1, which would fire
+    // the wrong "Check Maximum Bet Limit2." toast instantly). MATCH_ODDS only —
+    // Bookmaker/Fancy/Tied are untouched. `market` is the CLICK-TIME snapshot.
+    if (
+      String(market.gtype || "").toLowerCase() === "match" &&
+      String(market.mname || "").toUpperCase() === "MATCH_ODDS" &&
+      Number(market.maxb) === 1
+    ) {
+      setPlacing(true);
+      setTimeout(() => {
+        setPlacing(false);
+        // Panel closes first, then the toast (same order as the success flow)
+        setBetState(INITIAL_BET_STATE);
+        toast.error(TOASTS.GAME_NOT_ACTIVE_2);
+      }, 5000);
+      return;
+    }
+
+    // ── Step 0c: cashout Min/Max range check ──
+    // The hedge stake is COMPUTED, not chosen — the panel still opens with an
+    // out-of-range value, but the reference refuses to confirm a cashout whose
+    // stake sits outside the market's Min/Max header range (Min: market.min,
+    // Max: maxb > 0 ? maxb : max), with its own toast. Runs BEFORE Step 1:
+    // minStake is 0 for cashout (so MIN_BET_LIMIT never fires) and the max
+    // check would show the wrong "Check Maximum Bet Limit2." text.
+    if (isCashout) {
+      const coMin = Number(market?.min) || 0;
+      const coMaxb = Number(market?.maxb) || 0;
+      const coMax = coMaxb > 0 ? coMaxb : Number(market?.max) || 0;
+      if ((coMin > 0 && stakeNum < coMin) || (coMax > 0 && stakeNum > coMax)) {
+        toast.error(TOASTS.BET_NOT_CONFIRM_RANGE);
+        return;
+      }
+    }
+
     // ── Step 1: stake + odds validation ──
     if (!stakeNum || stakeNum <= 0) {
       toast.error(TOASTS.ENTER_VALID_STAKE);
