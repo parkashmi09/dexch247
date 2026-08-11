@@ -34,6 +34,7 @@ import {
   getStakeLimits,
   getOddsBounds,
   isRateCapped,
+  applyMatchOddsLimits,
 } from "../utils/sportsBetRules.js";
 import { manualBetGate, manualBetLiveCheck, autoBetCheck, autoCheckApplies, EPS } from "../utils/bookieFavour.js";
 import {
@@ -209,17 +210,22 @@ export default function GameDetails() {
       return;
     }
 
-    // ── Step 0b: MATCH_ODDS maxb:1 kill-switch ──
-    // The feed marks MATCH_ODDS unbettable by quoting maxb:1 while the market
-    // still renders OPEN. Reference: submit runs the loader ~5s, then rejects
-    // with "Game Not Active2." — no validation, no buffer, no API call. Must
-    // run BEFORE stake validation (maxb:1 makes maxStake 1, which would fire
-    // the wrong "Check Maximum Bet Limit2." toast instantly). MATCH_ODDS only —
-    // Bookmaker/Fancy/Tied are untouched. `market` is the CLICK-TIME snapshot.
+    // ── Step 0b: MATCH_ODDS unbettable kill-switch ──
+    // Two feed signals mark MATCH_ODDS unbettable while the market renders
+    // OPEN: the legacy maxb:1 flag, or — with applyMatchOddsLimits folding the
+    // state-dependent cap into `max` — an effective cap of 0/1 (pre-match
+    // umaxbof) on a market that quotes umaxbof. Reference: submit runs the
+    // loader ~5s, then rejects with "Game Not Active2." — no validation, no
+    // buffer, no API call. Must run BEFORE stake validation (a cap of 1 makes
+    // maxStake 1, which would fire the wrong "Check Maximum Bet Limit2." toast
+    // instantly). MATCH_ODDS only — Bookmaker/Fancy/Tied are untouched.
+    // `market` is the CLICK-TIME snapshot (already transformed).
+    const moEffCap =
+      market.umaxbof !== undefined ? Number(market.max) || 0 : null;
     if (
       String(market.gtype || "").toLowerCase() === "match" &&
       String(market.mname || "").toUpperCase() === "MATCH_ODDS" &&
-      Number(market.maxb) === 1
+      (Number(market.maxb) === 1 || (moEffCap !== null && moEffCap <= 1))
     ) {
       setPlacing(true);
       setTimeout(() => {
@@ -567,7 +573,9 @@ export default function GameDetails() {
         if (mData && !Array.isArray(mData)) {
           mData = mData.data ?? [];
         }
-        const marketArr = Array.isArray(mData) ? mData : [];
+        const marketArr = (Array.isArray(mData) ? mData : []).map((m) =>
+          applyMatchOddsLimits(m, sid)
+        );
         setMarkets(marketArr);
         latestMarketsRef.current = marketArr;
 
