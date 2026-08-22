@@ -19,6 +19,7 @@ import {
   getLastResults,
   placeCasinoBet,
   getMatchExposure,
+  getMyBets,
 } from "../../../apiservices/CasionApi.js";
 import { CASINO_STREAM_URL } from "../../../config.js";
 import { fetchBalanceThunk } from "../../../features/user/userSlice.js";
@@ -109,6 +110,33 @@ export default function AB3Page() {
     return () => clearInterval(iv);
   }, [mid]);
 
+  // Poll the user's bets for the current round so the "My Bet" panel renders,
+  // mirroring what useCasinoGame does for the standard casino pages.
+  const [myBets, setMyBets] = useState([]);
+  const fetchMyBets = useCallback(async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = user?.user_id || user?.id;
+      if (!userId || !mid) return;
+      const res = await getMyBets(userId, mid);
+      if (res?.success && res?.bets) {
+        setMyBets(res.bets.map((bet) => ({
+          matchedBet: bet.player_name || bet.selection || bet.nat || "",
+          odds: bet.odds || bet.urate || "0",
+          stake: bet.stake || bet.amt || "0",
+          type: (bet.type || bet.btype || "back").toLowerCase(),
+        })));
+      }
+    } catch { /* ignore */ }
+  }, [mid]);
+
+  useEffect(() => {
+    if (!mid) return;
+    fetchMyBets();
+    const iv = setInterval(fetchMyBets, 2000);
+    return () => clearInterval(iv);
+  }, [mid, fetchMyBets]);
+
   // Bet state
   const [showPlaceBet, setShowPlaceBet] = useState(false);
   const [betValue, setBetValue] = useState("");
@@ -117,7 +145,6 @@ export default function AB3Page() {
   const [selectedBetData, setSelectedBetData] = useState(null);
   const [stakeAmount, setStakeAmount] = useState("");
   const [placing, setPlacing] = useState(false);
-  const [myBets, setMyBets] = useState([]);
   const [mobilePanelTab, setMobilePanelTab] = useState("game");
   const [resultModal, setResultModal] = useState({ show: false, mid: "" });
 
@@ -159,6 +186,7 @@ export default function AB3Page() {
         toast.success("Bet successfully placed");
         setShowPlaceBet(false);
         setStakeAmount("");
+        fetchMyBets();
         const token = localStorage.getItem("token");
         if (token) dispatch(fetchBalanceThunk());
       } else {
@@ -169,7 +197,7 @@ export default function AB3Page() {
     } finally {
       setPlacing(false);
     }
-  }, [stakeAmount, selectedBetData, betValue, betType, mid, selectedSelection, dispatch]);
+  }, [stakeAmount, selectedBetData, betValue, betType, mid, selectedSelection, dispatch, fetchMyBets]);
 
   const loading = !gameData;
   const iframeSrc = `${CASINO_STREAM_URL}?id=${GAME_ID}`;

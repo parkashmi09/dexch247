@@ -243,8 +243,14 @@ const CasinoService = {
       // exposure row is namespaced ("Player A Consecutive") to avoid colliding
       // with the Main row under the same team_name. Odd/Even card bets (selection
       // "Card N Odd") are untouched — they aren't the player nats.
+      // teen62 (V VIP Teenpatti 1-day) is the same table as teen: Main and
+      // Consecutive both quote runners called literally "Player A" / "Player B"
+      // (sids 1/2 vs 17/18), separated only by mtype. Without this it fell to the
+      // legacy path with team_name "Player A" for BOTH markets, so a Main bet and
+      // a Consecutive bet on the same player collided in one exposure row and the
+      // table showed a single combined worst-case figure on both.
       let teenConsecutive = false;
-      if (!market && String(gameName).toLowerCase() === "teen") {
+      if (!market && ["teen", "teen62"].includes(String(gameName).toLowerCase())) {
         const isPlayer = /^player\s+[ab]$/i.test(String(selection).trim());
         if (isPlayer && String(mtype).toLowerCase() === "match") {
           market = { key: "main", runners: ["Player A", "Player B"] };
@@ -461,6 +467,151 @@ const CasinoService = {
       throw new Error(error.message || "Failed to place casino bet");
     }
   },
+  /**
+   * Player-initiated UNDO of their own most recent still-open bet in a round.
+   *
+   * Backs the "Undo Bet" button on Unique Roulette, where a click posts a bet
+   * immediately (the chip IS the stake — there is no confirm step), so the only
+   * way to take one back is to reverse it server-side.
+   *
+   * WHY THIS IS NOT AN EXPLOIT: it is refused unless the round is still OPEN for
+   * betting (live feed `lt > 0` and `mid` still equal to the bet's round). In
+   * Unique Roulette the deck state is FIXED for the whole betting window — the
+   * card is only drawn at lt=0 — so no information reaches the player between
+   * placing and undoing. Verified against the live feed: the open-spot count is
+   * constant while lt > 0 and only changes at the round boundary. Undoing is
+   * therefore exactly as informed as placing was, and closing the window is what
+   * stops anyone cancelling a bet they have learnt is a loser.
+   *
+   * Deliberately restricted to the LEGACY single-row exposure path. Book-managed
+   * markets (helper/casinoMarketBook.js) spread one bet across every runner, and
+   * a two-way market's row is a min() over both sides that cannot be un-applied
+   * by reversing one delta — so those are refused rather than silently corrupted.
+   *
+   * Reversal mirrors the settlement void path exactly
+   * (settlementCasinoWorker.js → settleBetCommon, `winner === "void"`):
+   * cash -= exposer, exposure delta backed out, bet closed/void, credit_amt 0.
+   * inr_balance and P&L are untouched — a void is not a win or a loss — and no
+   * CreditsLedger row is written, matching that path and scripts/voidStuckCasinoBets2.js.
+   *
+   * @returns {{bet_id:number, refunded:number, cash:number}}
+   */
+  undoLastBet: async ({ userId, gameName, roundId, all = false }) => {
+    if (!userId || !gameName || roundId == null) {
+      throw new Error("userId, gameName and roundId are required");
+    }
+
+    // 1️⃣ Round must still be open for betting — see the note above.
+    let feed;
+    try {
+      feed = await CasinoService.fetchAllData(gameName);
+    } catch (e) {
+      throw new Error("Could not verify the round is still open");
+    }
+    const root = feed?.data?.data || feed?.data || feed || {};
+    const liveMid = root?.mid ?? root?.t1?.mid ?? root?.t1?.gmid;
+    const liveLt = Number(root?.lt ?? root?.t1?.lt ?? 0);
+    if (String(liveMid ?? "") !== String(roundId) || !(liveLt > 0)) {
+      throw new Error("Betting is closed for this round — the bet can no longer be undone");
+    }
+
+    const transaction = await sequelize.transaction();
+    try {
+      // 2️⃣ The user's OPEN bets on this round, newest first. `all` (Clear) takes
+      // every one; otherwise (Undo) just the most recent. Doing the whole set in
+      // ONE transaction matters — a Clear that failed halfway would leave the
+      // wallet and the exposure rows disagreeing.
+      const bets = await CasinoBet.findAll({
+        where: {
+          user_id: userId,
+          game_name: gameName,
+          event_id: String(roundId),
+          status: "open",
+        },
+        order: [["id", "DESC"]],
+        ...(all ? {} : { limit: 1 }),
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+      if (!bets.length) {
+        throw new Error("No bet to undo");
+      }
+
+      // 3️⃣ Legacy single-row path only.
+      for (const b of bets) {
+        if (findCasinoMarket(gameName, b.selection) || isSuperOverFamily(gameName)) {
+          throw new Error("This market's bets cannot be undone");
+        }
+      }
+
+      const wallet = await Wallet.findOne({
+        where: { user_id: userId },
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+      if (!wallet) throw new Error("Wallet not found");
+
+      let refund = 0;
+      for (const bet of bets) {
+        const exposer = Number(bet.exposer) || 0;
+        refund = round2(refund + -exposer); // exposer is stored negative
+
+        // Back this bet's delta out of its exposure row. Placement did
+        // `exposure_amount += exposer` for that one team_name, so undo subtracts
+        // it. NOT a blanket delete for the round — with `all` we still unwind bet
+        // by bet, so any row shared with a bet we are NOT undoing stays correct.
+        const teamName = String(bet.selection).trim();
+        const row = await UserExposure.findOne({
+          where: {
+            user_id: userId,
+            match_id: String(roundId),
+            team_name: teamName,
+            event_id: String(roundId),
+            game_type: null,
+          },
+          transaction,
+        });
+        if (row) {
+          const next = round2(Number(row.exposure_amount || 0) - exposer);
+          if (next === 0) await row.destroy({ transaction });
+          else await row.update({ exposure_amount: next }, { transaction });
+        }
+
+        await bet.update(
+          { status: "closed", result_status: "void", credit_amt: 0 },
+          { transaction }
+        );
+      }
+
+      // 4️⃣ Reverse the placement locks in one wallet write.
+      wallet.cash = round2(Number(wallet.cash) + refund);
+      await wallet.save({ transaction });
+
+      await transaction.commit();
+      const bet = bets[0];
+
+      const cash = Number(wallet.cash);
+      // Keep total_exposures in step, then push the new balance (fire-and-forget:
+      // the undo is already committed and must not fail on a socket error).
+      (async () => {
+        try {
+          const { syncTotalExposure } = await import("../helper/netExposureHelper.js");
+          await syncTotalExposure(userId);
+          const fresh = await Wallet.findOne({ where: { user_id: userId }, raw: true });
+          emitBalanceUpdate(userId, { cash: Number(fresh?.cash ?? cash) });
+        } catch (e) {
+          console.error("[CasinoService.undoLastBet] post-commit sync failed:", e.message);
+        }
+      })();
+
+      console.log("✅ Bet(s) undone:", { count: bets.length, bet_id: bet.id, userId, gameName, roundId, refund });
+      return { bet_id: bet.id, count: bets.length, refunded: refund, cash };
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
+  },
+
   UserBets: async (userId, match_id) => {
     try {
       if (!userId) {

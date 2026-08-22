@@ -115,6 +115,9 @@ export default function SuperOver3Page() {
   // Bet state
   const [showPlaceBet, setShowPlaceBet] = useState(false);
   const [betValue, setBetValue] = useState("");
+  // Session ("Fancy") lines bet at the rate-derived decimal but SHOW the run
+  // line, like the live site. Null for every other market, where the two agree.
+  const [displayOdds, setDisplayOdds] = useState(null);
   const [betType, setBetType] = useState("");
   const [selectedSelection, setSelectedSelection] = useState("");
   const [selectedBetData, setSelectedBetData] = useState(null);
@@ -153,6 +156,7 @@ export default function SuperOver3Page() {
   const handleBetClick = useCallback((value, selection, item, type) => {
     if (!value) return;
     setBetValue(value);
+    setDisplayOdds(item?._displayOdds ?? null);
     setBetType(type);
     setSelectedSelection(item?.nat || selection);
     setSelectedBetData(item);
@@ -219,6 +223,7 @@ export default function SuperOver3Page() {
           bets={myBets}
           showPlaceBet={showPlaceBet}
           betValue={betValue}
+          displayOdds={displayOdds}
           betType={betType}
           selection={selectedSelection}
           min={selectedBetData?.min}
@@ -245,7 +250,9 @@ export default function SuperOver3Page() {
 
         <div className={mobilePanelTab === "bets" ? "d-none d-xl-block" : ""}>
           {/* Scorecard */}
-          <SuperOverScorecard team1={team1} team2={team2} cardString={card} scard={scard} />
+          {/* markets + gmid let the card tell which side is batting and remember
+              the first innings — `t1.card` resets at the innings change. */}
+          <SuperOverScorecard team1={team1} team2={team2} cardString={card} scard={scard} markets={t2} gmid={gmid} />
 
           {/* Video + Balls */}
           <div className="casino-video">
@@ -286,6 +293,7 @@ export default function SuperOver3Page() {
         <PlaceBetMobile
           show={showPlaceBet}
           betValue={betValue}
+          displayOdds={displayOdds}
           betType={betType}
           selection={selectedSelection}
           min={selectedBetData?.min}

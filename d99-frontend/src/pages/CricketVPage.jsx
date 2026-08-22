@@ -12,7 +12,7 @@ import {
   getSportsScoreCard,
 } from "../apiservices/SportsApi.js";
 import { getCasinoGameDetails } from "../apiservices/CasionApi.js";
-import { SPORTS_STREAM_URL } from "../config.js";
+import { SPORTS_STREAM_URL, SCORECARD_URL } from "../config.js";
 import { fetchBalanceThunk } from "../features/user/userSlice.js";
 import { fetchMatchedBetsThunk } from "../features/matchedBets/matchedBetsSlice.js";
 import {
@@ -225,8 +225,8 @@ export default function CricketVPage() {
       .catch(() => {});
 
     getSportsScoreCard(gmid, sid)
-      .then((url) => setScoreUrl(url || `https://scorecard.avrkhub.in/?etid=${sid}&gmid=${gmid}`))
-      .catch(() => setScoreUrl(`https://scorecard.avrkhub.in/?etid=${sid}&gmid=${gmid}`));
+      .then((url) => setScoreUrl(url || `${SCORECARD_URL}/?etid=${sid}&gmid=${gmid}`))
+      .catch(() => setScoreUrl(`${SCORECARD_URL}/?etid=${sid}&gmid=${gmid}`));
   }, [gmid, sid]);
 
   // --- Poll sports private market data + exposures ---

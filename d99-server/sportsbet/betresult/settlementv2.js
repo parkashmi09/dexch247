@@ -2320,20 +2320,42 @@ async function processFanBet({ job_id, bet, eventName, marketId, marketName }) {
         //     }
         // }
 
-        // await writeReport({
-        //     job_id, bet_id, user_id, eventid, match_id,
-        //     game_type: String(game_type || 'FAN').toUpperCase(),
-        //     market_type, fancy_name, selection_name,
-        //     user_selection_yn: lower(bet_type || '') || null,
-        //     resolved_winner,
-        //     actual_numeric: null,
-        //     rule_op: null,
-        //     rule_threshold: null,
-        //     credit_amount: credit,
-        //     exposures_map: exposuresMap,
-        //     api_snapshot: result.meta,
-        //     decision_path
-        // });
+        // AUDIT TRAIL — must stay enabled. While this was commented out, FAN was
+        // the only path that wrote nothing (processnonfancy/processMobmGroup both
+        // report), so session bets settled with no record of what upstream
+        // actually returned. Reconstructing a single account then meant querying
+        // the vendor by hand months later.
+        //
+        // `actual_numeric` is the upstream outcome — for a session market the
+        // feed puts the ACTUAL RUNS in winnerId — and rule_threshold is the line
+        // the bet was struck at. Storing both makes a settlement re-checkable
+        // from the row alone: yes wins when actual >= line, no wins when it
+        // doesn't. api_snapshot keeps the matched market verbatim so a disputed
+        // bet can be argued from the feed's own words.
+        {
+            const matched = Array.isArray(result?.items) ? result.items[0] : null;
+            // NOT num() here — it coerces missing to 0, and 0 runs is a real
+            // outcome. Absent/'SUSPENDED' must land as NULL, not as a score.
+            const rawActual = matched?.winnerId;
+            const actualNumeric =
+                rawActual === null || rawActual === undefined || rawActual === ''
+                    ? NaN : Number(rawActual);
+            const lineNumeric = Number(odds);
+            await writeReport({
+                job_id, bet_id, user_id, eventid, match_id,
+                game_type: String(game_type || 'FAN').toUpperCase(),
+                market_type, fancy_name, selection_name,
+                user_selection_yn: lower(bet_type || '') || null,
+                resolved_winner,
+                actual_numeric: Number.isFinite(actualNumeric) ? actualNumeric : null,
+                rule_op: lower(bet_type) === 'yes' ? 'gte' : 'lt',
+                rule_threshold: Number.isFinite(lineNumeric) ? lineNumeric : null,
+                credit_amount: credit,
+                exposures_map: exposuresMap,
+                api_snapshot: { market: matched || null, meta: result?.meta || null },
+                decision_path
+            });
+        }
 
         const resultStatus = winner ? 'won' : 'loss';
 

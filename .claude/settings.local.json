@@ -25,7 +25,9 @@
       "Bash(echo \"exit=$?\")",
       "Bash(curl -s -X POST \"https://api.dexch247.com/api/user/cricket/get-match-private-data\" -H \"Content-Type: application/json\" -d '{\"gmid\":\"705573002\",\"sid\":\"4\"}')",
       "Bash(python -c \"import sys,json;d=json.load\\(sys.stdin\\);[print\\(repr\\(b.get\\('selection_name'\\)\\),'| mtype',b.get\\('market_type'\\),'| bt',b.get\\('bet_type'\\),'| odds',b.get\\('odds'\\),'| size',b.get\\('size'\\),'| liab',b.get\\('liability'\\)\\) for b in d['data'] if b.get\\('game_type'\\)=='FAN']\")",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(curl -s --max-time 15 \"https://diamond-casino-api-demo-s2.avrkhub.in/casino/data?gtype=teenunique&key=KX9F2A8Q7ZP1\")",
+      "Bash(python3 -c ' *)"
     ]
   }
 }

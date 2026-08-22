@@ -4,7 +4,8 @@ import Layout from "../../../components/layout/Layout.jsx";
 import { CasinoHeader, CasinoMobileTabs, CasinoHiddenBetTable, CasinoLoader, CasinoMobileBetTable, CasinoResultModal, CasinoRulesModal } from "../../../components/casino/common/tableLayout/index.jsx";
 import { FlipClock } from "../../../components/casino/tables/teen62/index.jsx";
 import BetTableRoulette12 from "../../../components/casino/tables/roulette12/BetTableRoulette12.jsx";
-import { getCasinoGameDetails, getLastResults, placeCasinoBet } from "../../../apiservices/CasionApi.js";
+import BetTable from "../../../components/casino/common/BetTable.jsx";
+import { getCasinoGameDetails, getLastResults, placeCasinoBet, getMyBets, undoCasinoBet } from "../../../apiservices/CasionApi.js";
 import { CASINO_STREAM_URL } from "../../../config.js";
 import { fetchBalanceThunk } from "../../../features/user/userSlice.js";
 import toast from "react-hot-toast";
@@ -121,6 +122,54 @@ export default function Roulette11Page() {
 
   useEffect(() => { if (mid) setPlacedBets([]); }, [mid]);
 
+  // Poll the user's bets for the current round so the "My Bet" panel renders,
+  // mirroring what useCasinoGame does for the standard casino pages.
+  const fetchMyBets = useCallback(async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = user?.user_id || user?.id;
+      if (!userId || !mid) return;
+      const res = await getMyBets(userId, mid);
+      if (res?.success && res?.bets) {
+        setMyBets(res.bets
+          // An undone bet stays in the table as result_status 'void' for the
+          // audit trail, but must not linger in the player's My Bet list.
+          .filter((bet) => String(bet.result_status || "").toLowerCase() !== "void")
+          .map((bet) => ({
+            matchedBet: bet.player_name || bet.selection || bet.nat || "",
+            selection: bet.selection || bet.player_name || "",
+            odds: bet.odds || bet.urate || "0",
+            stake: parseFloat(bet.stake || bet.amt || "0") || 0,
+            type: (bet.type || bet.btype || "back").toLowerCase(),
+          })));
+      }
+    } catch { /* ignore */ }
+  }, [mid]);
+
+  useEffect(() => {
+    if (!mid) return;
+    fetchMyBets();
+    const iv = setInterval(fetchMyBets, 2000);
+    return () => clearInterval(iv);
+  }, [mid, fetchMyBets]);
+
+  // Snapshot the outgoing round's bets so Repeat has something to replay — the
+  // server's My Bet list is scoped to the live mid and is empty once it rolls.
+  const lastRoundBetsRef = useRef([]);
+  const myBetsRef = useRef([]);
+  myBetsRef.current = myBets;
+  const prevMidRef = useRef(mid);
+  useEffect(() => {
+    if (prevMidRef.current && prevMidRef.current !== mid && myBetsRef.current.length) {
+      lastRoundBetsRef.current = myBetsRef.current.map((b) => ({
+        selection: b.selection || b.matchedBet, stake: b.stake, type: b.type,
+      }));
+    }
+    prevMidRef.current = mid;
+  }, [mid]);
+
+  const [repeating, setRepeating] = useState(false);
+
   const iframeSrc = `${CASINO_STREAM_URL}?id=${GAME_TYPE}`;
 
   // ── Board click → place bet ──
@@ -164,9 +213,85 @@ export default function Roulette11Page() {
     }
   }, [selectedChip, betMode, lt, placing, subMap, mid, dispatch]);
 
-  const handleUndo = useCallback(() => setPlacedBets((prev) => prev.slice(0, -1)), []);
-  const handleClear = useCallback(() => setPlacedBets([]), []);
-  const hasBets = placedBets.length > 0;
+  // Undo / Clear / Repeat.
+  //
+  // Bets post to the server the instant a spot is clicked (the chip IS the stake
+  // — there is no confirm step), so these three buttons cannot work by touching
+  // local state. They used to: Undo/Clear only spliced a `placedBets` array that
+  // is not even rendered on this page, and Repeat had no onClick at all. The
+  // money was already locked, so all three did nothing.
+  //
+  // Undo  → reverse the LAST open bet on this round, server-side.
+  // Clear → reverse ALL of them, in one transaction.
+  // Repeat→ re-place the previous round's bets at the CURRENT prices.
+  //
+  // The server refuses an undo once betting closes for the round, which is what
+  // keeps it from being an exploit — see CasinoService.undoLastBet.
+  const [undoing, setUndoing] = useState(false);
+  const runUndo = useCallback(async (all) => {
+    if (undoing || !mid) return;
+    setUndoing(true);
+    try {
+      const res = await undoCasinoBet(GAME_TYPE, mid, { all });
+      if (res?.success) {
+        toast.success(all ? "Bets cleared" : "Bet undone");
+        setPlacedBets((prev) => (all ? [] : prev.slice(0, -1)));
+        await fetchMyBets();
+        const token = localStorage.getItem("token");
+        if (token) dispatch(fetchBalanceThunk());
+      } else {
+        toast.error(res?.error || "Could not undo");
+      }
+    } finally {
+      setUndoing(false);
+    }
+  }, [undoing, mid, fetchMyBets, dispatch]);
+
+  const handleUndo = useCallback(() => runUndo(false), [runUndo]);
+  const handleClear = useCallback(() => runUndo(true), [runUndo]);
+
+  // Re-place last round's bets. `lastRoundBets` is snapshotted when the round
+  // rolls (below), because the server's My Bet list is scoped to the current mid
+  // and the previous round's is gone by then. Prices are taken live, so a repeat
+  // books at today's odds, not the ones that expired.
+  const handleRepeat = useCallback(async () => {
+    if (repeating || !mid || lt <= 0) return;
+    const prior = lastRoundBetsRef.current;
+    if (!prior.length) { toast.error("No previous bets to repeat"); return; }
+    setRepeating(true);
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = (user?.user_id || user?.id || "").toString();
+      if (!userId) { toast.error("Please login to place bets"); return; }
+      let placed = 0;
+      for (const b of prior) {
+        const item = Object.values(subMap).find((s) => String(s.n) === String(b.selection));
+        const odds = item ? (b.type === "lay" ? item.l : item.b) : 0;
+        if (!item || !(parseFloat(odds) > 0)) continue;
+        const res = await placeCasinoBet({
+          userId, player_name: item.n, gameId: mid?.toString() || "",
+          gameName: GAME_TYPE, gtype: GAME_TYPE, mtype: "match",
+          amount: b.stake, odds: parseFloat(odds), selection: item.n,
+          roundId: mid || 0, type: b.type || "back",
+        }).catch(() => null);
+        if (res?.success || res?.status === 200) placed++;
+      }
+      if (placed) {
+        toast.success(`Repeated ${placed} bet${placed > 1 ? "s" : ""}`);
+        await fetchMyBets();
+        const token = localStorage.getItem("token");
+        if (token) dispatch(fetchBalanceThunk());
+      } else {
+        toast.error("Those bets are not available this round");
+      }
+    } finally {
+      setRepeating(false);
+    }
+  }, [repeating, mid, lt, subMap, fetchMyBets, dispatch]);
+
+  // Server truth, not the local array — so the buttons stay usable after a page
+  // refresh and grey out once there is genuinely nothing left to undo.
+  const hasBets = myBets.length > 0;
 
   const loading = !gameData;
 
@@ -206,25 +331,7 @@ export default function Roulette11Page() {
               )}
             </div>
           </div>
-          <div className="sidebar-box my-bet-container">
-            <div className="sidebar-title"><h4>My Bet</h4></div>
-            <div className="my-bets">
-              <div className="table-responsive">
-                <table className="table">
-                  <thead><tr><th>Matched Bet</th><th className="text-end">Odds</th><th className="text-end">Stake</th></tr></thead>
-                  <tbody>
-                    {myBets.map((bet, i) => (
-                      <tr key={i}>
-                        <td>{bet.matchedBet}</td>
-                        <td className="text-end">{bet.odds}</td>
-                        <td className="text-end">{bet.stake}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+          <BetTable bets={myBets} />
         </div>
       }
     >
@@ -304,19 +411,19 @@ export default function Roulette11Page() {
               </div>
               <div className="coin-btns">
                 <div>
-                  <button className="btn btn-danger" disabled={!hasBets} onClick={handleUndo}>
+                  <button className="btn btn-danger" disabled={!hasBets || undoing} onClick={handleUndo}>
                     <i className="fas fa-undo" /><span className="d-none d-md-flex">Undo Bet</span>
                   </button>
                   <span className="d-md-none">Undo Bet</span>
                 </div>
                 <div>
-                  <button className="btn btn-info">
+                  <button className="btn btn-info" disabled={repeating || lt <= 0} onClick={handleRepeat}>
                     <i className="fas fa-redo" /><span className="d-none d-md-flex">Repeat</span>
                   </button>
                   <span className="d-md-none">Repeat</span>
                 </div>
                 <div>
-                  <button className="btn btn-warning" disabled={!hasBets} onClick={handleClear}>
+                  <button className="btn btn-warning" disabled={!hasBets || undoing} onClick={handleClear}>
                     <i className="fas fa-trash" /><span className="d-none d-md-flex">Clear</span>
                   </button>
                   <span className="d-md-none">Clear</span>

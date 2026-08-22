@@ -717,7 +717,7 @@ export default function GameDetails() {
           <div className={`scorestats${Number(sid) === 4 ? " scorestats-cricket" : ""}`}>
             <iframe
               src={Number(sid) === 4
-                ? `https://scorecard.avrkhub.in/?etid=${sid}&gmid=${gmid}&v=5`
+                ? `${SCORECARD_URL}/?etid=${sid}&gmid=${gmid}&v=5`
                 : scoreUrl}
               frameBorder="0"
             />

@@ -39,6 +39,11 @@ export default function TeenUniquePage() {
     closeBetPanel,
   } = useCasinoGame(GAME_ID, { formatResult: formatTeenUniqueResult });
 
+  // The slip is open from the first card picked, but a bet needs all THREE
+  // positions — settlement splits the six dealt cards on them and rejects any
+  // other count. Block submit until the selection is complete.
+  const picksComplete = String(selectedSelection || "").replace(/\D/g, "").length === 3;
+
   const [mobilePanelTab, setMobilePanelTab] = useState("game");
   const [resultModal, setResultModal] = useState({ show: false, mid: "" });
   const loading = !gameData;
@@ -63,6 +68,7 @@ export default function TeenUniquePage() {
           placing={placing}
           onClosePlaceBet={closeBetPanel}
           onSubmitBet={handlePlaceBet}
+          submitDisabled={!picksComplete}
           gameType="teenunique"
         />
       }
@@ -92,6 +98,7 @@ export default function TeenUniquePage() {
               <BetTableTeenUnique
                 gameData={rawGameData}
                 onBetClick={handleBetClick}
+                onClearSelection={closeBetPanel}
               />
             </div>
 
@@ -130,6 +137,7 @@ export default function TeenUniquePage() {
           placing={placing}
           onClose={closeBetPanel}
           onSubmit={handlePlaceBet}
+          submitDisabled={!picksComplete}
           gameType="teenunique"
         />
 

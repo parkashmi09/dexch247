@@ -2,22 +2,36 @@ const AB_CARD_BASE = "/assets/img/andar-bahar-cards/";
 
 const CARD_POSITIONS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
+// ANDAR BAHAR 50 CARDS pays a flat 100% of the stake on a win, i.e. decimal 2.0,
+// on every card and both sides. The per-card `child` entries carry NO price:
+//   child[].b → 0/1 flag, "is this side currently bettable"
+//   child[].l → how many of that rank are still left in the shoe
+// The real price is in sub[0].b, which reads 2 whenever the market is OPEN (0
+// while suspended) — verified live on both ab3 and ab4.
+//
+// This box used to pass `item.b` — the 0/1 FLAG — as the odds, so every bet was
+// booked at odds 1 and a winner was paid stake×(1−1) = ZERO profit. The stake
+// came back and nothing else. (The display below already shows `l`, the shoe
+// count, which is correct and unchanged.)
+const AB3_ODDS = 2;
+
 function CardOddBox({ pos, item, onBetClick, exposure }) {
   // When l > 0, show the card image (pos 1-13); when l === 0, show blank (0.jpg)
   const imgNum = item && item.l > 0 ? pos : 0;
   const imgSrc = `${AB_CARD_BASE}${imgNum}.jpg`;
-  const odds = item?.b || 0;
-  const canClick = odds > 0;
+  // `b` stays the availability gate — it is a flag, not a price.
+  const canClick = Number(item?.b) > 0;
   const expN = exposure !== undefined ? parseFloat(exposure) : NaN;
 
   return (
     <div
       className="card-odd-box"
-      onClick={canClick ? () => onBetClick?.(odds, item.nat, item, "back") : undefined}
+      onClick={canClick ? () => onBetClick?.(AB3_ODDS, item.nat, item, "back") : undefined}
       style={canClick ? { cursor: "pointer" } : undefined}
     >
+      {/* the shoe count, NOT the price — see AB3_ODDS above */}
       <div className="casino-odds">{item?.l || 0}</div>
-      <div className={odds === 0 ? "" : ""}>
+      <div>
         <img src={imgSrc} alt="" />
       </div>
       <div className="casino-nation-book">

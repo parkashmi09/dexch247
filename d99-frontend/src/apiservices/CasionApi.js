@@ -80,6 +80,24 @@ export const getMatchExposure = async (userId, matchId, signal = null) => {
   }
 };
 
+// Undo the player's most recent open bet on a round (Unique Roulette "Undo Bet").
+// The server takes the user from the auth token, so no userId is sent. Returns
+// the parsed error body instead of throwing, so the caller can show the server's
+// reason ("Betting is closed for this round…", "No bet to undo", …).
+export const undoCasinoBet = async (gameName, roundId, { all = false } = {}, signal = null) => {
+  try {
+    const response = await api.post(
+      "/casino/casino/undobet",
+      { gameName, roundId, all },
+      { signal }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.name === "AbortError" || error.name === "CanceledError") return null;
+    return error?.response?.data || { success: false, error: "Could not undo the bet" };
+  }
+};
+
 export const getMyBets = async (userId, matchId, signal = null) => {
   try {
     const response = await api.post(

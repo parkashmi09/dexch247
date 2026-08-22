@@ -20,6 +20,105 @@ const CACHE_TTL = 2; // Cache time in seconds
 console.log("DEBUG: BASE_URL =", BASE_URL);
 console.log("DEBUG: API_KEY =", API_KEY ? "Loaded" : "Missing");
 
+// ---------------------------------------------------------------------------
+// FEED "LAST UPDATED" EXTRACTION
+// ---------------------------------------------------------------------------
+// The staleness guard (sportsbet/liveOddsGuard.js) needs to know how old the
+// prices in a feed response are. Upstream has not standardised the field name,
+// so probe a candidate list at the response root first, then fall back to the
+// NEWEST per-market stamp. Returns epoch ms, or null when nothing parses —
+// callers must treat null as "unknown", never as "stale".
+const FEED_TIME_KEYS = [
+  'lastUpdatedAt', 'last_updated_at', 'lastUpdated', 'last_updated',
+  'updatedAt', 'updated_at', 'lutm', 'ltm', 'utime', 'updateTime', 'timestamp', 'ts',
+];
+
+const IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1000;
+
+// A bare wall-clock string with NO zone marker is IST on this feed — the same
+// trap already documented for racing `stime` in sportbetscontroller.js. Reading
+// it as UTC lands 5h30m in the past and every bet would look stale.
+function parseFeedTimeValue(v) {
+  if (v == null) return null;
+
+  if (typeof v === 'number' && Number.isFinite(v)) {
+    // Heuristic: 10-digit values are epoch seconds, 13-digit are ms.
+    return v > 1e11 ? v : v * 1000;
+  }
+
+  const s = String(v).trim();
+  if (!s) return null;
+
+  if (/^\d+$/.test(s)) return parseFeedTimeValue(Number(s));
+
+  // Carries an explicit zone (Z or ±HH:MM) → trust Date.parse.
+  if (/[zZ]$|[+-]\d{2}:?\d{2}$/.test(s)) {
+    const t = Date.parse(s);
+    return Number.isFinite(t) ? t : null;
+  }
+
+  // Bare locale wall-clock, e.g. "29/07/2026, 20:46:06" or "7/22/2026 1:44:00 AM".
+  const m = s.match(
+    /^(\d{1,4})[/-](\d{1,2})[/-](\d{1,4})[,\sT]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/i
+  );
+  if (m) {
+    let [, a, b, c, hh, mm, ss, ap] = m;
+    a = Number(a); b = Number(b); c = Number(c);
+    let day, month, year;
+    if (a > 31) {            // YYYY-MM-DD
+      year = a; month = b; day = c;
+    } else if (a > 12) {     // DD/MM/YYYY — unambiguous
+      day = a; month = b; year = c;
+    } else if (b > 12) {     // MM/DD/YYYY — unambiguous
+      month = a; day = b; year = c;
+    } else {
+      // Genuinely ambiguous (both ≤ 12). AM/PM implies the en-US M/D form;
+      // otherwise assume D/M, which is what en-GB / en-IN locales emit.
+      if (ap) { month = a; day = b; } else { day = a; month = b; }
+      year = c;
+    }
+    let hour = Number(hh);
+    if (ap) {
+      const pm = ap.toUpperCase() === 'PM';
+      if (pm && hour < 12) hour += 12;
+      if (!pm && hour === 12) hour = 0;
+    }
+    const utc = Date.UTC(year, month - 1, day, hour, Number(mm), Number(ss || 0));
+    return Number.isFinite(utc) ? utc - IST_OFFSET_MS : null;
+  }
+
+  // Anything else — let Date have a go, but only accept a sane result.
+  const t = Date.parse(s);
+  return Number.isFinite(t) ? t : null;
+}
+
+function pickFeedTime(obj) {
+  if (!obj || typeof obj !== 'object') return null;
+  for (const k of FEED_TIME_KEYS) {
+    if (obj[k] != null) {
+      const t = parseFeedTimeValue(obj[k]);
+      if (t != null) return t;
+    }
+  }
+  return null;
+}
+
+export function extractFeedUpdatedMs(root, markets) {
+  const top = pickFeedTime(root) ?? pickFeedTime(root?.data);
+  if (top != null) return top;
+
+  // No root stamp — use the freshest market-level stamp we can find.
+  if (Array.isArray(markets)) {
+    let newest = null;
+    for (const m of markets) {
+      const t = pickFeedTime(m);
+      if (t != null && (newest == null || t > newest)) newest = t;
+    }
+    return newest;
+  }
+  return null;
+}
+
 // Helper for caching
 const getCachedData = async (key, fetchFunction) => {
   let cachedData = null;
@@ -247,7 +346,16 @@ const CricketService = {
         if (Array.isArray(innerData) && innerData.length > 0) {
           redis.setex(`odds:${gmid}`, 3, JSON.stringify(innerData)).catch(() => { });
         }
-        return { success: true, data: innerData };
+        // `feed_updated_ms` carries the upstream "last updated" stamp so the
+        // bet-placement staleness guard can tell a live price from a frozen
+        // one. Extra key only — the { success, data } contract is unchanged,
+        // and it is null whenever the feed omits a recognisable stamp.
+        return {
+          success: true,
+          data: innerData,
+          feed_updated_ms: extractFeedUpdatedMs(response.data, innerData),
+          fetched_at_ms: Date.now(),
+        };
       }
 
       // IMPORTANT: odds cron stores by gmid only

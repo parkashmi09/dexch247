@@ -942,7 +942,24 @@ async function resolvePoker20(bet) {
 //helper
 
 
-// rdesc example: "Player B#B : Under 21(16)"
+// Side-bet result line. Three shapes come back from the feed, and the third one
+// is why this needs its own parser:
+//   "B : UNDER 21(16)"   total below 21
+//   "B : OVER 21(22)"    total above 21
+//   "B : (21)"           EXACTLY 21 — no Under/Over word at all
+// Real example of the third: teen42 round 160260724161356.
+//
+// The `(n)` total is the ground truth, so decide on the NUMBER and treat the
+// Under/Over word as decoration. The old regex required UNDER|OVER, so on a 21 it
+// simply failed to match and returned false for BOTH sides — a push was settled
+// as a double loss, taking money off players who bet either way.
+const UO_LINE = /B\s*:\s*(?:UNDER|OVER)?\s*(?:21)?\s*\((\d+)\)/i;
+
+/**
+ * @returns {true|false|"void"|null} "void" → exactly 21, a push: neither Under
+ *          nor Over lands, so the stake is returned. null → the side line could
+ *          not be read at all (caller decides; do NOT silently treat as a loss).
+ */
 function isTeen41Winner(selection, rdesc, winnat) {
   if (!selection) return false;
 
@@ -950,7 +967,6 @@ function isTeen41Winner(selection, rdesc, winnat) {
   const winNat = normalize(winnat);       // "PLAYER A" / "PLAYER B"
 
   const parts = (rdesc || "").split("#");
-  const mainPart = normalize(parts[0] || "");   // "PLAYER B"
   const sidePart = normalize(parts[1] || "");   // "B : UNDER 21(16)"
 
   // 1) Main winner: Player A / Player B
@@ -958,26 +974,16 @@ function isTeen41Winner(selection, rdesc, winnat) {
     return sel === winNat;
   }
 
-  // 2) Player B Under 21
-  if (sel === "PLAYER B UNDER 21") {
-    const match = sidePart.match(/B\s*:\s*(UNDER|OVER)\s*21\s*\((\d+)\)/i);
-    if (!match) return false;
+  // 2) Player B Under 21 / Over 21 — both read the same total.
+  if (sel === "PLAYER B UNDER 21" || sel === "PLAYER B OVER 21") {
+    const match = sidePart.match(UO_LINE);
+    if (!match) return null;                 // unreadable — caller retries
 
-    const kind = match[1].toUpperCase();  // UNDER / OVER
-    const val = Number(match[2]);        // e.g. 16
+    const total = Number(match[1]);          // e.g. 16 / 22 / 21
+    if (!Number.isFinite(total)) return null;
 
-    return kind === "UNDER" && val < 21;
-  }
-
-  // 3) Player B Over 21
-  if (sel === "PLAYER B OVER 21") {
-    const match = sidePart.match(/B\s*:\s*(UNDER|OVER)\s*21\s*\((\d+)\)/i);
-    if (!match) return false;
-
-    const kind = match[1].toUpperCase();
-    const val = Number(match[2]);        // e.g. 23
-
-    return kind === "OVER" && val > 21;
+    if (total === 21) return "void";         // push — refund both sides
+    return sel === "PLAYER B UNDER 21" ? total < 21 : total > 21;
   }
 
   // Any unknown selection → lose
@@ -1007,8 +1013,17 @@ async function resolveTeen41(bet) {
   const rdesc = t1.rdesc || "";
   const winnat = t1.winnat || "";
 
-  // 1️⃣ Raw market outcome for selection
-  const outcome = isTeen41Winner(selection, rdesc, winnat); // true/false
+  // 1️⃣ Raw market outcome for selection: true | false | "void" | null
+  const outcome = isTeen41Winner(selection, rdesc, winnat);
+
+  // Side line unreadable → leave the bet OPEN and retry rather than booking a
+  // loss off a result we could not parse.
+  if (outcome === null) {
+    console.warn("[Settlement] teen41 unreadable Under/Over line, retrying", {
+      bet_id: bet.id, selection, rdesc,
+    });
+    return null;
+  }
 
   const selNorm = normalize(selection);
   let userWon;
@@ -1017,8 +1032,14 @@ async function resolveTeen41(bet) {
   if (selNorm === "PLAYER A" || selNorm === "PLAYER B") {
     const betType = String(type || "back").toLowerCase(); // "back" or "lay"
     userWon = betType === "lay" ? !outcome : outcome;
+  } else if (outcome === "void") {
+    // 3️⃣ Player B's total was EXACTLY 21 — neither Under nor Over lands, so the
+    // bet is a push. Pass "void" straight through; settleBetCommon refunds the
+    // locked stake and books no win/loss. Must NOT be flipped by back/lay: the
+    // side market is back-only and the push applies to whoever holds it.
+    userWon = "void";
   } else {
-    // 3️⃣ For side bets (Player B Under 21 / Over 21) → ignore type, use outcome directly
+    // 4️⃣ Other side bets → ignore type, use outcome directly
     userWon = outcome;
   }
 
@@ -3947,21 +3968,43 @@ async function resolveMogambo(bet) {
   // ------------------------------
   const totalMatch = sel.match(/^3\s*CARD\s*TOTAL\s*(\d+)/i);
   if (totalMatch) {
-    const want = parseInt(totalMatch[1], 10);
-    if (Number.isNaN(want) || total === null) return null;
+    // "3 Card Total <N>" — N is the LINE the bet was struck at, a Fancy2
+    // over/under on the sum of the three dealt cards (A=1 … K=13):
+    //   BACK / Yes → wins when the total is AT OR ABOVE the line
+    //   LAY  / No  → wins when it falls short
+    //
+    // This used to test `want === total` — an EXACT hit — which is wrong for a
+    // near-even-money line (the quoted rates sit around 95/115, i.e. ~1.95/2.15
+    // decimal; an exact-total shot would pay many times that). The line is set
+    // relative to the cards already showing, so it tracks the midpoint of what
+    // is still possible: with 9+J = 20 on the table the line was 27, the last
+    // card can only be 1-13, and the round finished at 29.
+    //
+    // Combined with the selection being tagged with the RATE instead of the line
+    // (fixed in the frontend), the equality test could never be true — so every
+    // back lost and every lay won, deterministically.
+    const line = parseInt(totalMatch[1], 10);
+    if (Number.isNaN(line)) return null;
 
-    const equal = (want === total);
+    // Round is complete (we have t1) but the total is unreadable — the game rules
+    // cover a round ending before all three cards are dealt, so push rather than
+    // guess or leave the bet retrying forever with the stake locked.
+    if (total === null) {
+      console.warn("[Settlement] mogambo 3 Card Total unreadable → push", {
+        bet_id: bet.id, selection, rdesc, card: t1.card,
+      });
+      return "void";
+    }
 
-    const outcome = equal
-      ? (betType === "BACK")
-      : (betType === "LAY");
+    const atOrAbove = total >= line;
+    const outcome = betType === "LAY" ? !atOrAbove : atOrAbove;
 
     console.log("[Settlement] mogambo total check", {
       bet_id: bet.id,
       selection,
-      want,
+      line,
       total,
-      equal,
+      atOrAbove,
       type: betType,
       outcome
     });
@@ -3982,6 +4025,11 @@ async function resolveMogambo(bet) {
 function parse3Cards(cardStr) {
   const raw = (cardStr || "").split(/[, ]+/).filter(Boolean);
   if (raw.length < 3) return null;
+
+  // A slot still face-down comes through as the bare token "1" (no suit), which
+  // would otherwise parse as the VALUE 1 and silently under-count the total.
+  // Only ever a fallback — parseTotal(rdesc) supplies the real figure.
+  if (raw.some((c) => /^[01]$/.test(c))) return null;
 
   const nums = raw.map(c => {
     // rank = first 1 or 2 chars until letter
@@ -5560,11 +5608,27 @@ async function resolveAb20(bet) {
   }
 
   if (firstIndex === -1) {
-    console.warn("[Settlement] ab20 rank not found", {
+    // The rank never appeared in the completed deal, so the bet can never
+    // resolve — this is the "cancelled (pushed)" case in the Andar Bahar rules
+    // ("all remaining bets ... will be canceled (pushed) automatically"). Push =
+    // stake returned, no win or loss.
+    //
+    // Safe to decide here because the results endpoint 404s while a round is
+    // still running (verified live), so a successful fetch always carries the
+    // FULL deal — a missing rank is genuinely absent, never "not dealt yet".
+    //
+    // This used to `return null`, which sent the bet back to OPEN to be retried
+    // forever: an unresolvable bet stayed stuck with the player's stake locked
+    // indefinitely. In practice every rank does get dealt (12 copies per rank in
+    // the shoe; across real ab4 rounds the last rank to appear did so by card
+    // 25), so this is a safety net rather than a common path.
+    console.warn("[Settlement] ab20/ab3/ab4 rank never dealt → push", {
       bet_id: bet.id,
+      game: game_name,
       wantRank,
+      cards: cards.length,
     });
-    return null;
+    return "void";
   }
 
   // Card dealing convention (must match the frontend exactly):
@@ -6124,16 +6188,93 @@ async function resolveTeen1(bet) {
   return Boolean(userWon);
 }
 
-// teenunique — Unique Teenpatti
-// Single-market game (sub array has only 1 item; no `nat`).
-// Outcome is binary, derived purely from rdesc:
-//   rdesc === "Won"  → market wins  (back wins, lay loses)
-//   rdesc === "Lost" → market loses (back loses, lay wins)
-async function resolveTeenunique(bet) {
-  const { game_name, event_id, type } = bet;
+// ---------------------------------------------------------------------------
+// Teenpatti 3-card hand evaluation (used by teenunique).
+//
+// Category order is the one this site publishes on every teenpatti table — see
+// the rules components teen41/Teen41Rules.jsx, teen41/Teen33Rules.jsx and the
+// shared chart teen6.jpg that TeenUniqueRules.jsx renders:
+//   6 Straight Flush (Pure Sequence)  ← highest
+//   5 Trail (Three of a kind)
+//   4 Straight (Sequence)
+//   3 Flush (Colour)
+//   2 Pair
+//   1 High Card
+// NOTE this puts Straight Flush ABOVE Trail, which differs from the more common
+// international ranking; it follows the vendor's own published chart.
+// ---------------------------------------------------------------------------
+const TP_RANKS = { A: 14, K: 13, Q: 12, J: 11 };
 
-  if (!event_id) {
-    console.warn(`[Settlement] teenunique missing event_id ${bet.id}`);
+/** "10DD" → { v: 10, suit: "DD" }; "ASS" → { v: 14, suit: "SS" } */
+function parseTeenpattiCard(code) {
+  const m = String(code || "").trim().match(/^(10|[AJQK2-9])([SHDC]{1,2})$/i);
+  if (!m) return null;
+  const r = m[1].toUpperCase();
+  const v = TP_RANKS[r] ?? parseInt(r, 10);
+  return Number.isFinite(v) ? { v, suit: m[2].toUpperCase() } : null;
+}
+
+/**
+ * Score a 3-card hand as a comparable array: [category, ...tiebreakers].
+ * Plain lexicographic comparison of two scores decides the hand.
+ */
+function scoreTeenpattiHand(cards) {
+  const c = cards.map(parseTeenpattiCard);
+  if (c.some((x) => !x)) return null;
+
+  const vals = c.map((x) => x.v).sort((a, b) => b - a);      // high → low
+  const sameSuit = c.every((x) => x.suit === c[0].suit);
+  const [a, b, d] = vals;
+
+  // Sequence. Ace plays high (A-K-Q) or low (A-2-3); A-2-3 is the LOWEST
+  // straight, so it is scored on a top card of 3.
+  const isRun = a - b === 1 && b - d === 1;
+  const isWheel = a === 14 && b === 3 && d === 2;            // A-2-3
+  const isSeq = isRun || isWheel;
+  const seqTop = isWheel ? 3 : a;
+
+  const trail = a === b && b === d;
+  const pairVal = a === b ? a : (b === d ? b : null);
+  const kicker = a === b ? d : (b === d ? a : null);
+
+  if (isSeq && sameSuit) return [6, seqTop];
+  if (trail) return [5, a];
+  if (isSeq) return [4, seqTop];
+  if (sameSuit) return [3, ...vals];
+  if (pairVal !== null) return [2, pairVal, kicker];
+  return [1, ...vals];
+}
+
+/** −1 / 0 / +1 for handA vs handB. */
+function compareTeenpattiHands(x, y) {
+  for (let i = 0; i < Math.max(x.length, y.length); i++) {
+    const p = x[i] ?? 0, q = y[i] ?? 0;
+    if (p !== q) return p > q ? 1 : -1;
+  }
+  return 0;
+}
+
+// teenunique — UNIQUE TEENPATTI
+//
+// The player picks THREE of the six positions on the table; the other three are
+// the opponent's. `selection` stores the chosen positions as digits, e.g. "234"
+// = positions 2, 3 and 4. The round's six dealt cards arrive in t1.card, in
+// position order, and the higher teenpatti hand wins.
+//
+// WHY THIS NO LONGER READS rdesc: it used to settle purely on
+// `rdesc === "Won" → the bet wins`. That field is a CONSTANT — every completed
+// round returns rdesc "Won", win "0", winnat "Result" (verified across a dozen
+// rounds) — so every back bet was paid out unconditionally, whatever the cards.
+// All four teenunique bets ever placed were settled as wins.
+//
+// It also cannot work in principle: two players choosing complementary halves of
+// the same six cards must get OPPOSITE results, so no round-level Won/Lost can
+// express this game's outcome. Only card + selection can, and both are stored.
+async function resolveTeenunique(bet) {
+  const { game_name, event_id, selection, type } = bet;
+
+  if (!event_id || !selection) {
+    console.warn(`[Settlement] teenunique missing event_id/selection ${bet.id}`);
     return null;
   }
 
@@ -6143,33 +6284,52 @@ async function resolveTeenunique(bet) {
   });
 
   const t1 = resp.data?.data?.data?.t1;
-  if (!t1 || !t1.rdesc) {
-    console.warn(`[Settlement] teenunique no rdesc yet ${bet.id}`);
+  if (!t1 || !t1.card) {
+    console.warn(`[Settlement] teenunique no card data yet ${bet.id}`);
     return null;
   }
 
-  const rdesc = (t1.rdesc || "").trim().toUpperCase();
+  const cards = String(t1.card).split(",").map((s) => s.trim()).filter(Boolean);
+  const picks = String(selection).replace(/\D/g, "").split("").map(Number);
+
+  if (cards.length !== 6 || picks.length !== 3 || new Set(picks).size !== 3
+      || picks.some((p) => p < 1 || p > 6)) {
+    console.warn("[Settlement] teenunique unusable round/selection", {
+      bet_id: bet.id, selection, cards: cards.length,
+    });
+    return null;
+  }
+
+  const mine = picks.map((p) => cards[p - 1]);
+  const theirs = cards.filter((_, i) => !picks.includes(i + 1));
+
+  const myScore = scoreTeenpattiHand(mine);
+  const oppScore = scoreTeenpattiHand(theirs);
+  if (!myScore || !oppScore) {
+    console.warn("[Settlement] teenunique unparseable cards", { bet_id: bet.id, card: t1.card });
+    return null;
+  }
+
+  const cmp = compareTeenpattiHands(myScore, oppScore);
   const betType = (type || "BACK").trim().toUpperCase();
-
-  let marketWin;
-  if (rdesc === "WON") marketWin = true;
-  else if (rdesc === "LOST") marketWin = false;
-  else {
-    console.warn(`[Settlement] teenunique unknown rdesc ${bet.id}`, { rdesc });
-    return null;
-  }
-
-  const userWon = betType === "LAY" ? !marketWin : marketWin;
 
   console.log("[Settlement] teenunique resolve ✅", {
     bet_id: bet.id,
-    rdesc,
-    marketWin,
+    selection,
+    card: t1.card,
+    mine, myScore,
+    theirs, oppScore,
+    cmp,
     type: betType,
-    userWon,
   });
 
-  return Boolean(userWon);
+  // Dead heat — both three-card hands score identically. Neither side is better,
+  // so the bet is a push (stake returned), the same treatment the teen41/teen42
+  // exactly-21 side bet gets. Rare but reachable, since ranks repeat across suits.
+  if (cmp === 0) return "void";
+
+  const marketWin = cmp > 0;
+  return Boolean(betType === "LAY" ? !marketWin : marketWin);
 }
 
 // teen120 — 1 CARD 20-20

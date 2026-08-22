@@ -115,8 +115,9 @@ export default function Worli3Page() {
       const res = await placeCasinoBet(payload);
       if (res?.success || res?.status === 200) {
         toast.success("Bet successfully placed");
-        // reset the selected coin/stake after a successful bet
-        setSelectedCoin(0);
+        // Keep the selected coin sticky across bets — the user picks a coin once
+        // and can place multiple bets without reselecting. It only changes when
+        // they pick a different coin or hit Reset.
         const token = localStorage.getItem("token");
         if (token) dispatch(fetchBalanceThunk());
         // refresh My Bets + per-market exposure immediately

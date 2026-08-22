@@ -71,7 +71,18 @@ export async function runBetBuffer(gameType, selectedBetData, originalOdds, betT
           // For superover markets, odds are in odds array with otype
           const backOdd = currentItem.odds?.find?.((o) => o.otype === "back");
           const layOdd = currentItem.odds?.find?.((o) => o.otype === "lay");
-          if (backOdd || layOdd) {
+          if (selectedBetData._sessionRate) {
+            // Session ("Fancy") lines: `odds` is the RUN LINE, `size` is the rate
+            // in bps — the real price is size/100 + 1 (see
+            // tables/superover3/SuperOverMarkets.jsx → sessionRateToDecimal).
+            // Re-reading `.odds` here would overwrite the converted decimal with
+            // the raw line and re-introduce the stake×(line−1) payout. Same trap
+            // the Trio Session / Patti2 Total branches guard against in
+            // hooks/useCasinoGame.js.
+            const rate = betType === "lay" ? layOdd?.size : backOdd?.size;
+            const r = parseFloat(rate) || 0;
+            currentOdds = r > 0 ? r / 100 + 1 : 0;
+          } else if (backOdd || layOdd) {
             currentOdds = betType === "lay" ? (parseFloat(layOdd?.odds) || 0) : (parseFloat(backOdd?.odds) || 0);
           } else {
             currentOdds = betType === "lay" ? (parseFloat(currentItem.l) || 0) : (parseFloat(currentItem.b) || 0);

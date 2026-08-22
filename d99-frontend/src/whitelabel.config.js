@@ -23,7 +23,7 @@ export const WHITELABEL = {
   socketUrl: "https://api.dexch247.com",
   casinoStreamUrl: "https://stream-s-43.uhdmovies.online/casino-stream",
   sportsStreamUrl: "https://stream-s-43.uhdmovies.online/sports-stream",
-  scorecardUrl: "https://scorecard22-avrkhub.tuknfalt.workers.dev",
+  scorecardUrl: "https://scorecard.daimond-api.site",
 };
 
 export default WHITELABEL;

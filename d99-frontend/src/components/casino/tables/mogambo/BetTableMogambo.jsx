@@ -1,3 +1,4 @@
+import { sessionRateToDecimal } from "../superover3/SuperOverMarkets.jsx";
 function getExp(exposures, nat) {
   if (!nat || !exposures) return null;
   return exposures[nat] ?? exposures[nat.toLowerCase()] ?? null;
@@ -36,25 +37,11 @@ function headToHeadBook(bets, names) {
   return { [names[0]]: Math.round(book[names[0]]), [names[1]]: Math.round(book[names[1]]) };
 }
 
-// "3 Card Total" is a Fancy2 line market: each bet is on a specific size/line, stored
-// as "3 Card Total <N>". The net position is the sum of per-bet spreads — lay adds
-// +N, back adds -N, scaled by stake/100. E.g. back 110 + lay 80 (stake 100 each)
-// => -110 + 80 = -30. Returns null when there are no such bets.
-function threeCardTotalBook(bets, baseName) {
-  const re = new RegExp(`^${baseName}\\s+(\\d+(?:\\.\\d+)?)$`, "i");
-  let sum = 0, any = false;
-  for (const b of bets || []) {
-    const m = String(b.selection ?? b.nat ?? "").trim().match(re);
-    if (!m) continue;
-    const size = Number(m[1]);
-    const S = Number(b.stake) || 0;
-    if (!size || !S) continue;
-    sum += (String(b.type).toLowerCase() === "lay" ? 1 : -1) * size * (S / 100);
-    any = true;
-  }
-  return any ? Math.round(sum) : null;
-}
-
+// NOTE: the "3 Card Total" book is NOT derived here. Its exposure is stored
+// server-side under "3 Card Total <line>", and useCasinoGame also maps it under
+// the bare "3 Card Total", so getExp finds it. A previous helper computed a
+// position by summing the number in the selection tag — that assumed the tag was
+// a rate; it is the LINE, so the figure was meaningless.
 export default function BetTableMogambo({ tableData = [], onBetClick, exposures = {}, bets = [] }) {
   const mogambo = tableData.find((d) => d.nat === "Mogambo");
   const dagaTeja = tableData.find((d) => d.nat === "Daga / Teja");
@@ -62,7 +49,6 @@ export default function BetTableMogambo({ tableData = [], onBetClick, exposures 
   // Per-outcome book derived from the user's round bets (backend stores only the
   // backed-side liability, which can't show the +win / -loss on both outcomes).
   const book = headToHeadBook(bets, ["Mogambo", "Daga / Teja"]);
-  const totalBook = threeCardTotalBook(bets, "3 Card Total");
 
   function renderMainRow(item, side) {
     if (!item) return null;
@@ -104,18 +90,28 @@ export default function BetTableMogambo({ tableData = [], onBetClick, exposures 
               <div className="casino-table-row">
                 <div className="casino-nation-detail">
                   <div className="casino-nation-name">{total.nat}</div>
-                  <ExpSpan value={totalBook !== null ? totalBook : getExp(exposures, total.nat)} />
+                  <ExpSpan value={getExp(exposures, total.nat)} />
                 </div>
+                {/* Fancy2 line market: `b`/`l` is the LINE (e.g. 27) and
+                    `bbhav`/`lbhav` is the RATE in bps (95 / 115). Bet at the
+                    rate-derived decimal, keep showing the line big and the rate
+                    small — same convention as Trio Session and Patti2 Total.
+                    Passing the LINE through as the price booked the bet at odds
+                    27, so a lay of 100 locked stake×26. */}
                 <div
                   className={`casino-odds-box lay${total.gstatus !== "OPEN" ? " suspended-box" : ""}`}
-                  onClick={() => total.gstatus === "OPEN" && total.l > 0 && onBetClick?.(total.l, total.nat, total, "lay")}
+                  onClick={() => total.gstatus === "OPEN" && total.l > 0 && total.lbhav > 0 && onBetClick?.(
+                    sessionRateToDecimal(total.lbhav), total.nat,
+                    { ...total, _sessionRate: true, _displayOdds: total.l }, "lay")}
                 >
                   <span className="casino-odds">{total.l || 0}</span>
                   <span className="casino-volume">{total.lbhav || ""}</span>
                 </div>
                 <div
                   className={`casino-odds-box back${total.gstatus !== "OPEN" ? " suspended-box" : ""}`}
-                  onClick={() => total.gstatus === "OPEN" && total.b > 0 && onBetClick?.(total.b, total.nat, total, "back")}
+                  onClick={() => total.gstatus === "OPEN" && total.b > 0 && total.bbhav > 0 && onBetClick?.(
+                    sessionRateToDecimal(total.bbhav), total.nat,
+                    { ...total, _sessionRate: true, _displayOdds: total.b }, "back")}
                 >
                   <span className="casino-odds">{total.b || 0}</span>
                   <span className="casino-volume">{total.bbhav || ""}</span>

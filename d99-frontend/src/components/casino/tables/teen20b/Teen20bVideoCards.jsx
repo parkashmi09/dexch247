@@ -8,9 +8,10 @@ function getCardImage(token) {
 export default function Teen20bVideoCards({ cardString = "" }) {
   const tokens = cardString.split(",").map((t) => t.trim());
 
-  // First 3 = Player A, last 3 = Player B
-  const playerACards = [0, 1, 2].map((i) => getCardImage(tokens[i]));
-  const playerBCards = [3, 4, 5].map((i) => getCardImage(tokens[i]));
+  // Cards are dealt alternately to each player —
+  // [0]=pA card1, [1]=pB card1, [2]=pA card2, [3]=pB card2, [4]=pA card3, [5]=pB card3
+  const playerACards = [0, 2, 4].map((i) => getCardImage(tokens[i]));
+  const playerBCards = [1, 3, 5].map((i) => getCardImage(tokens[i]));
 
   return (
     <div className="casino-video-cards">

@@ -2,10 +2,11 @@ import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useDispatch } from "react-redux";
 import Layout from "../../../components/layout/Layout.jsx";
 import { CasinoMobileTabs, CasinoHiddenBetTable, CasinoLoader, CasinoResultModal, CasinoMobileBetTable } from "../../../components/casino/common/tableLayout/index.jsx";
+import BetTable from "../../../components/casino/common/BetTable.jsx";
 import { FlipClock } from "../../../components/casino/tables/teen62/index.jsx";
 import BetTableOurRoulette from "../../../components/casino/tables/ourroullete/BetTableOurRoulette.jsx";
 import RatesTable from "../../../components/casino/tables/ourroullete/RatesTable.jsx";
-import { getCasinoGameDetails, getLastResults, placeCasinoBet } from "../../../apiservices/CasionApi.js";
+import { getCasinoGameDetails, getLastResults, placeCasinoBet, getMyBets, undoCasinoBet } from "../../../apiservices/CasionApi.js";
 import { CASINO_STREAM_URL } from "../../../config.js";
 import { fetchBalanceThunk } from "../../../features/user/userSlice.js";
 import toast from "react-hot-toast";
@@ -103,7 +104,14 @@ export default function OurRoulettePage() {
     return map;
   }, [gameData?.sub]);
 
-  const [selectedChip, setSelectedChip] = useState(25);
+  // No chip is selected on load, and the board will not take a bet until the
+  // player picks one. This used to default to 25 — the table minimum — which
+  // meant the very first click on the board placed a real 25 bet at a stake the
+  // player had never chosen, with no confirmation step and an "Undo Bet" button
+  // that cannot actually undo it. The chip IS the stake on this game (there is no
+  // stake box, unlike the card tables), so it has to be an explicit choice.
+  // Persists across rounds once picked — only the initial choice is required.
+  const [selectedChip, setSelectedChip] = useState(null);
   const [placedBets, setPlacedBets] = useState([]);
   const [placing, setPlacing] = useState(false);
   const [myBets, setMyBets] = useState([]);
@@ -113,10 +121,52 @@ export default function OurRoulettePage() {
 
   useEffect(() => { if (mid) setPlacedBets([]); }, [mid]);
 
+  // Poll the user's bets for the current round so the "My Bet" panel renders,
+  // mirroring what useCasinoGame does for the standard casino pages.
+  const fetchMyBets = useCallback(async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = user?.user_id || user?.id;
+      if (!userId || !mid) return;
+      const res = await getMyBets(userId, mid);
+      if (res?.success && res?.bets) {
+        setMyBets(res.bets
+          // An undone bet stays in the table as result_status 'void' for the
+          // audit trail, but it must not linger in the player's My Bet list —
+          // "undo" that leaves the bet on screen reads as though it failed.
+          .filter((bet) => String(bet.result_status || "").toLowerCase() !== "void")
+          .map((bet) => ({
+            matchedBet: bet.player_name || bet.selection || bet.nat || "",
+            odds: bet.odds || bet.urate || "0",
+            stake: bet.stake || bet.amt || "0",
+            type: (bet.type || bet.btype || "back").toLowerCase(),
+            status: String(bet.status || "").toLowerCase(),
+          })));
+      }
+    } catch { /* ignore */ }
+  }, [mid]);
+
+  useEffect(() => {
+    if (!mid) return;
+    fetchMyBets();
+    const iv = setInterval(fetchMyBets, 2000);
+    return () => clearInterval(iv);
+  }, [mid, fetchMyBets]);
+
   const handleBoardClick = useCallback(async (id) => {
-    if (!selectedChip || lt <= 0 || placing) return;
+    if (lt <= 0 || placing) return;
+    // Tell the player why nothing happened — a silent no-op reads as a broken board.
+    if (!selectedChip) { toast.error("Select a chip to set your stake"); return; }
     const item = subMap[id];
     if (!item) return;
+    // Spot out of play (its numbers are already drawn): `s` is 0 and `b` is 0.
+    // The board no longer offers these, but the feed polls every 500ms so a spot
+    // can close between render and click — without this the request goes out with
+    // odds 0 and the server 400s, surfacing as "Error placing bet".
+    if (Number(item.s) !== 1 || !(Number(item.b) > 0)) {
+      toast.error("This bet is no longer available");
+      return;
+    }
 
     setPlacing(true);
     try {
@@ -142,8 +192,36 @@ export default function OurRoulettePage() {
     finally { setPlacing(false); }
   }, [selectedChip, lt, placing, subMap, mid, dispatch]);
 
-  const handleUndo = useCallback(() => setPlacedBets((prev) => prev.slice(0, -1)), []);
-  const hasBets = placedBets.length > 0;
+  // Real undo: reverse the LAST open bet on this round server-side (refund the
+  // stake, back out its exposure, close it as void). This used to only pop a
+  // local array, which did nothing at all — the bet was already placed and the
+  // money already locked, so the button silently lied.
+  //
+  // The server refuses once betting closes for the round, which is what keeps
+  // this from being an exploit — see CasinoService.undoLastBet.
+  const [undoing, setUndoing] = useState(false);
+  const handleUndo = useCallback(async () => {
+    if (undoing || !mid) return;
+    setUndoing(true);
+    try {
+      const res = await undoCasinoBet(GAME_TYPE, mid);
+      if (res?.success) {
+        toast.success("Bet undone");
+        setPlacedBets((prev) => prev.slice(0, -1));
+        await fetchMyBets();
+        const token = localStorage.getItem("token");
+        if (token) dispatch(fetchBalanceThunk());
+      } else {
+        toast.error(res?.error || "Could not undo the bet");
+      }
+    } finally {
+      setUndoing(false);
+    }
+  }, [undoing, mid, fetchMyBets, dispatch]);
+
+  // Server truth, not the local array — so Undo still works after a refresh and
+  // greys out once there is genuinely nothing left to take back.
+  const hasBets = myBets.some((b) => b.status === "open");
   const loading = !gameData;
 
   return (
@@ -151,19 +229,7 @@ export default function OurRoulettePage() {
       variant="casino-page"
       rightSidebar={
         <div className="sidebar right-sidebar casino-right-sidebar">
-          <div className="sidebar-box my-bet-container">
-            <div className="sidebar-title"><h4>My Bet</h4></div>
-            <div className="my-bets">
-              <div className="table-responsive">
-                <table className="table">
-                  <thead><tr><th>Matched Bet</th><th className="text-end">Odds</th><th className="text-end">Stake</th></tr></thead>
-                  <tbody>{myBets.map((b, i) => (
-                    <tr key={i}><td>{b.matchedBet}</td><td className="text-end">{b.odds}</td><td className="text-end">{b.stake}</td></tr>
-                  ))}</tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+          <BetTable bets={myBets} />
           <RatesTable sub2={sub2} />
         </div>
       }
@@ -236,8 +302,8 @@ export default function OurRoulettePage() {
               </div>
               <div className="coin-btns">
                 <div>
-                  <button className="btn btn-danger" disabled={!hasBets} onClick={handleUndo}>
-                    <i className="fas fa-undo" /><span className="d-none d-md-flex">Undo Bet</span>
+                  <button className="btn btn-danger" disabled={!hasBets || undoing} onClick={handleUndo}>
+                    <i className="fas fa-undo" /><span className="d-none d-md-flex">{undoing ? "Undoing…" : "Undo Bet"}</span>
                   </button>
                   <span className="d-md-none">Undo Bet</span>
                 </div>
@@ -247,7 +313,9 @@ export default function OurRoulettePage() {
 
           <div className="casino-detail">
             <div className="casino-table">
-              <BetTableOurRoulette gameData={gameData} onBet={handleBoardClick} latestWinNumber={latestWinNumber} />
+              {/* myBets drives the chips shown on the board — server truth, so
+                  they survive a refresh and clear themselves after an undo. */}
+              <BetTableOurRoulette gameData={gameData} onBet={handleBoardClick} latestWinNumber={latestWinNumber} myBets={myBets} />
             </div>
 
             <div className="casino-last-result-title">

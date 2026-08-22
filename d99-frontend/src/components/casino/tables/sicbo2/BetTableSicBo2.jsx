@@ -31,6 +31,11 @@ export default function BetTableSicBo2({ tableData = [], onBetClick, exposures =
   const find = (name) => tableData.find((d) => d.nat === name);
   const isSus = (item) => !item || item.gstatus !== "OPEN";
 
+  // NOTE: Sic Bo deliberately shows NO per-spot book. Every spot is an
+  // independent back-only market whose only downside is the stake, and the box
+  // already prints its payout ratio — so the worst-case figure other casino
+  // tables render here adds nothing. Exposure is still recorded server-side and
+  // counted in net exposure; it is just not surfaced on the table.
   function renderBox(item, content, extraClass = "") {
     const sus = isSus(item);
     return (

@@ -107,37 +107,53 @@ export function AB4VideoCards({ cardString = "", nextCount = "0", nextSide = "Ba
   );
 }
 
+// ANDAR BAHAR 150 CARDS pays a flat 100% of the stake on a win (game rules:
+// "a winning payout of 100% of the bet amount will be given"), so the PRICE is
+// ALWAYS decimal 2.0 — it never varies by card or by side.
+//
+// The vendor feed carries no odds for this table at all. Its two child fields
+// are easy to mistake for a price, and both have been mistaken for one:
+//   child[].b → 0/1 flag, "is this side currently bettable"
+//   child[].l → how many of that rank are still left in the 156-card shoe
+//               (12 at a fresh shoe, counting down)
+//
+// So the card box and the bet price show DIFFERENT numbers, and that is correct:
+//   • printed ON the card  → `l`, the remaining count (matches the live site,
+//     which shows a different number per rank, e.g. 8 9 8 9 7 6 7 8 7 10 8 9 8)
+//   • sent as the odds     → AB4_ODDS, always 2
+// Passing `l` as the odds is what overpaid winners: a bet early in the shoe was
+// stored at odds 12 and settlement paid stake×(12−1), returning 1100 on a 100
+// bet instead of 100.
+const AB4_ODDS = 2;
+
 // Betting grid for 13 card positions
-function CardsBetBox({ boxClass, title, items, isSuspended, onBetClick, exposures = {} }) {
+function CardsBetBox({ boxClass, title, items, isSuspended, onBetClick }) {
   return (
     <div className={`${boxClass}${isSuspended ? " suspended-box" : ""}`}>
       <div className="ab-title">{title}</div>
       <div className="ab-cards">
         {items.map((item) => {
           const pos = getCardPos(item.nat);
-          const odds = parseFloat(item.l) || 0;
           const isActive = Number(item.b) > 0;
           // Show card image only when this side is active (b > 0), blank when suspended
           const imgNum = isActive ? pos : 0;
-          const canClick = !isSuspended && isActive && odds > 0;
-          const exp = exposures?.[item.nat] ?? null;
-          const expN = exp !== null ? parseFloat(exp) : NaN;
+          // Remaining count of this rank in the shoe — printed on the card, and
+          // the reason the box can be dead: at 0 the rank is exhausted and can
+          // never be drawn again, so it must not take a bet.
+          const remaining = Number(item.l) || 0;
+          const canClick = !isSuspended && isActive && remaining > 0;
 
           return (
             <div
               key={item.sid}
               className="card-odd-box"
-              onClick={canClick ? () => onBetClick?.(odds, item.nat, item, "back") : undefined}
+              onClick={canClick ? () => onBetClick?.(AB4_ODDS, item.nat, item, "back") : undefined}
               style={canClick ? { cursor: "pointer" } : undefined}
             >
-              <div className="casino-odds">{odds}</div>
+              {/* the shoe count, NOT the price — see AB4_ODDS above */}
+              <div className="casino-odds">{remaining}</div>
               <div className={isSuspended ? "" : ""}>
                 <img src={`${AB_CARD_BASE}${imgNum}.jpg`} alt={item.nat} />
-              </div>
-              <div className="casino-nation-book">
-                {!isNaN(expN) && expN !== 0 && (
-                  <span className={expN >= 0 ? "text-success" : "text-danger"}>{expN}</span>
-                )}
               </div>
             </div>
           );
@@ -147,7 +163,9 @@ function CardsBetBox({ boxClass, title, items, isSuspended, onBetClick, exposure
   );
 }
 
-export default function BetTableAB4({ gameData, onBetClick, exposures = {} }) {
+// `exposures` is deliberately NOT accepted/rendered: this table shows no
+// worst-case book under the cards. AB4Page still passes the prop; it is ignored.
+export default function BetTableAB4({ gameData, onBetClick }) {
   const child = gameData?.data?.data?.child || gameData?.data?.child || gameData?.child || [];
   const sub = gameData?.data?.data?.sub || gameData?.data?.sub || gameData?.sub || [];
   const card = gameData?.data?.data?.card || gameData?.data?.card || gameData?.card || "";
@@ -180,7 +198,6 @@ export default function BetTableAB4({ gameData, onBetClick, exposures = {} }) {
           items={andarItems}
           isSuspended={andarSusp}
           onBetClick={onBetClick}
-          exposures={exposures}
         />
         <CardsBetBox
           boxClass="bahar-box"
@@ -188,7 +205,6 @@ export default function BetTableAB4({ gameData, onBetClick, exposures = {} }) {
           items={baharItems}
           isSuspended={baharSusp}
           onBetClick={onBetClick}
-          exposures={exposures}
         />
       </div>
     </div>

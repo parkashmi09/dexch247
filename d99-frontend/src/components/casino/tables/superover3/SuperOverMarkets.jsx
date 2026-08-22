@@ -9,6 +9,31 @@ function isOddsEmpty(v) {
 }
 
 // ---------------------------------------------------------------------------
+// Session ("Fancy") lines price differently to every other market here.
+//
+// A Fancy section quotes a RUN LINE plus a RATE, not a decimal price:
+//   odds → the line, e.g. 12 runs   (this is NOT a price)
+//   size → the rate in bps, e.g. 75 back / 85 lay
+// Same convention the reports side already documents — see
+// d99-server/controller/admin/reportsController.js → computeProfit CASE 2:
+// "`size` is the rate in bps; `odds` is NOT a decimal. profit = stake × size/100".
+//
+// Passing the LINE through as the price is what broke the P/L: a 100 stake was
+// booked at odds 12, so placement locked stake×(12−1) = 1100 on a lay and
+// settlement paid 1100 on a winning back, instead of the 75 the rate quotes.
+//
+// Converting to a decimal keeps the whole existing back/lay pipeline correct
+// without special-casing settlement — stake×(decimal−1) == stake×rate/100:
+//   back wins  → +stake × rate/100      lay loses → −stake × rate/100
+//   lay  wins  → +stake                 back loses → −stake
+// Mirrors how Trio Session and Patti2 Total already convert bhav in
+// hooks/useCasinoGame.js (decimal = bhav/100 + 1).
+export function sessionRateToDecimal(rate) {
+  const r = Number(rate) || 0;
+  return r > 0 ? r / 100 + 1 : 0;
+}
+
+// ---------------------------------------------------------------------------
 // Book display
 // The per-runner book (profit under the backed runner, worst-case exposure under
 // the others; fancy/session worst case) is computed and stored SERVER-SIDE at
@@ -105,7 +130,11 @@ function TieMarket({ item, onBet, exposures }) {
       <div className="market-body " data-title="OPEN">
         <div className="row row10">
           <div className="col-md-12">
-            <div className="fancy-market " data-title="ACTIVE">
+            {/* Was hardcoded `data-title="ACTIVE"` with no suspended class, so a
+                suspended Tie never drew the SUSPENDED overlay (.suspended-row::after
+                renders attr(data-title)) — the odds just blanked to "-" with no
+                lock. Matches Fancy / Fancy1 / Bookmaker now. */}
+            <div className={`fancy-market${suspended ? " suspended-row" : " "}`} data-title={suspended ? "SUSPENDED" : "ACTIVE"}>
               <div className="market-row">
                 <div className="market-nation-detail">
                   <span className="market-nation-name">Tie</span>
@@ -246,13 +275,19 @@ function FancyMarket({ market, onBet, exposures }) {
                       <NationBook value={exp} />
                     </div>
                   </div>
+                  {/* Bet at the RATE converted to a decimal; keep showing the
+                      LINE big and the rate small, which is what the site shows. */}
                   <div className="market-odd-box lay "
-                    onClick={() => !isOddsEmpty(layVal) && !suspended && onBet?.(layVal, sec.nat, { ...sec, _marketName: "Fancy" }, "lay")}>
+                    onClick={() => !isOddsEmpty(layVal) && !isOddsEmpty(laySize) && !suspended && onBet?.(
+                      sessionRateToDecimal(laySize), sec.nat,
+                      { ...sec, _marketName: "Fancy", _sessionRate: true, _displayOdds: layVal }, "lay")}>
                     <span className="market-odd">{isOddsEmpty(layVal) || suspended ? "-" : layVal}</span>
                     {!isOddsEmpty(layVal) && !suspended && <span className="market-volume">{formatAmount(laySize)}</span>}
                   </div>
                   <div className="market-odd-box back "
-                    onClick={() => !isOddsEmpty(backVal) && !suspended && onBet?.(backVal, sec.nat, { ...sec, _marketName: "Fancy" }, "back")}>
+                    onClick={() => !isOddsEmpty(backVal) && !isOddsEmpty(backSize) && !suspended && onBet?.(
+                      sessionRateToDecimal(backSize), sec.nat,
+                      { ...sec, _marketName: "Fancy", _sessionRate: true, _displayOdds: backVal }, "back")}>
                     <span className="market-odd">{isOddsEmpty(backVal) || suspended ? "-" : backVal}</span>
                     {!isOddsEmpty(backVal) && !suspended && <span className="market-volume">{formatAmount(backSize)}</span>}
                   </div>

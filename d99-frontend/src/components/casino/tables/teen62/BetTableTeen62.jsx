@@ -5,15 +5,19 @@
  * - Odd/Even × 6 cards (subtype=oddeven, each card has odds[] with Odd/Even)
  */
 
+// Main and Consecutive both use the runner names "Player A" / "Player B", so
+// their books MUST be looked up under different keys. The server namespaces the
+// Consecutive row as "<runner> Consecutive" (CasinoService.placeBet), leaving the
+// bare runner name for Main — which is itself a two-way book across both players.
+//
+// The Consecutive lookup deliberately does NOT fall back to the bare name. It
+// used to (and searched for a " con" suffix the server never writes), so the
+// Consecutive row displayed the MAIN market's figure — which is why a bet on one
+// showed the same worst-case number under both.
 function getExposure(exposures, nat, subtype) {
   if (!nat || !exposures) return null;
-  // For con subtype, try "Player A con" first, then fall back to "Player A"
-  const suffix = subtype === "con" ? " con" : "";
-  const withSuffix = nat + suffix;
-  const keys = [
-    withSuffix, withSuffix.toLowerCase(),
-    nat, nat.toLowerCase(), nat.trim(), nat.toLowerCase().trim(),
-  ];
+  const base = subtype === "con" ? `${nat} Consecutive` : nat;
+  const keys = [base, base.toLowerCase(), base.trim(), base.toLowerCase().trim()];
   for (const k of keys) {
     if (exposures[k] !== undefined) return exposures[k];
   }

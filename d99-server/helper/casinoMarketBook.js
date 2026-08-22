@@ -170,6 +170,197 @@ const TEEN32_MARKETS = [
   { key: "main", runners: ["Player A", "Player B"] },
 ];
 
+// teen33 — INSTANT TEENPATTI 3.0. ONLY the main Player A / Player B market books
+// (back AND lay): exactly one player wins (settlementCasinoWorker.resolveTeen33
+// matches the selection against t1.winnat, which is only ever "Player A" /
+// "Player B"), so the backed player shows the profit and the other the worst-case
+// loss — the exchange book — instead of the legacy single −stake row that put a
+// figure only under the placed player and nothing under its opponent. Back A →
+// A:+stake*(odds−1), B:−stake; lay A is the inverse (A:−stake*(odds−1), B:+stake).
+// The Player B Under 21 / Over 21 side bets are back-only, settle independently
+// and don't match these runner names, so they stay OUT of the book on the legacy
+// single-row path (one worst-case figure under the backed selection).
+const TEEN33_MARKETS = [
+  { key: "main", runners: ["Player A", "Player B"] },
+];
+
+// teen42 — JACK TOP OPEN TEENPATTI. ONLY the main Player A / Player B market
+// books (back AND lay): exactly one player wins — settlement routes teen42 to
+// resolveTeen41, which matches the selection against t1.winnat, and the feed only
+// ever returns "Player A" / "Player B" there. So the backed player shows the
+// profit and the other the worst-case loss — the exchange book — instead of the
+// legacy single row that put one figure under the placed player and nothing under
+// its opponent. Back A → A:+stake*(odds−1), B:−stake; lay A is the inverse
+// (A:−stake*(odds−1), B:+stake). The Player B Under 21 / Over 21 side bets are
+// back-only, settle independently off rdesc, and don't match these runner names,
+// so they stay OUT of the book on the legacy single-row path.
+const TEEN42_MARKETS = [
+  { key: "main", runners: ["Player A", "Player B"] },
+];
+
+// teen41 — QUEEN TOP OPEN TEENPATTI. Same shape as teen42 above (they share
+// resolveTeen41 and BetTableTeen41): ONLY the main Player A / Player B market
+// books (back AND lay), exactly one player wins via t1.winnat, so the backed
+// player shows the profit and the other the worst-case loss. Back A →
+// A:+stake*(odds−1), B:−stake; lay A is the inverse. The Player B Under 21 /
+// Over 21 side bets stay OUT on the legacy single-row path.
+const TEEN41_MARKETS = [
+  { key: "main", runners: ["Player A", "Player B"] },
+];
+
+// lucky15 — LUCKY 15. ONE six-way market: what the next ball produces. Exactly
+// one outcome lands — resolveLucky15 parses t1.rdesc/winnat ("4 Run") down to a
+// single key and matches it against the selection, with the valid set being
+// exactly these six nats — so the backed runner shows the profit and the other
+// five each show the worst-case loss (−stake), the exchange book, instead of the
+// legacy single row under the backed runner alone. Back "6 Runs" →
+// 6 Runs:+stake*(odds−1), every other runner:−stake.
+//
+// Names are the feed's exact `nat`s: note the runners are plural ("4 Runs")
+// while the RESULT comes back singular ("4 Run"). That mismatch is already
+// handled inside resolveLucky15 (it extracts the digit), and it never reaches
+// here — findCasinoMarket matches the SELECTION, which is the feed nat.
+//
+// The table is back-only (`l` is 0 on every runner), so the lay branch of
+// calculateCasinoBook is unreachable in practice; it stays correct regardless.
+const LUCKY15_MARKETS = [
+  {
+    key: "main",
+    runners: ["0 Runs", "1 Runs", "2 Runs", "4 Runs", "6 Runs", "Wicket"],
+  },
+];
+
+// btable2 — BOLLYWOOD CASINO 2. Same six-movie main market as btable and the
+// same settlement shape: resolveBtable2 parses the movie out of rdesc and exactly
+// one wins, so the backed movie shows the profit and the other five each show the
+// worst-case loss (−stake) — the exchange book — instead of the legacy single row
+// under the backed movie alone. Back Don → Don:+stake*(odds−1), others:−stake;
+// lay is the inverse.
+//
+// NOT shared with BTABLE_MARKETS on purpose: the two feeds disagree on casing —
+// btable sends "Kis Kis Ko Pyaar Karoon", btable2 sends "Kis Kis ko Pyaar
+// Karoon". findCasinoMarket normalizes so either would MATCH, but
+// calculateCasinoBook writes the row under the REGISTRY's spelling, which would
+// then differ from the nat BetTableBtable2 looks up. It only survives today via
+// that component's .toLowerCase() fallback; storing the feed's exact nat removes
+// the dependency.
+//
+// The Odd / Red / Black / Card / Dulha Dulhan / Barati side markets settle
+// independently and stay OUT of the registry, keeping the legacy single-row path.
+const BTABLE2_MARKETS = [
+  {
+    key: "main",
+    runners: [
+      "Don",
+      "Amar Akbar Anthony",
+      "Sahib Bibi Aur Ghulam",
+      "Dharam Veer",
+      "Kis Kis ko Pyaar Karoon",
+      "Ghulam",
+    ],
+  },
+];
+
+// joker1 — UNLIMITED JOKER ONE DAY. A single two-way market: Player A vs Player
+// B. Exactly one wins — resolveJoker1 reads the winner out of t1.rdesc ("Player
+// A" / "Player B") and matches it against the selection, rejecting anything else
+// — so the backed player shows the profit and the other the worst-case loss (the
+// exchange book), instead of the legacy single row that put one figure under the
+// backed player and nothing under the opponent. Back A → A:+stake*(odds−1),
+// B:−stake; lay is the inverse. The feed offers back only (`l` is 0 on both
+// runners), so the lay branch is unreachable in practice but stays correct.
+const JOKER1_MARKETS = [
+  { key: "main", runners: ["Player A", "Player B"] },
+];
+
+// race2 — RACE TO 2ND. ONE four-way market: which player reaches 2nd place.
+// Exactly one wins — resolveRace2 matches the selection against t1.winnat /
+// rdesc and accepts only these four nats — so the backed player shows the profit
+// and the other three each show the worst-case loss (−stake), the exchange book,
+// instead of the legacy single row under the backed player alone. Back A →
+// A:+stake*(odds−1), B/C/D:−stake; lay A is the inverse (A:−stake*(odds−1), the
+// other three +stake). Both back and lay are quoted on every runner.
+const RACE2_MARKETS = [
+  { key: "main", runners: ["Player A", "Player B", "Player C", "Player D"] },
+];
+
+// teen3 — INSTANT TEENPATTI (the plain one; teen32 is "Instant Teenpatti 2.0"
+// and teen33 is "3.0" — three separate tables with near-identical names, all
+// booked here). A two-way Player A vs Player B market: exactly one wins, since
+// teen3 settles through resolveTeen33, which matches the selection against
+// t1.winnat and accepts nothing else. Backing A books A:+stake*(odds−1) and
+// B:−stake; lay is the inverse — so the backed player shows the profit and the
+// other the worst-case loss, instead of the legacy single row that put one
+// figure under the backed player and left the opponent blank.
+const TEEN3_MARKETS = [
+  { key: "main", runners: ["Player A", "Player B"] },
+];
+
+// poison — TEENPATTI POISON ONE DAY. FOUR independent markets on one table, the
+// feed separating them by `subtype` (poison / poisono / poisonr / poisonc) and
+// the result carrying one outcome for each:
+//   rdesc = "Player A#Odd#Red#Diamond"
+// Verified over 10 consecutive rounds that every result has exactly these four
+// parts and always names exactly one runner per market — no ties, no extra
+// values — so each group is a clean book on its own.
+//
+// Registering them as SEPARATE keys matters: each gets its own game_type, so net
+// exposure takes the worst case WITHIN a market and then SUMS across the four.
+// That is right here because the markets settle independently — a punter can
+// lose the winner, the odd/even, the colour and the suit all in the same round,
+// and one combined worst-case figure would badly under-state that liability.
+//
+// Runner names are the feed's exact `nat`s, including the "Poison " prefix —
+// that is what gets stored as `selection` and what BetTablePoison looks up.
+// (resolvePoison strips the prefix before matching rdesc; that is its own
+// business and does not reach here.)
+//
+// The table is back-only (`l` is 0 on every runner), so the lay branch of
+// calculateCasinoBook is unreachable in practice; it stays correct regardless.
+const POISON_MARKETS = [
+  { key: "main", runners: ["Player A", "Player B"] },
+  { key: "oddeven", runners: ["Poison Even", "Poison Odd"] },
+  { key: "colour", runners: ["Poison Red", "Poison Black"] },
+  {
+    key: "suit",
+    runners: ["Poison Spade", "Poison Heart", "Poison Diamond", "Poison Club"],
+  },
+];
+
+// dolidana — DOLI DANA. A two-dice table with 25 runners in six groups, the feed
+// separating them by `subtype` and the result naming one outcome per group:
+//   rdesc = "Player B#No#-#8#Even#Greater than 7"
+//            winner  anypair pair sum oddeven lucky7
+//
+// FOUR of the six are booked, and the choice is deliberate. A group may only be
+// booked when its runners are EXHAUSTIVE — some runner always wins — because the
+// wallet lock is the MIN across the rows. If an outcome exists that is not a
+// runner, every row can be positive while the punter still loses, and the lock
+// silently under-states the risk:
+//   ✅ main     Player A / Player B — rdesc part 0 always names exactly one
+//   ✅ sumtotal Sum Total 2…12 — every possible two-dice sum, so one always lands
+//   ✅ oddeven  Odd / Even — a sum is always one or the other
+//   ✅ lucky7   Lucky 7 / Greater than 7 / Less than 7 — =7, >7, <7 is exhaustive
+//
+//   ❌ sumpair  1-1 … 6-6 Pair is NOT exhaustive: "no pair" is a real outcome with
+//      no runner. Backing all six would book min(row) = −stake and lock that,
+//      while a non-pair roll actually loses 6 × stake. Stays on the legacy path.
+//   ❌ anypair  a single YES/NO runner with no complement on the table — the
+//      legacy single row already shows the one figure it can.
+const DOLIDANA_MARKETS = [
+  { key: "main", runners: ["Player A", "Player B"] },
+  {
+    key: "sumtotal",
+    runners: [
+      "Sum Total 2", "Sum Total 3", "Sum Total 4", "Sum Total 5",
+      "Sum Total 6", "Sum Total 7", "Sum Total 8", "Sum Total 9",
+      "Sum Total 10", "Sum Total 11", "Sum Total 12",
+    ],
+  },
+  { key: "oddeven", runners: ["Odd", "Even"] },
+  { key: "lucky7", runners: ["Lucky 7", "Greater than 7", "Less than 7"] },
+];
+
 const MARKETS = {
   aaa: AAA_MARKETS,
   aaa2: AAA_MARKETS,
@@ -179,11 +370,25 @@ const MARKETS = {
   queen: QUEEN_MARKETS,
   teen6: TEEN6_MARKETS,
   btable: BTABLE_MARKETS,
+  btable2: BTABLE2_MARKETS,
   card32: CARD32_MARKETS,
   card32eu: CARD32_MARKETS,
   poker: POKER_MARKETS,
   teen9: TEEN9_MARKETS,
   teen32: TEEN32_MARKETS,
+  teen33: TEEN33_MARKETS,
+  dolidana: DOLIDANA_MARKETS,
+  poison: POISON_MARKETS,
+  race2: RACE2_MARKETS,
+  teen3: TEEN3_MARKETS,
+  joker1: JOKER1_MARKETS,
+  // joker120 — UNLIMITED JOKER 20-20. Same Player A vs Player B game as joker1
+  // in the 20-20 format: it shares resolveJoker1 for settlement and
+  // BetTableJoker1 for its table, so the same two-runner book applies.
+  joker120: JOKER1_MARKETS,
+  lucky15: LUCKY15_MARKETS,
+  teen41: TEEN41_MARKETS,
+  teen42: TEEN42_MARKETS,
 };
 
 const norm = (s) => String(s ?? "").trim().toLowerCase();

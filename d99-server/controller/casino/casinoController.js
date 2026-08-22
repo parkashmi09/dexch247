@@ -127,7 +127,8 @@ const CasinoController = {
     }
     ,
     placeBet: async (req, res) => {
-    const {
+    // `let`, not `const`: ab4's price is pinned server-side below.
+    let {
         userId,
         player_name,
         gameId,
@@ -158,6 +159,22 @@ const CasinoController = {
             error: "userId, gameId, amount, odds, and selection are required"
         });
     }
+    // ANDAR BAHAR 50 / 150 CARDS (ab3 / ab4) have a FIXED price: the rules pay
+    // "100% of the bet amount" on a win, i.e. decimal 2.0, on every card and both
+    // sides. Confirmed against the live feed — sub[0].b reads 2 while the market
+    // is OPEN on both games.
+    //
+    // The per-card `child` entries carry no price at all: child[].b is a 0/1
+    // "this side is bettable" flag and child[].l is how many of that rank are
+    // left in the shoe. Both tables used to send one of those as the odds:
+    //   ab4 sent `l`  → a win early in the shoe paid stake×(12−1) = 1100 on 100
+    //   ab3 sent `b`  → every win paid stake×(1−1) = 0 profit
+    // Both tables now send 2; pin it here too so a cached browser cannot book a
+    // bogus price on a money market.
+    if (['ab3', 'ab4'].includes(String(gameName).toLowerCase())) {
+        odds = 2;
+    }
+
    let  exposer =0;
    let libality =0;
     // LAY liability is always stake*(odds-1). There used to be an
@@ -328,6 +345,35 @@ const CasinoController = {
     }
 }
 ,
+
+// Undo the caller's most recent open bet on a round ("Undo Bet" on Unique
+// Roulette). The user_id is taken from the AUTH TOKEN, never the body, so one
+// player cannot void another's bet. All the money rules and the still-open-round
+// check live in CasinoService.undoLastBet.
+undoBet: async (req, res) => {
+    try {
+      const { gameName, roundId, all } = req.body;
+      // Only a player account may undo, and only its own bet. An owner/staff
+      // token must not reach a player's wallet through this route.
+      if (req.user?.account?.type !== "USER") {
+        return res.status(403).json({ success: false, error: "Only a player can undo their own bet" });
+      }
+      const userId = req.user.account.id;
+
+      if (!userId) {
+        return res.status(401).json({ success: false, error: "Unauthorized" });
+      }
+      if (!gameName || roundId == null) {
+        return res.status(400).json({ success: false, error: "gameName and roundId are required" });
+      }
+
+      const result = await CasinoService.undoLastBet({ userId, gameName, roundId, all: !!all });
+      return res.status(200).json({ success: true, message: all ? "Bets cleared" : "Bet undone", data: result });
+    } catch (error) {
+      console.error("❌ undoBet error:", error.message);
+      return res.status(400).json({ success: false, error: error.message });
+    }
+  },
 
 getUserBets: async (req, res) => {
     try {

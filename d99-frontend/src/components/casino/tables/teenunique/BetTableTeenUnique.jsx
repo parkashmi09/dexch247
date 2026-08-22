@@ -26,7 +26,7 @@ function isSusp(item) {
   return !item || item.gstatus === "0" || item.gstatus === "SUSPENDED";
 }
 
-const BetTableTeenUnique = memo(function BetTableTeenUnique({ gameData, onBetClick }) {
+const BetTableTeenUnique = memo(function BetTableTeenUnique({ gameData, onBetClick, onClearSelection }) {
   const sub = gameData?.sub || gameData?.data?.data?.sub || [];
   const cardString = gameData?.card || gameData?.data?.data?.card || "";
   const cards = cardString ? cardString.split(",").map((c) => c.trim()) : [];
@@ -38,8 +38,8 @@ const BetTableTeenUnique = memo(function BetTableTeenUnique({ gameData, onBetCli
   const mid = gameData?.mid || gameData?.data?.data?.mid;
   useEffect(() => { setSelectedCards([]); }, [mid]);
 
-  const openBetModal = useCallback((selections) => {
-    if (!mainItem) return;
+  const openBetModal = useCallback((selections, keepStake = false) => {
+    if (!mainItem || !selections.length) return;
     const nat = selections.map((i) => i + 1).sort((a, b) => a - b).join("");
     // Odds/limits fall back to the standard 3-card teenpatti values when the
     // feed omits them, so the panel always opens with a valid Range/Odds.
@@ -51,21 +51,29 @@ const BetTableTeenUnique = memo(function BetTableTeenUnique({ gameData, onBetCli
       min: Number(mainItem.min) || 100,
       max: Number(mainItem.max) || 100000,
     };
-    onBetClick?.(odds, nat, betItem, "back");
+    onBetClick?.(odds, nat, betItem, "back", { keepStake });
   }, [mainItem, onBetClick]);
 
-  // Auto-open the side bet panel the moment 3 cards are picked. On desktop the
-  // mobile-only "Placebet" button is hidden, so without this there's no trigger.
-  // Keyed on the selection signature so it fires once per pick (not on every
-  // poll refresh of mainItem).
-  const selectionKey =
-    selectedCards.length === MAX_SELECTIONS
-      ? [...selectedCards].sort((a, b) => a - b).join("")
-      : "";
+  // Open the bet panel on the FIRST card picked, then keep it in step as cards 2
+  // and 3 refine the selection — so the player can start typing a stake straight
+  // away instead of waiting until all three are chosen. (It used to fire only at
+  // 3 of 3; on desktop the mobile-only "Placebet" button is hidden, so that was
+  // the sole trigger and nothing showed before then.)
+  //
+  // keepStake is set from the second pick onwards: the panel is already open and
+  // this is the same bet being refined, so a stake already typed must survive.
+  // The bet itself still needs all three — the slip's submit stays disabled until
+  // then (see submitDisabled in TeenUniquePage), because settlement requires
+  // exactly three positions and would reject a partial selection.
+  //
+  // Keyed on the selection signature so it fires once per pick, not on every
+  // 500ms poll refresh of mainItem.
+  const selectionKey = [...selectedCards].sort((a, b) => a - b).join("");
   const openRef = useRef(openBetModal);
   openRef.current = openBetModal;
   useEffect(() => {
-    if (selectionKey) openRef.current(selectedCards);
+    if (!selectionKey) return;
+    openRef.current(selectedCards, selectionKey.length > 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectionKey]);
 
@@ -77,7 +85,12 @@ const BetTableTeenUnique = memo(function BetTableTeenUnique({ gameData, onBetCli
     });
   }, []);
 
-  const handleReset = useCallback(() => { setSelectedCards([]); }, []);
+  // Clearing the picks must also close the slip — it is now open from the first
+  // card, so leaving it up with no selection behind it would be stale.
+  const handleReset = useCallback(() => {
+    setSelectedCards([]);
+    onClearSelection?.();
+  }, [onClearSelection]);
 
   return (
     <>

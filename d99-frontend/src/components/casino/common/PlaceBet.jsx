@@ -32,6 +32,11 @@ export default function PlaceBet({
   gameType,
   lotteryBall,
   jokerCardSrc,
+  // Optional extra gate on the submit button. Unique Teenpatti opens this slip
+  // on the FIRST card picked so a stake can be entered early, but the bet needs
+  // all three, so it blocks submission until then. Defaults off — every other
+  // game is unaffected.
+  submitDisabled = false,
 }) {
   const odds = Number(betValue) || 0;
   // What the odds box shows — defaults to the bet odds, but a market may show a
@@ -144,7 +149,7 @@ export default function PlaceBet({
           )}
           <div>
             <button className="btn btn-danger me-1" onClick={() => setStakeAmount("")}>Reset</button>
-            <button className="btn btn-success" disabled={!stakeNum || placing} onClick={onSubmit}>
+            <button className="btn btn-success" disabled={!stakeNum || placing || submitDisabled} onClick={onSubmit}>
               {placing ? "..." : "Submit"}
             </button>
           </div>

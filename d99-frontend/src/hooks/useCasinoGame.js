@@ -300,7 +300,12 @@ export default function useCasinoGame(gameId, options = {}) {
   }, [gameId]);
 
   // ─── Bet click handler ───
-  const handleBetClick = useCallback((value, selection, item, type) => {
+  // opts.keepStake — leave whatever the player has already typed in the slip.
+  // Used by Unique Teenpatti, where the panel opens on the FIRST card picked and
+  // is then re-fired as cards 2 and 3 refine the same selection; without this the
+  // stake would be wiped on each further pick. Every other caller omits it and
+  // keeps the original behaviour (switching runner clears the stake).
+  const handleBetClick = useCallback((value, selection, item, type, opts = {}) => {
     if (!value) return;
     setBetValue(value);
     // Trio Session shows the line (b/l) in the slip, but bets/settles at the
@@ -314,7 +319,7 @@ export default function useCasinoGame(gameId, options = {}) {
     setSelectedSelection(item?.nat || selection);
     setSelectedBetData(item);
     setShowPlaceBet(true);
-    setStakeAmount("");
+    if (!opts.keepStake) setStakeAmount("");
   }, [gameId]);
 
   const closeBetPanel = useCallback(() => setShowPlaceBet(false), []);
@@ -335,6 +340,7 @@ export default function useCasinoGame(gameId, options = {}) {
     try {
       const selSid = selectedBetData._parentSid || selectedBetData.sid;
       const selName = selectedBetData.nat || "";
+      const selSubtype = selectedBetData.subtype;
       const originalOdds = parseFloat(betValue) || 0;
       let latestOdds = originalOdds;
       let suspended = false;
@@ -348,7 +354,15 @@ export default function useCasinoGame(gameId, options = {}) {
           const sub = gd?.data?.data?.sub || gd?.data?.sub || [];
           const lt = gd?.data?.data?.lt ?? gd?.data?.lt ?? 0;
 
-          const currentItem = sub.find((s) => s.sid === selSid) || sub.find((s) => s.nat === selName);
+          // Resolve by sid first. The nat fallback must also match subtype:
+          // teen/teen62 quote "Player A" TWICE (Main sid 1, Consecutive sid 17),
+          // so a bare nat match can land on the wrong row and report the other
+          // market's status — surfacing as "Game Suspended" on a market that is
+          // actually open.
+          const currentItem =
+            (selSid != null && sub.find((s) => s.sid === selSid)) ||
+            (selSubtype && sub.find((s) => s.nat === selName && s.subtype === selSubtype)) ||
+            sub.find((s) => s.nat === selName);
           if (!currentItem) return;
 
           const gs = (currentItem.gstatus || "").toUpperCase();
@@ -381,6 +395,15 @@ export default function useCasinoGame(gameId, options = {}) {
             // (decimal = bhav/100 + 1), NOT the b/l line. Must match how
             // BetTableTrio.handleBet priced the bet, or the monitor would overwrite
             // the stored odds with the raw b/l line (~21) and overpay settlement.
+            const bhav = betTypeRef.current === "lay"
+              ? parseFloat(currentItem.lbhav)
+              : parseFloat(currentItem.bbhav);
+            currentOdds = bhav > 0 ? bhav / 100 + 1 : 0;
+          } else if (gameId === "mogambo" && currentItem.subtype === "total") {
+            // Mogambo "3 Card Total" (Fancy2): same shape as Trio/Patti2 — the
+            // price is bbhav/lbhav as profit-per-100 (decimal = bhav/100 + 1),
+            // NOT the b/l line. Re-reading b/l here would overwrite the decimal
+            // with the line (e.g. 27) and settle at stake x 26.
             const bhav = betTypeRef.current === "lay"
               ? parseFloat(currentItem.lbhav)
               : parseFloat(currentItem.bbhav);
@@ -433,9 +456,14 @@ export default function useCasinoGame(gameId, options = {}) {
       // so other games' selection formats are untouched.
       let selectionName = selectedBetData.nat || "";
       if (gameId === "mogambo" && selectedBetData.subtype === "total") {
-        const lineSize = betType === "lay" ? selectedBetData.lbhav : selectedBetData.bbhav;
-        if (lineSize != null && lineSize !== "") {
-          selectionName = `${selectionName} ${lineSize}`.trim();
+        // Tag the bet with the LINE it was struck at ("3 Card Total 27") — that
+        // is what settlement compares the dealt total against. It used to read
+        // bbhav/lbhav, which are the RATES (95 / 115), so the tag carried a
+        // number the 3-card total can never reach (max 39) and every back lost
+        // while every lay won. The line lives in b/l.
+        const line = betType === "lay" ? selectedBetData.l : selectedBetData.b;
+        if (line != null && line !== "") {
+          selectionName = `${selectionName} ${line}`.trim();
         }
       }
       // Lottery (lottcard): the player picks a number under Single/Double/Triple.

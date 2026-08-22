@@ -38,7 +38,42 @@ function getColor(n) {
   return RED.has(n) ? "red" : "black";
 }
 
-const BetTableOurRoulette = memo(function BetTableOurRoulette({ gameData, onBet, latestWinNumber = -1 }) {
+function chipLabel(n) {
+  if (n >= 100000) return `${n / 100000}L`;
+  if (n >= 1000) return `${Math.round((n / 1000) * 10) / 10}K`;
+  return String(n);
+}
+
+// Colour tiers mirror the denomination selector in OurRoulettePage.
+function chipColor(n) {
+  if (n >= 1000) return "#aa66cc";
+  if (n >= 200) return "#99cc00";
+  return "#00ddff";
+}
+
+/** A chip sitting on a board spot — same markup as the denomination chips, so
+ *  the existing .board-cell-in .casino-coin .bet-chip-holder sizing applies. */
+function PlacedChip({ amount }) {
+  return (
+    <div className="casino-coin">
+      <div className="bet-chip-holder" style={{ "--g-chip-inner-color": chipColor(amount) }}>
+        <div className="bet-chip">
+          <div className="bet-chip-front" />
+          <div className="bet-chip-top" />
+          <div className="bet-chip-amount">
+            <svg className="bet-chip-amount-in" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 108 108">
+              <text x="50%" y="53.5%" dominantBaseline="middle" textAnchor="middle" fill="#fff" fontSize="32" fontWeight="700">
+                {chipLabel(amount)}
+              </text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const BetTableOurRoulette = memo(function BetTableOurRoulette({ gameData, onBet, latestWinNumber = -1, myBets = [] }) {
   const lt = gameData?.lt ?? 0;
   const sub = gameData?.sub;
   const mid = gameData?.mid ?? "";
@@ -49,6 +84,24 @@ const BetTableOurRoulette = memo(function BetTableOurRoulette({ gameData, onBet,
     return map;
   }, [sub]);
 
+  // Total staked per board spot, so a placed bet actually shows up as a chip on
+  // the table. Derived from myBets (the server's own list for this round) rather
+  // than a local array, so the chips survive a page refresh and disappear by
+  // themselves when a bet is undone — the 2s My Bet poll is the single source of
+  // truth. The feed's `n` (spot name, e.g. "0", "20,21", "3rd Column") maps back
+  // to the board id `i`.
+  const stakeBySpot = useMemo(() => {
+    const idByName = {};
+    (sub || []).forEach((item) => { if (item?.n != null) idByName[String(item.n)] = item.i; });
+    const totals = {};
+    myBets.forEach((b) => {
+      const id = idByName[String(b.matchedBet ?? "").trim()];
+      if (id == null) return;
+      totals[id] = (totals[id] || 0) + (parseFloat(b.stake) || 0);
+    });
+    return totals;
+  }, [sub, myBets]);
+
   const winnerStraightId = useMemo(() => {
     if (lt > 0) return -1;
     if (latestWinNumber >= 0 && latestWinNumber <= 36) return latestWinNumber + 1;
@@ -58,11 +111,36 @@ const BetTableOurRoulette = memo(function BetTableOurRoulette({ gameData, onBet,
     return -1;
   }, [lt, latestWinNumber, statusMap]);
 
-  const isCellSuspended = (straightId) => lt > 0 ? false : straightId !== winnerStraightId;
+  // Per-SPOT availability. Unique Roulette deals cards out of the deck, so a spot
+  // closes the moment its numbers are gone: the feed flags that per entry with
+  // `s` (1 = still in the deck, 0 = drawn) and zeroes `b`. Only ~11 of the 146
+  // spots are typically live late in a round.
+  //
+  // This gate used to be missing entirely: while betting was open (lt > 0) NO
+  // cell was ever marked suspended, so every drawn number stayed clickable. The
+  // click then sent odds 0, which the server rejects outright
+  // (controller/casino/casinoController.js validates `!odds`), returning HTTP 400
+  // — and placeCasinoBet throws on non-2xx, so the page's catch fired the generic
+  // "Error placing bet" toast. Verified live: a spot with s:0 → HTTP 400.
+  //
+  // Checked per chip-area id, NOT per cell: one number cell hosts up to four
+  // separate spots (split-left, straight, corner, split-top), each with its own
+  // `s`/`b`.
+  const isAvailable = (id) => {
+    const it = statusMap[id];
+    return !!it && Number(it.s) === 1 && Number(it.b) > 0;
+  };
+
+  const isCellSuspended = (straightId) => lt > 0 ? !isAvailable(straightId) : straightId !== winnerStraightId;
   const isOutsideSuspended = lt <= 0;
+  const isOutsideCellSuspended = (id) => isOutsideSuspended || !isAvailable(id);
   const isWinner = (straightId) => lt <= 0 && straightId === winnerStraightId;
 
-  const click = (id) => onBet?.(id);
+  // Never emit a bet for a spot that is out of play — the server would 400 it.
+  const click = (id) => { if (lt > 0 && isAvailable(id)) onBet?.(id); };
+  const chipProps = (id) => (lt > 0 && isAvailable(id)
+    ? { onClick: () => click(id), style: { cursor: "pointer" } }
+    : { style: { pointerEvents: "none" } });
 
   // Get rate for outside bets from sub item
   const getRate = (id) => {
@@ -71,19 +149,17 @@ const BetTableOurRoulette = memo(function BetTableOurRoulette({ gameData, onBet,
     return item.b || 0;
   };
 
-  const osc = isOutsideSuspended ? " suspended-box" : "";
-
   return (
     <div className="roulette-box-container">
       <div className="board-in">
         <div className="board-right">
           {RIGHT_BETS.map((bet) => (
-            <div key={bet.id} className={`board-cell yellow${osc}`}>
+            <div key={bet.id} className={`board-cell yellow${isOutsideCellSuspended(bet.id) ? " suspended-box" : ""}`}>
               <div className="board-cell-in">
                 <span className="board-text">{bet.label}</span>
                 {!isOutsideSuspended && <span className="rate"><b>{getRate(bet.id)}</b></span>}
                 {isOutsideSuspended && "0"}
-                <div id={String(bet.id)} className="bet-chip-area center-center coin-place" onClick={() => click(bet.id)} />
+                <div id={String(bet.id)} className="bet-chip-area center-center coin-place" {...chipProps(bet.id)}>{stakeBySpot[bet.id] > 0 && <PlacedChip amount={stakeBySpot[bet.id]} />}</div>
               </div>
             </div>
           ))}
@@ -91,12 +167,12 @@ const BetTableOurRoulette = memo(function BetTableOurRoulette({ gameData, onBet,
 
         <div className="board-bottom">
           {BOTTOM_BETS.map((bet) => (
-            <div key={bet.id} className={`board-cell yellow${osc}`}>
+            <div key={bet.id} className={`board-cell yellow${isOutsideCellSuspended(bet.id) ? " suspended-box" : ""}`}>
               <div className="board-cell-in">
                 <span className="board-text">{bet.label}</span>
                 {!isOutsideSuspended && <span className="rate"><b>{getRate(bet.id)}</b></span>}
                 {isOutsideSuspended && "0"}
-                <div id={String(bet.id)} className="bet-chip-area center-center coin-place" onClick={() => click(bet.id)} />
+                <div id={String(bet.id)} className="bet-chip-area center-center coin-place" {...chipProps(bet.id)}>{stakeBySpot[bet.id] > 0 && <PlacedChip amount={stakeBySpot[bet.id]} />}</div>
               </div>
             </div>
           ))}
@@ -116,7 +192,7 @@ const BetTableOurRoulette = memo(function BetTableOurRoulette({ gameData, onBet,
                 <div key={num} className={cls}>
                   <div className="board-cell-in">
                     <span key={spanKey} className={numCls}>0</span>
-                    <div id="1" className="bet-chip-area center-center coin-place" onClick={() => click(1)} />
+                    <div id="1" className="bet-chip-area center-center coin-place" {...chipProps(1)}>{stakeBySpot[1] > 0 && <PlacedChip amount={stakeBySpot[1]} />}</div>
                   </div>
                 </div>
               );
@@ -126,10 +202,10 @@ const BetTableOurRoulette = memo(function BetTableOurRoulette({ gameData, onBet,
               <div key={num} className={cls}>
                 <div className="board-cell-in">
                   <span key={spanKey} className={numCls}>{num}</span>
-                  <div id={String(splitLeft)} className="bet-chip-area center-left coin-place" onClick={() => click(splitLeft)} />
-                  <div id={String(straight)} className="bet-chip-area center-center coin-place" onClick={() => click(straight)} />
-                  {corner > 0 && <div id={String(corner)} className="bet-chip-area bottom-left coin-place" onClick={() => click(corner)} />}
-                  <div id={String(splitTop)} className="bet-chip-area top-center coin-place" onClick={() => click(splitTop)} />
+                  <div id={String(splitLeft)} className="bet-chip-area center-left coin-place" {...chipProps(splitLeft)}>{stakeBySpot[splitLeft] > 0 && <PlacedChip amount={stakeBySpot[splitLeft]} />}</div>
+                  <div id={String(straight)} className="bet-chip-area center-center coin-place" {...chipProps(straight)}>{stakeBySpot[straight] > 0 && <PlacedChip amount={stakeBySpot[straight]} />}</div>
+                  {corner > 0 && <div id={String(corner)} className="bet-chip-area bottom-left coin-place" {...chipProps(corner)}>{stakeBySpot[corner] > 0 && <PlacedChip amount={stakeBySpot[corner]} />}</div>}
+                  <div id={String(splitTop)} className="bet-chip-area top-center coin-place" {...chipProps(splitTop)}>{stakeBySpot[splitTop] > 0 && <PlacedChip amount={stakeBySpot[splitTop]} />}</div>
                 </div>
               </div>
             );

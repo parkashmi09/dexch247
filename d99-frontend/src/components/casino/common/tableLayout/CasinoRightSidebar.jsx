@@ -21,6 +21,7 @@ export default function CasinoRightSidebar({
   gameType,
   lotteryBall,
   jokerCardSrc,
+  submitDisabled,
 }) {
   const [isSticky, setIsSticky] = useState(false);
   const ref = useRef(null);
@@ -54,6 +55,7 @@ export default function CasinoRightSidebar({
         gameType={gameType}
         lotteryBall={lotteryBall}
         jokerCardSrc={jokerCardSrc}
+        submitDisabled={submitDisabled}
       />
       {beforeBets}
       <BetTable bets={bets} />

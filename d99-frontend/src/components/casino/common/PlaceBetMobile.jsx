@@ -40,6 +40,11 @@ export default function PlaceBetMobile({
   gameType,
   lotteryBall,
   jokerCardSrc,
+  // Optional extra gate on the submit button. Unique Teenpatti opens this slip
+  // on the FIRST card picked so a stake can be entered early, but the bet needs
+  // all three, so it blocks submission until then. Defaults off — every other
+  // game is unaffected.
+  submitDisabled = false,
 }) {
   const isMobile = useIsMobile();
   const odds = Number(betValue) || 0;
@@ -143,7 +148,7 @@ export default function PlaceBetMobile({
             <button className="btn btn-link" onClick={() => setStakeAmount("")}>Clear</button>
             <button className="btn btn-info">Edit</button>
             <button className="btn btn-danger" onClick={() => setStakeAmount("")}>Reset</button>
-            <button className="btn btn-success" disabled={!stakeNum || placing} onClick={onSubmit}>
+            <button className="btn btn-success" disabled={!stakeNum || placing || submitDisabled} onClick={onSubmit}>
               {placing ? "..." : "Place Bet"}
             </button>
           </div>

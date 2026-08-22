@@ -261,7 +261,7 @@ export default function SuperOverPage() {
 
         <div className={mobilePanelTab === "bets" ? "d-none d-xl-block" : ""}>
           {/* Scorecard */}
-          <SuperOverScorecard team1={team1} team2={team2} cardString={card} scard={scard} ballsPerOver={6} />
+          <SuperOverScorecard team1={team1} team2={team2} cardString={card} scard={scard} markets={t2} gmid={gmid} ballsPerOver={6} />
 
           {/* Video + Balls */}
           <div className="casino-video">

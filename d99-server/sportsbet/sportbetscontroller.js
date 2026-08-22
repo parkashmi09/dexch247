@@ -16,6 +16,7 @@ import Owner from "../model/admin/Owner.js";
 import { Op, Sequelize } from "sequelize";
 import UserMatchLocks from "../model/admin/UserMatchLocks.js";
 import UserEventMarketLocks from "../model/admin/UserEventMarketLocks.js";
+import DeactivatedMatch from "../model/user/DeactivatedMatch.js";
 import BetLockService from "../services/BetLockService.js";
 import DebitLedger from "../model/user/DebitLedger.js";
 import CreditsLedger from "../model/user/CreditsLedger.js";
@@ -24,6 +25,7 @@ import UserNetExposure from "../model/user/UserNetExposure.js";
 import { emitBalanceUpdate } from "../utils/socketUtils.js";
 import { calculateUserNetExposure, syncTotalExposure } from "../helper/netExposureHelper.js";
 import CricketService from "../services/CricketService.js";
+import { verifyLiveOdds } from "./liveOddsGuard.js";
 import { isBookmakerMarket, backProfit, backProfitRate, round2 } from "../helper/marketClassify.js";
 
 // Resolve server-side min/max stake limits from the live (redis-cached) private
@@ -766,6 +768,30 @@ export const placeBet = async (req, res, options) => {
       }
     }
 
+    // ✅ checking risk-management match deactivation
+    // deactivated_matches is written by the admin risk panel (riskManagementController)
+    // but was read by NOTHING — not this path, not the frontend — so
+    // "deactivate match" was a no-op and betting continued as normal. Rows are
+    // keyed by eventid and carry status INACTIVE (blocked) / ACTIVE (restored).
+    // Lookup failure fails OPEN, matching every other feed/lock check here.
+    if (eventid) {
+      try {
+        const deactivated = await DeactivatedMatch.findOne({
+          where: { eventid: String(eventid) },
+          attributes: ['status'],
+          transaction,
+        });
+        if (deactivated && String(deactivated.status).toUpperCase() === 'INACTIVE') {
+          return res.status(403).json({
+            success: false,
+            message: 'Betting is closed on this match',
+          });
+        }
+      } catch (deactErr) {
+        console.warn('[placeBet] Deactivated-match lookup failed (non-blocking):', deactErr.message);
+      }
+    }
+
     //=============================================================================================
     // ✅ STEP 3:                   PLATFORM SPECIFIC VALIDATIONS DIAMOND99
     //=============================================================================================
@@ -956,6 +982,60 @@ export const placeBet = async (req, res, options) => {
           throw new Error('Bet Not Accept Rate Over 4.00 on Oneday and T20');
         }
       }
+    }
+
+    //=============================================================================================
+    // ✅ STEP 4.7:        LIVE ODDS GUARD — staleness, suspension, line/rate match
+    //=============================================================================================
+    // The API must not book a price just because the client sent it. This
+    // re-reads the live book and refuses the bet when:
+    //   · the feed's own last-updated stamp is older than ODDS_MAX_STALENESS_SEC
+    //     (default 5s) — the screen is frozen, so the "price" is not a price;
+    //   · the market or runner is SUSPENDED / BALL RUNNING;
+    //   · the submitted line is no longer on the ladder, or the rate attached to
+    //     that line has moved.
+    // Without this, a replayed or edited request carrying a stale-but-favourable
+    // line was accepted verbatim (past-posting). The frontend already runs these
+    // checks; the client is not a trust boundary.
+    // Fails OPEN on feed/market/runner lookup failure, exactly like STEP 4.5/4.6.
+    {
+      const guard = await verifyLiveOdds({
+        eventid, sid, match_id, mname, gtype, market_type,
+        selection_name,
+        selection_id: req.body?.selectionId ?? req.body?.sid_selection ?? null,
+        bet_type, odds, size,
+      });
+      if (!guard.ok) {
+        console.warn(`[placeBet] REJECTED by live odds guard (${guard.code}) user=${user_id} sel="${selection_name}"`, guard.detail || {});
+        throw new Error(guard.message);
+      }
+    }
+
+    //=============================================================================================
+    // ✅ STEP 4.8:              ACCOUNT-LEVEL GATES (status / bet lock / exposure)
+    //=============================================================================================
+    // users.status and users.exp_limit are writable from the admin panel but
+    // were never READ during placement: a Suspended account could keep betting,
+    // and an exposure ceiling did nothing at all.
+    //
+    // bet_locked is deliberately NOT re-checked here — STEP 2's
+    // BetLockService.isBettingAllowed() already covers it AND walks the staff
+    // hierarchy, so duplicating it would just be a second source of truth to
+    // drift. exp_limit is applied once the liability delta is known (STEP 5b);
+    // this block only loads it, so accounts without a ceiling pay no extra query.
+    let accountExpLimit = 0;
+    {
+      const acct = await User.findOne({
+        where: { user_id },
+        attributes: ['status', 'exp_limit'],
+        transaction,
+      });
+      if (!acct) throw new Error('Account not found');
+      if (acct.status && String(acct.status).toLowerCase() !== 'active') {
+        throw new Error('Account is not active');
+      }
+      const lim = Number(acct.exp_limit);
+      accountExpLimit = Number.isFinite(lim) && lim > 0 ? lim : 0;
     }
 
     //=============================================================================================
@@ -2414,6 +2494,26 @@ export const placeBet = async (req, res, options) => {
     }
 
     console.log('FINAL BALANCE CHANGE:', balanceChange, '(+deduct, -release)');
+
+    //=============================================================================================
+    // ✅ STEP 5b:               PER-USER EXPOSURE CEILING (users.exp_limit)
+    //=============================================================================================
+    // Runs only when the account actually carries a ceiling, so unlimited users
+    // pay nothing for it. calculateUserNetExposure returns the PRE-bet worst
+    // case (<= 0, hence the abs) because exposure rows are not written until
+    // STEP 6 below; the projected total is that plus the liability this bet
+    // newly blocks. A hedge that releases funds (balanceChange < 0) can only
+    // lower exposure, so it is never refused.
+    if (accountExpLimit > 0 && balanceChange > 0) {
+      const preExposure = Math.abs(await calculateUserNetExposure(user_id, transaction));
+      const projected = preExposure + balanceChange;
+      console.log(`[placeBet] Exposure ceiling: pre=${preExposure} +${balanceChange} = ${projected} limit=${accountExpLimit}`);
+      if (projected > accountExpLimit) {
+        throw new Error(
+          `Exposure limit reached — this bet would take you to ${projected.toFixed(2)} against a limit of ${accountExpLimit.toFixed(2)}`
+        );
+      }
+    }
 
     //=============================================================================================
     // ✅ STEP 6:                    UPSERT MARKET EXPOSURE OF THE USER

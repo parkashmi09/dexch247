@@ -12,6 +12,14 @@ export default function BetTableTeen41({ tableData = [], onBetClick, exposures =
   const underB = find("Player B Under 21");
   const overB = find("Player B Over 21");
 
+  // teen41/teen42 ship the Under 21 / Over 21 side market in their feed; teen33
+  // (Instant Teenpatti 3.0) shares this table but has NO side bet — its feed
+  // carries only Player A and Player B, and its rules list no side market. Without
+  // this guard teen33 rendered the row anyway as two permanently-suspended boxes
+  // with a blank name and odds 0 (renderUOBox on an undefined item), which reads
+  // as a broken/closed market rather than one that doesn't exist.
+  const hasUnderOver = !!(underB || overB);
+
   function renderRow(item, label) {
     const sus = isSus(item);
     const exp = getExp(exposures, item?.nat);
@@ -78,11 +86,13 @@ export default function BetTableTeen41({ tableData = [], onBetClick, exposures =
           </div>
           <div className="casino-table-body">
             {renderRow(playerB, "Main")}
-            {/* Under/Over row */}
-            <div className="casino-table-row under-over-row">
-              {renderUOBox(underB)}
-              {renderUOBox(overB)}
-            </div>
+            {/* Under/Over row — teen41/teen42 only; teen33 has no side market */}
+            {hasUnderOver && (
+              <div className="casino-table-row under-over-row">
+                {renderUOBox(underB)}
+                {renderUOBox(overB)}
+              </div>
+            )}
           </div>
         </div>
       </div>

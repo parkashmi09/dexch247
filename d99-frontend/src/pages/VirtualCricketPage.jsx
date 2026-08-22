@@ -10,7 +10,7 @@ import {
   sportsPlaceBet,
   getSportsScoreCard,
 } from "../apiservices/SportsApi.js";
-import { SPORTS_STREAM_URL } from "../config.js";
+import { SPORTS_STREAM_URL, SCORECARD_URL } from "../config.js";
 import { fetchBalanceThunk } from "../features/user/userSlice.js";
 import { fetchMatchedBetsThunk } from "../features/matchedBets/matchedBetsSlice.js";
 import {
@@ -242,10 +242,10 @@ export default function VirtualCricketPage() {
     // Scorecard iframe url (structured score data isn't exposed elsewhere).
     getSportsScoreCard(gmid, sid)
       .then((url) => {
-        setScoreUrl(url || `https://scorecard.avrkhub.in/?etid=${sid}&gmid=${gmid}`);
+        setScoreUrl(url || `${SCORECARD_URL}/?etid=${sid}&gmid=${gmid}`);
       })
       .catch(() => {
-        setScoreUrl(`https://scorecard.avrkhub.in/?etid=${sid}&gmid=${gmid}`);
+        setScoreUrl(`${SCORECARD_URL}/?etid=${sid}&gmid=${gmid}`);
       });
   }, [gmid, sid]);
 
