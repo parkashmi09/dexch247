@@ -121,6 +121,22 @@ export function isOddsLocked(market) {
 }
 
 /**
+ * MATCH_ODDS bettable limit depends on match state, never on the raw fields
+ * alone: pre-match (iplay false) -> umaxbof (the provider's tiny pre-match
+ * cap, e.g. 0/1); in-play -> maxb on cricket (sid 4), max on every other
+ * sport. maxb is folded into `max` so the header shows a single Max and the
+ * getStakeLimits chain picks the same number. Markets that never quote
+ * umaxbof (racing, virtual feeds) are returned untouched.
+ */
+export function applyMatchOddsLimits(market, sid) {
+  if (String(market?.mname || "").toUpperCase() !== "MATCH_ODDS") return market;
+  if (market?.umaxbof === undefined) return market;
+  const inPlayMax = Number(sid) === 4 ? market.maxb : market.max;
+  const effectiveMax = Number(market.iplay ? inPlayMax : market.umaxbof) || 0;
+  return { ...market, max: effectiveMax, maxb: 0 };
+}
+
+/**
  * Stake limits chain (spec §3.5). Note `??` cannot be used here: the feed sends
  * literal 0 for "no limit" on MATCH_ODDS runners, and 0 must fall through to the
  * next source rather than win.
